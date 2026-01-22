@@ -1,0 +1,29 @@
+using UnityEngine;
+namespace JW.SlidingPuzzle
+{
+    public class ConstData
+    {
+        //Player Stat
+        public static readonly float MOVE_LERP_SCALE = 4.0f;
+        public static readonly int PLAYER_START_HP = 5;
+        public static readonly int PLAYER_START_DMG = 1;
+        public static readonly int PLAYER_START_MOVECOUNT = 10;
+
+        public static readonly int LEVELUP_XP_OFFSET = 3;
+
+        //Enemy Stat Up Value
+        public static readonly float ENEMY_HP_POW = 1.06f;
+        public static readonly float ENEMY_DMG_POW = 1.03f;
+        public static readonly float ENEMY_XP_POW = 1.015f;
+    }
+
+    public class ConstString
+    {
+        //Animation Trigger
+        public static readonly string ONE_HAND_ATTACK_ANIM = "OneHandAttack";
+        public static readonly string TWO_HAND_ATTACK_ANIM = "TwoHandAttack";
+        public static readonly string HIT_ANIM = "Hitted";
+
+        public static readonly string PLAYER_STATE_KEY = "CharacterState";
+    }
+}
