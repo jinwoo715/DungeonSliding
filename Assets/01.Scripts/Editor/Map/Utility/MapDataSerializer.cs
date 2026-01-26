@@ -4,7 +4,7 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace JW.SlidingPuzzle
+namespace JW.DungeonSliding
 {
     public class MapDataSerializer
     {

@@ -2,7 +2,7 @@
 
 using System.Collections.Generic;
 
-namespace JW.SlidingPuzzle
+namespace JW.DungeonSliding
 {
     public struct MapDataContext
     {
@@ -10,14 +10,14 @@ namespace JW.SlidingPuzzle
         public readonly int[] TileArray;
         public readonly int XCount;
         public readonly int ZCount;
-        public readonly TilePoint PlayerPoint;
+        public readonly Tile PlayerPoint;
 
-        public readonly IReadOnlyDictionary<TilePoint, EffectObjectData> EffectObjData;
+        public readonly IReadOnlyDictionary<Tile, EffectObjectData> EffectObjData;
         public readonly IReadOnlyList<EnemyTempleteSheet> EnemyTempleteSheet;
 
         public MapDataContext
-            (string name, int[] tiles, int xCount, int zCount, TilePoint playerPoint,
-            IReadOnlyDictionary<TilePoint, EffectObjectData> effectData, IReadOnlyList<EnemyTempleteSheet> enemyTemplete
+            (string name, int[] tiles, int xCount, int zCount, Tile playerPoint,
+            IReadOnlyDictionary<Tile, EffectObjectData> effectData, IReadOnlyList<EnemyTempleteSheet> enemyTemplete
             )
         {
             MapName = name;
@@ -46,15 +46,15 @@ namespace JW.SlidingPuzzle
         private float _gridFieldX;
 
         private int[] _tileMap;
-        private TilePoint _playerPoint = new TilePoint(-1,-1);
+        private Tile _playerPoint = new Tile(-1,-1);
         private List<EnemyTempleteSheet> _enemyTempleteSheet = new List<EnemyTempleteSheet>();
-        private Dictionary<TilePoint, EffectObjectData> _effectObjData = new Dictionary<TilePoint, EffectObjectData>();
+        private Dictionary<Tile, EffectObjectData> _effectObjData = new Dictionary<Tile, EffectObjectData>();
 
         public float WindowHeight => _windowHeight;
         public float GridFieldX => _gridFieldX;
 
-        public TilePoint PlayerPoint => _playerPoint;
-        public IReadOnlyDictionary<TilePoint, EffectObjectData> EffectObjects => _effectObjData;
+        public Tile PlayerPoint => _playerPoint;
+        public IReadOnlyDictionary<Tile, EffectObjectData> EffectObjects => _effectObjData;
 
 
         public MapEditState()
@@ -80,7 +80,7 @@ namespace JW.SlidingPuzzle
             zCount = z;
             _tileMap = new int[zCount * xCount];
         }
-        public void SetTileType(TilePoint point, ETileType tileType)
+        public void SetTileType(Tile point, ETileType tileType)
         {
             _tileMap[(xCount * point.ZPos) + point.XPos] = (int)tileType;
         }
@@ -91,7 +91,7 @@ namespace JW.SlidingPuzzle
 
             return _tileMap[ToIndex(x, z)];
         }
-        public bool IsRoute(TilePoint point)
+        public bool IsRoute(Tile point)
         {
             if (_tileMap == null) return false;
             if (!IsBounds(point)) return false;
@@ -99,7 +99,7 @@ namespace JW.SlidingPuzzle
             return _tileMap[ToIndex(point)] == 1;
         }
 
-        private bool IsBounds(TilePoint p)
+        private bool IsBounds(Tile p)
         {
             return p.XPos >= 0 && p.ZPos >= 0 && p.XPos < xCount && p.ZPos < zCount;
         }
@@ -107,7 +107,7 @@ namespace JW.SlidingPuzzle
         {
             return x >= 0 && z >= 0 && x < xCount && z < zCount;
         }
-        private int ToIndex(TilePoint p)
+        private int ToIndex(Tile p)
         {
             return (xCount * p.ZPos) + p.XPos;
         }
@@ -116,7 +116,7 @@ namespace JW.SlidingPuzzle
             return (xCount * z) + x;
         }
         
-        public bool IsExistEnemy(TilePoint point) 
+        public bool IsExistEnemy(Tile point) 
         {
             for (int i = 0; i < _enemyTempleteSheet.Count; i++)
             {
@@ -135,7 +135,7 @@ namespace JW.SlidingPuzzle
 
             return _enemyTempleteSheet[templeteNum];
         }
-        public EnemySettingData GetEnemy(int templeteNum, TilePoint point)
+        public EnemySettingData GetEnemy(int templeteNum, Tile point)
         {
             if (_enemyTempleteSheet[templeteNum].EnemyData.TryGetValue(point, out EnemySettingData value))
             {
@@ -144,7 +144,7 @@ namespace JW.SlidingPuzzle
             else
                 return null;
         }
-        public void SetEnemy(int templeteNum, TilePoint point, int enemyUid)
+        public void SetEnemy(int templeteNum, Tile point, int enemyUid)
         {
             if(_enemyTempleteSheet[templeteNum].EnemyData.TryGetValue(point, out EnemySettingData data))
             {
@@ -156,7 +156,7 @@ namespace JW.SlidingPuzzle
                 _enemyTempleteSheet[templeteNum].EnemyData.Add(point, new EnemySettingData(enemyUid,point));
             }
         }
-        public void RemoveEnemy(int templeteNum, TilePoint point)
+        public void RemoveEnemy(int templeteNum, Tile point)
         {
             _enemyTempleteSheet[templeteNum].EnemyData.Remove(point);
         }
@@ -179,13 +179,13 @@ namespace JW.SlidingPuzzle
         }
 
         //Player
-        public void SetPlayerPoint(TilePoint point)
+        public void SetPlayerPoint(Tile point)
         {
             _playerPoint = point;
         }
 
         //EffectObject
-        public void RemoveEffectObject(TilePoint point)
+        public void RemoveEffectObject(Tile point)
         {
             _effectObjData.Remove(point);
         }
@@ -194,7 +194,7 @@ namespace JW.SlidingPuzzle
             _effectObjData[effectTileData.Point] = effectTileData;
         }
 
-        public bool TryGetEffectObject(TilePoint point, out EffectObjectData effectTileData)
+        public bool TryGetEffectObject(Tile point, out EffectObjectData effectTileData)
         {
             if(_effectObjData.TryGetValue(point, out EffectObjectData data))
             {
@@ -207,10 +207,10 @@ namespace JW.SlidingPuzzle
                 return false;
             }
         }
-        public int GetTeleports(out TilePoint t1, out TilePoint t2)
+        public int GetTeleports(out Tile t1, out Tile t2)
         {
-            t1 = TilePoint.Invalid;
-            t2 = TilePoint.Invalid;
+            t1 = Tile.Invalid;
+            t2 = Tile.Invalid;
 
             int teleportCount = 0;
 

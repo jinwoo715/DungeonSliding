@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace JW.SlidingPuzzle
+namespace JW.DungeonSliding
 {
     [CreateAssetMenu(fileName = "MapData", menuName = "Data/Map", order = 1)]
     public class MapData : ScriptableObject
@@ -10,7 +10,7 @@ namespace JW.SlidingPuzzle
         public int Height;
         public int[] MapTiles;
 
-        public TilePoint PlayerPosition;
+        public Tile PlayerPosition;
         public EnemyTemplete[] EnemyTemplete;
         public List<EffectObjectData> effectTileDatas;
     }
@@ -24,7 +24,7 @@ namespace JW.SlidingPuzzle
     [System.Serializable]
     public class EnemyTempleteSheet
     {
-        public Dictionary<TilePoint, EnemySettingData> EnemyData = new Dictionary<TilePoint, EnemySettingData>();
+        public Dictionary<Tile, EnemySettingData> EnemyData = new Dictionary<Tile, EnemySettingData>();
     }
 
     [System.Serializable]
@@ -41,9 +41,9 @@ namespace JW.SlidingPuzzle
     public class EnemySettingData
     {
         public int EnemyUID;
-        public TilePoint Point;
+        public Tile Point;
 
-        public EnemySettingData(int enemyUID, TilePoint point)
+        public EnemySettingData(int enemyUID, Tile point)
         {
             EnemyUID = enemyUID;
             Point = point;
@@ -54,9 +54,9 @@ namespace JW.SlidingPuzzle
     public class EffectObjectSettingData
     {
         public int EffectObjUID;
-        public TilePoint Point;
-        public TilePoint TeleportPoint;
-        public EffectObjectSettingData(int enemyUID, TilePoint point)
+        public Tile Point;
+        public Tile TeleportPoint;
+        public EffectObjectSettingData(int enemyUID, Tile point)
         {
             EffectObjUID = enemyUID;
             Point = point;

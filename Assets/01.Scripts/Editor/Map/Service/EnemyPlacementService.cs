@@ -2,11 +2,11 @@
 
 using System;
 
-namespace JW.SlidingPuzzle 
+namespace JW.DungeonSliding 
 {
     public class EnemyPlacementService
     {
-        public void ProcessEnemyPoint(MapEditState mapEditState, TilePoint point, int templeteNum, int enemyUid)
+        public void ProcessEnemyPoint(MapEditState mapEditState, Tile point, int templeteNum, int enemyUid)
         {
             if (!mapEditState.IsRoute(point)) return;
 

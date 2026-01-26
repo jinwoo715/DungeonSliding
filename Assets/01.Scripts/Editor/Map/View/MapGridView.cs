@@ -1,4 +1,4 @@
-using JW.SlidingPuzzle;
+using JW.DungeonSliding;
 using System;
 using UnityEditor;
 using UnityEngine;
@@ -87,7 +87,7 @@ public class MapGridView
     }
     private void DrawPlayerIcon()
     {
-        TilePoint playerPoint = _mapState.PlayerPoint;
+        Tile playerPoint = _mapState.PlayerPoint;
 
         if (playerPoint.XPos == -1 || playerPoint.ZPos == -1)
             return;
@@ -118,7 +118,7 @@ public class MapGridView
         }
     }
 
-    private Rect GetIconRect(TilePoint point)
+    private Rect GetIconRect(Tile point)
     {
         float iconRatio = 0.5f;
         float iconSize = _iconImageSize * iconRatio;

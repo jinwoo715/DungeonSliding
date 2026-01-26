@@ -1,0 +1,24 @@
+using UnityEngine;
+
+namespace JW.DungeonSliding
+{
+    public abstract class EffectObjectBase : MonoBehaviour, IEffectObject, ITilePosition
+    {
+        protected EffectObjectData _effectObjectData;
+
+        public EEffectObjectType EffectType => _effectObjectData.EffectObjectType;
+        public Tile TilePosition => _effectObjectData.Point;
+
+        public void Init(EffectObjectData effectObjectData)
+        {
+            _effectObjectData = effectObjectData;
+        }
+
+        public abstract MoveContext OnEnterTile(ref MoveContext moveContext);
+
+        public void SetPosition(Tile point)
+        {
+            this.transform.localPosition = point.GetPosition;
+        }
+    }
+}

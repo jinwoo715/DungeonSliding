@@ -1,6 +1,8 @@
+using JW.DungeonSliding.GamePlay.Entities;
 using UnityEngine;
 
-namespace JW.SlidingPuzzle {
+namespace JW.DungeonSliding 
+{
     public class CretureStatViewer_UI : MonoBehaviour
     {
         private Transform _targetTransform;
@@ -9,7 +11,7 @@ namespace JW.SlidingPuzzle {
         [SerializeField] private CretureStat_UI _hpUI;
         [SerializeField] private CretureStat_UI _damageUI;
 
-        public void Init(Creture target)
+        public void Init(Creature target)
         {
             _targetTransform = target.transform;
             //target.ShowChangeHPEvent += UpdateStat;

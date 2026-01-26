@@ -1,5 +1,5 @@
 using UnityEngine;
-namespace JW.SlidingPuzzle
+namespace JW.DungeonSliding
 {
     public class ConstData
     {

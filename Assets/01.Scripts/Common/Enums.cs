@@ -1,5 +1,5 @@
 
-namespace JW.SlidingPuzzle
+namespace JW.DungeonSliding
 {
     public enum EGameFlowType
     {
@@ -68,19 +68,36 @@ namespace JW.SlidingPuzzle
 
 
     //Ability
+
+    public enum EAbilityRank
+    {
+        Nomal,
+        Rare,
+        Legend
+    }
     public enum EAbilityTriggerType
     {
         Instant,
+
         EnterRoom,
+
+        BackAttack,
         Attack,
         Hitted, 
         Kill,
+
         MoveStart,
         MoveEnd,
+
         LevelUp,
+
         BattleStart,
         BattleEnd,
-        OnStepEffectTile
+
+        OnStepEffectTile,
+
+        OnDeathByHP,
+        OnDeathByMoveCount
     }
    
     public enum EDurationType
@@ -96,15 +113,51 @@ namespace JW.SlidingPuzzle
     {
         Stat,
         Rule,
-        Reward
+    }
+
+    public enum ERuleAbilityType
+    {
+        // --- 생존/방어 ---
+        Revive,              // 죽으면 1회 부활
+        RoomBarrier,         // 방 입장 시 베리어 획득
+
+        // --- 이동/기믹 ---
+        WallBound,            // 벽 앞에서 반대쪽 이동
+
+        // --- 공격/강화 ---
+        AroundEnemyBonus,    // 주변 적 비례 추가 데미지
+        DoubleAttack,        // 확률적 2번 공격
+        CounterAttack,       // 피격 시 확률 반격
+        DistanceDamageBonus, // 이동한 타일 수만큼 공격 강화
+
+        // --- 제어/위험 ---
+        EnemyBind,           // 적 움직임 1턴 속박
+        Berserker,           // 피해 2배 / 피격 2배
+
+        // --- 자원 역전 (부활과 구분 필요) ---
+        LastResortMove,      // Move 0일 때 HP 소모 회복
+        LastResortHP         // HP 0일 때 Move 소모 회복
     }
 
     public enum EPlayerStat
     {
+        None,
         HP,
+        MaxHp,
         Damage,
-        MoveCount
+        MoveCount,
+        MaxMoveCount,
+        NextAttackDamage,
+        RerollCount,
     }
+
+    public enum EApplyStatType
+    {
+        Add,
+        Multiple,
+        Ratio
+    }
+
     public enum ERuleEffect
     {
         None,

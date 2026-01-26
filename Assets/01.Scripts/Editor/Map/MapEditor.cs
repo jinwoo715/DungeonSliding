@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using UnityEditorInternal;
 using Unity.Plastic.Newtonsoft.Json;
 
-namespace JW.SlidingPuzzle
+namespace JW.DungeonSliding
 {
     public class MapEditor : EditorWindow
     {
@@ -73,7 +73,7 @@ namespace JW.SlidingPuzzle
 
             string jsonName = "EnemyData.json";
             string jsonPath = Path.Combine("00.Resources/Data/", jsonName);
-            string data = LoadAsset.GetJsonData(jsonPath);
+            string data = LoadLocalAsset.GetJsonData(jsonPath);
 
             var enemyDatas = JsonConvert.DeserializeObject<List<EnemyDataSheet>>(data);
             _enemyNames = new string[enemyDatas.Count];
@@ -284,7 +284,7 @@ namespace JW.SlidingPuzzle
 
         private void OnClickGridCell(int x, int z)
         {
-            TilePoint point = new TilePoint(x, z);
+            Tile point = new Tile(x, z);
 
             switch (_sessionState.EditMode)
             {

@@ -6,7 +6,7 @@ using System.IO;
 using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
 
-namespace JW.SlidingPuzzle
+namespace JW.DungeonSliding
 {
     public class TextureProvider : ITextureProvider
     {
@@ -19,11 +19,11 @@ namespace JW.SlidingPuzzle
         {
             string playerIconName = "Player.png";
             string path = Path.Combine("00.Resources/Sprites/", playerIconName);
-            _playerIconTexture = LoadAsset.GetSingleTexture(path);
+            _playerIconTexture = LoadLocalAsset.GetSingleTexture(path);
 
             string jsonName = "EnemyData.json";
             string jsonPath = Path.Combine("00.Resources/Data/", jsonName);
-            string data = LoadAsset.GetJsonData(jsonPath);
+            string data = LoadLocalAsset.GetJsonData(jsonPath);
 
             var enemyDatas = JsonConvert.DeserializeObject<List<EnemyDataSheet>>(data);
 
@@ -31,7 +31,7 @@ namespace JW.SlidingPuzzle
             {
                 string imageName = enemyDatas[i].EnemyName + ".png";
                 string imagePath = Path.Combine("00.Resources/Sprites/", imageName);
-                _enemyTextureDic.Add(enemyDatas[i].EnemyUID, LoadAsset.GetSingleTexture(imagePath));
+                _enemyTextureDic.Add(enemyDatas[i].EnemyUID, LoadLocalAsset.GetSingleTexture(imagePath));
             }
 
             string[] effectObjectNames = Enum.GetNames(typeof(EEffectObjectType));
@@ -40,7 +40,7 @@ namespace JW.SlidingPuzzle
             for (int i = 0; i < effectObjectNames.Length; i++)
             {
                 string effectObjPath = effectPath + effectObjectNames[i] + ".png";
-                _effectObjectTextureDic.Add((EEffectObjectType)i, LoadAsset.GetSingleTexture(effectObjPath));
+                _effectObjectTextureDic.Add((EEffectObjectType)i, LoadLocalAsset.GetSingleTexture(effectObjPath));
             }
 
             string[] tileNames = Enum.GetNames(typeof(ETileType));
@@ -49,7 +49,7 @@ namespace JW.SlidingPuzzle
             for (int i = 0; i < tileNames.Length; i++)
             {
                 string tileName = tilePath + tileNames[i] + ".png";
-                _tileTextureDic.Add((ETileType)i, LoadAsset.GetSingleTexture(tileName));
+                _tileTextureDic.Add((ETileType)i, LoadLocalAsset.GetSingleTexture(tileName));
             }
         }
 

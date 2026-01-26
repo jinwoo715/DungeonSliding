@@ -1,16 +1,16 @@
-using JW.SlidingPuzzle;
+using JW.DungeonSliding;
 
 public class PlayerPlacementService
 {
 
-    public void ProcessPlayerPoint(MapEditState mapEditState, TilePoint point)
+    public void ProcessPlayerPoint(MapEditState mapEditState, Tile point)
     {
         if (!mapEditState.IsRoute(point))
             return;
 
         if (mapEditState.PlayerPoint == point)
         {
-            mapEditState.SetPlayerPoint(new TilePoint(-1, -1));
+            mapEditState.SetPlayerPoint(new Tile(-1, -1));
             return;
         }
 

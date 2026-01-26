@@ -3,11 +3,11 @@
 using System;
 using System.Collections.Generic;
 
-namespace JW.SlidingPuzzle
+namespace JW.DungeonSliding
 {
     public class EffectObjectPlacementService
     {
-        public void ProcessEffectObject(MapEditState mapEditState, TilePoint point, EEffectObjectType effectObjIndex)
+        public void ProcessEffectObject(MapEditState mapEditState, Tile point, EEffectObjectType effectObjIndex)
         {
             if (!mapEditState.IsRoute(point))
                 return;
@@ -51,7 +51,7 @@ namespace JW.SlidingPuzzle
             }
         }
 
-        private void HandleAddTeleport(MapEditState mapEditState, TilePoint tile)
+        private void HandleAddTeleport(MapEditState mapEditState, Tile tile)
         {
             int tCount = mapEditState.GetTeleports(out var t1, out var t2);
 

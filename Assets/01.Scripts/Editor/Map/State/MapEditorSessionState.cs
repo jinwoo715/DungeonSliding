@@ -1,4 +1,4 @@
-using JW.SlidingPuzzle;
+using JW.DungeonSliding;
 public class MapEditorSessionState
 {
     public EEditModeType EditMode;
