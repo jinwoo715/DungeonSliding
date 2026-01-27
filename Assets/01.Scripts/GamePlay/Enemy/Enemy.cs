@@ -8,9 +8,12 @@ namespace JW.DungeonSliding.GamePlay.Entities
     public class Enemy : Creature
     {
         public Action<Enemy> ReturnEvent;
+        public Action<Enemy> OnDeathEvent;
 
         private EnemyData _enemyData;
         private int _rewardXp = 0;
+
+        public int Xp => _rewardXp;
         public int EnemyUID => _enemyData.EnemyUID;
 
         public void SetData(EnemyData data, int floor)
@@ -32,7 +35,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public override void OnDeath()
         {
             base.OnDeath();
-            GameSceneContext.Instance.Reward.AddReward(new RewardData(_rewardXp));
+            OnDeathEvent?.Invoke(this);
         }
         protected override DamageInfo CalculateRealAppliedDamage(DamageInfo damageInfo)
         {
@@ -69,6 +72,14 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
             int scaled = ceil ? Mathf.CeilToInt(v) : Mathf.RoundToInt(v);
             return Mathf.Max(baseValue, scaled);
+        }
+
+        public override void RegisterAttack()
+        {
+            if (_sensor.GetCombatant(TilePosition.GetNextTile(Direction), ECretureType.Player, out var target))
+            {
+                _attackRequestListener.RegisterActpair(new ActPair(this, target));
+            }
         }
     }
 }

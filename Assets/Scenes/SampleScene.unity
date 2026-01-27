@@ -1100,6 +1100,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c51dfac6b46903f4eb679329c715b54c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _resource: {fileID: 1789582352}
 --- !u!4 &844265815
 Transform:
   m_ObjectHideFlags: 0
@@ -1349,9 +1350,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1081738077}
   - component: {fileID: 1081738078}
-  - component: {fileID: 1081738079}
   m_Layer: 0
-  m_Name: GameSceneContext
+  m_Name: GameSceneBootstrapper
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1384,31 +1384,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1b27577fe68ce54ca36fb71f856577f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mapManager: {fileID: 0}
-  _player: {fileID: 0}
-  _enemyManager: {fileID: 0}
-  _battleManager: {fileID: 0}
-  _inputSystem: {fileID: 0}
---- !u!114 &1081738079
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1081738076}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b782f69d128a5ef438ed641011b53a31, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _mapManager: {fileID: 0}
-  _player: {fileID: 0}
-  _enemyManager: {fileID: 0}
-  _battleManager: {fileID: 0}
-  _inputSystem: {fileID: 0}
-  _mapDatas: []
-  _gameFlowType: 0
-  <Floor>k__BackingField: 0
+  _mapManager: {fileID: 1852003851}
+  _player: {fileID: 726333315}
+  _enemyManager: {fileID: 657829999}
+  _battleManager: {fileID: 960454455}
+  _inputSystem: {fileID: 608497329}
 --- !u!1001 &1162436966
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2487,7 +2467,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef2850c40c29e134990cc02b4b3b511f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mapDatas: []
+  _mapDatas:
+  - {fileID: 11400000, guid: 66f1fb1ec015571438f01b5711e406aa, type: 2}
 --- !u!1 &1793553404
 GameObject:
   m_ObjectHideFlags: 0

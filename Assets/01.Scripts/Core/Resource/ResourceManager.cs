@@ -11,7 +11,7 @@ namespace JW.DungeonSliding.Core.Resource
 
         internal void Init()
         {
-            throw new NotImplementedException();
+            MapData = _mapDatas;
         }
     }
 }

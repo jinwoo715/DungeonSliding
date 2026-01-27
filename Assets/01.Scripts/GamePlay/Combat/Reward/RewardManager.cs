@@ -8,7 +8,7 @@ namespace JW.DungeonSliding
     {
         public Action<RewardData> GetRewardEvent;
 
-        public void AddReward(RewardData rewardData)
+        public void GainReward(RewardData rewardData)
         {
             GetRewardEvent?.Invoke(rewardData);
         }

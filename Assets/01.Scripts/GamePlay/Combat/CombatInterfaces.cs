@@ -6,7 +6,9 @@ namespace JW.DungeonSliding.GamePlay.Combat
 {
     public interface IAttackRequestListener
     {
-        public void ReceiveAttackRequest(IAttackable attacker, IDamageable target);
+        
+        public void RegisterActpair(ActPair pair);
+
     }
 
     public interface IDamageable
@@ -24,9 +26,11 @@ namespace JW.DungeonSliding.GamePlay.Combat
     public interface IAttackable
     {
         public event Action OnAttackDoneEvent;
+        public IAttackRequestListener _attackRequestListener { get; set; }
         public ICombatant AttackTarget { get; set; }
         public NextAttackBuff CurrentAttackBuff { get; }
         float DamageDealtMultiplier { get; set; }  // 가하는 피해 배율
+        public void RegisterAttack();
         public void Attack(ICombatant target);
     }
 
@@ -55,6 +59,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
     }
     public interface ICombatantSensor
     {
+        public bool GetCombatant(Tile tile, ECretureType targetType, out ICombatant combatant);
         public int GetNearCambatantCount(ICombatant except);
     }
 }

@@ -1,13 +1,6 @@
 
 namespace JW.DungeonSliding
 {
-    public enum EGameFlowType
-    {
-        None = 0,
-        Battle = 1 << 0,
-        Ability = 1 << 1,
-    }
-
     public enum EDirectionType
     {
         Left,
@@ -57,7 +50,11 @@ namespace JW.DungeonSliding
     {
         Idle,
         Run,
-        Battle
+    }
+    public enum ECretureType
+    {
+        Player,
+        Enemy
     }
 
     public enum ECretureStatType

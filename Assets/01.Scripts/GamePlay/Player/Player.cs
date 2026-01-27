@@ -1,6 +1,8 @@
 using DG.Tweening;
+using JW.DungeonSliding.Core.Flow;
 using JW.DungeonSliding.GamePlay.Combat;
 using JW.DungeonSliding.GamePlay.Context;
+using JW.DungeonSliding.Map;
 using JW.Utility;
 using System;
 using System.Collections;
@@ -9,14 +11,16 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Entities
 {
-    public class Player : Creature, ICombatant, IAbilityEntity
+    public class Player : Creature, IMoveable, IAbilityEntity
     {
         private RoutePlanner _route = new RoutePlanner();
         private ECharacterStateType _characterState = ECharacterStateType.Idle;
 
         public Func<Tile, EDirectionType, ETileEnterType, MoveContext> GetMoveContextFunc;
-        public Action FinishSlideEvent;
+        public event Action FinishSlideEvent;
         public event Action LevelUpEvent;
+
+        public IGameModeChanger _gameModeChanger;
 
         private int _level = 1;
         private int _levelUpXp = 0;
@@ -32,6 +36,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
         private int _addMaxHp = 0;
 
         private int _nextAttackAddDamage = 0;
+
+        public Action OnDeathEvent;
         private void ChangeCharacterState(ECharacterStateType stateType)
         {
             if (_characterState == stateType) return;
@@ -42,14 +48,19 @@ namespace JW.DungeonSliding.GamePlay.Entities
                 _animatorController.SetInt(ConstString.PLAYER_STATE_KEY, (int)_characterState);
             }
         }
+
+        public void Init(IGameModeChanger modeChanger)
+        {
+            _gameModeChanger = modeChanger;
+        }
+
         public override void Init()
         {
             base.Init();
-            GameSceneContext.Instance.Reward.GetRewardEvent -= GetReward;
-            GameSceneContext.Instance.Reward.GetRewardEvent += GetReward;
+            SetCretureStat(new CretureStat(ConstData.PLAYER_START_HP, ConstData.PLAYER_START_DMG));
             _levelUpXp = MathUtil.GetFib(_level + ConstData.LEVELUP_XP_OFFSET);
         }
-        private void GetReward(RewardData rewardData)
+        public void GetReward(RewardData rewardData)
         {
             _currentXp += rewardData.Xp;
 
@@ -67,8 +78,10 @@ namespace JW.DungeonSliding.GamePlay.Entities
             _levelUpXp = MathUtil.GetFib(_level + ConstData.LEVELUP_XP_OFFSET);
             LevelUpEvent?.Invoke();
         }
-        public void MoveRoute(EDirectionType inputDirection)
+        public void Move(EDirectionType inputDirection)
         {
+            _gameModeChanger.EnterGameMode(EGameModeType.Sliding);
+
             if (_characterState != ECharacterStateType.Idle)
                 return;
 
@@ -77,7 +90,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             if(moveQueue.Count == 1)
             {
                 SetCharacterRotation(inputDirection);
-                FinishSlideEvent?.Invoke();
+                FinishMove();
             }
             else
             {
@@ -110,7 +123,13 @@ namespace JW.DungeonSliding.GamePlay.Entities
             }
 
             ChangeCharacterState(ECharacterStateType.Idle);
+            FinishMove();
+        }
+
+        public void FinishMove()
+        {
             FinishSlideEvent?.Invoke();
+            _gameModeChanger.ExitGameMode(EGameModeType.Sliding);
         }
         private IEnumerator CoMove(MoveContext moveContext)
         {
@@ -132,7 +151,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public override void OnDeath()
         {
             base.OnDeath();
-            GameSceneContext.Instance.GameFail();
+            OnDeathEvent?.Invoke();
         }
         public override void GetHit(DamageInfo damageInfo)
         {
@@ -150,7 +169,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
             _animatorController.SetAnimationTrigger(ConstString.HIT_ANIM);
         }
-
         private IEnumerator CoKnockBack(MoveContext moveContext)
         {
             _isKnockbacking = true;
@@ -174,7 +192,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
             _isKnockbacking = false;
             SetPosition(moveContext.DestTile);
         }
-
         public override void EndHittedAnimation()
         {
             if (_isKnockbacking == true)
@@ -187,18 +204,11 @@ namespace JW.DungeonSliding.GamePlay.Entities
             yield return new WaitUntil(()=> _isKnockbacking == false);
             base.EndHittedAnimation();
         }
-
         public override void Attack(ICombatant target)
         {
             base.Attack(target);
             _animatorController.SetAnimationTrigger(ConstString.ONE_HAND_ATTACK_ANIM);
         }
-        private void OnDestroy()
-        {
-            if (GameSceneContext.Instance != null)
-                GameSceneContext.Instance.Reward.GetRewardEvent -= GetReward;
-        }
-
         public void ModifyStat(ApplyStatContext applyStatContext)
         {
             float floatValue = CalculateModifyValue(applyStatContext);
@@ -270,13 +280,34 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
             return value;
         }
-
         public void GainBarrier()
         {
             throw new NotImplementedException();
         }
+        public int SlideTileCount()
+        {
+            throw new NotImplementedException();
+        }
+        public bool IsRoute(EDirectionType dir)
+        {
+            throw new NotImplementedException();
+        }
+        public void MoveStep(EDirectionType dir, int stepCount = 1)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void RegisterAttack()
+        {
+            if(_sensor.GetCombatant(TilePosition.GetNextTile(Direction), ECretureType.Enemy, out var target))
+            {
+                _attackRequestListener.RegisterActpair(new ActPair(this, target));
+            }
+        }
 
         private int GetMaxHP => _originCretureStat.HP + _addMaxHp;
         private int GetDamage => Mathf.RoundToInt((_currentCretureStat.Damage + _addDamage) * _multiDamage);
+        public ESlideResultType SlideResultType => throw new NotImplementedException();
+        public EDirectionType MoveDir => throw new NotImplementedException();
     }
 }

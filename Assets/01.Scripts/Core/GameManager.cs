@@ -8,7 +8,8 @@ namespace JW.DungeonSliding.Core
         private static GameManager _instance;
         public static GameManager Instance => _instance;
 
-        public ResourceManager Resource { get; private set; }
+        [SerializeField] private ResourceManager _resource;
+        public ResourceManager Resource => _resource;
 
         private void Awake()
         {
@@ -27,7 +28,6 @@ namespace JW.DungeonSliding.Core
 
         private void InitManagers()
         {
-            Resource = GetComponentInChildren<ResourceManager>();
             Resource.Init();
         }
     }

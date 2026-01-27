@@ -24,6 +24,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
         public float DamageDealtMultiplier { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public float DamageTakenMultiplier { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public IAttackRequestListener _attackRequestListener { get; set; }
 
         protected ICombatant _attackTarget;
 
@@ -36,7 +37,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public event Action<int, int> ChangeRemainHP;
         public event Action<int> ShowHitDamageUIEvent;
         public event Action<ICombatant, ICombatant> OnCounterRequestedEvent;
-
+        public ICombatantSensor _sensor;
         public virtual void Init() 
         {
             IsActive = true;
@@ -207,5 +208,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         {
             throw new NotImplementedException();
         }
+
+        public abstract void RegisterAttack();
     }
 }

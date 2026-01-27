@@ -1,4 +1,4 @@
-using JW.DungeonSliding.GamePlay.Context;
+using JW.DungeonSliding.Core.Flow;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,44 +10,28 @@ namespace JW.DungeonSliding.GamePlay.Combat
     {
         private ICombatant _playerCombatant;
         private ICombatProvider _enemyCombatProvider;
+        private IGameModeChanger _gameModeChanger;
 
         private Queue<ActPair> actPairs = new Queue<ActPair>();
 
-        public struct ActPair
+        public void Init(ICombatProvider combatProvider, ICombatant player, IGameModeChanger gameModeChanger)
         {
-            public ActPair(ICombatant attacker, ICombatant target)
-            {
-                Attacker = attacker;
-                Target = target;
-            }
-
-            public ICombatant Attacker;
-            public ICombatant Target;
+            _gameModeChanger = gameModeChanger;
+            _enemyCombatProvider = combatProvider;
+            _playerCombatant = player;
         }
-        public void SetPlayerCombatant(ICombatant player) => _playerCombatant = player;
-        public void SetCombatProvider(ICombatProvider combatProvider) => _enemyCombatProvider = combatProvider;
-
+        
         public void StartBattleSequence()
         {
-            GameSceneContext.Instance.EnterGameFlow(EGameFlowType.Battle);
+            _gameModeChanger.EnterGameMode(EGameModeType.Battle);
 
-            Tile playerFowardTile = _playerCombatant.TilePosition.GetNextTile(_playerCombatant.Direction);
-            
-            if(_enemyCombatProvider.TryGetCombatant(playerFowardTile, out ICombatant combatant))
-            {
-                actPairs.Enqueue(new ActPair(_playerCombatant, combatant));
-            }
+            _playerCombatant.RegisterAttack();
 
             List<ICombatant> enemies = _enemyCombatProvider.GetAllCombatant();
 
             for (int i = 0; i < enemies.Count; i++)
             {
-                Tile enemyForwardTile = enemies[i].TilePosition.GetNextTile(enemies[i].Direction);
-
-                if(enemyForwardTile == _playerCombatant.TilePosition)
-                {
-                    actPairs.Enqueue(new ActPair(enemies[i], _playerCombatant));
-                }
+                enemies[i].RegisterAttack();
             }
 
             StartCoroutine(CoStartSequence());
@@ -99,12 +83,12 @@ namespace JW.DungeonSliding.GamePlay.Combat
                 Debug.Log("End Sequence");
             }
 
-            GameSceneContext.Instance.ExitGameFlow(EGameFlowType.Battle);
+            _gameModeChanger.ExitGameMode(EGameModeType.Battle);
         }
 
-        public void ReceiveAttackRequest(IAttackable attacker, IDamageable target)
+        public void RegisterActpair(ActPair pair)
         {
-            throw new NotImplementedException();
+            actPairs.Enqueue(pair);
         }
     }
 }

@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using JW.DungeonSliding.GamePlay.Combat;
 using JW.DungeonSliding.Map;
 using JW.DungeonSliding.GamePlay.Context;
+using System;
 
 namespace JW.DungeonSliding.GamePlay.Entities
 {
@@ -18,14 +19,19 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
         private Dictionary<int, EnemyData> _enemyDataDic = new Dictionary<int, EnemyData>();
 
+        public Action<RewardData> PlayerRewardEvent;
+
+        private IAttackRequestListener _attackRequestListener;
         private IBoard _board;
         int templeteNum = 0;
 
         [SerializeField] private TextAsset _enemyData;
-
-        public void SetBoard(IBoard board)
+        public ICombatantSensor CombatantSensor;
+        public void Init(IBoard board, IAttackRequestListener attackRequestListener, ICombatantSensor sensor)
         {
             _board = board;
+            _attackRequestListener = attackRequestListener;
+            CombatantSensor = sensor;
 
             var enemyDatas = JsonConvert.DeserializeObject<List<EnemyData>>(_enemyData.text);
 
@@ -35,12 +41,10 @@ namespace JW.DungeonSliding.GamePlay.Entities
             }
         }
 
-        public void SetEnemy(EnemyTemplete[] enemyTempletes)
+        public void SetEnemy(EnemyTemplete[] enemyTempletes, int floor)
         {
-            templeteNum = Random.Range(0, enemyTempletes.Length);
+            templeteNum = UnityEngine.Random.Range(0, enemyTempletes.Length);
             EnemyTemplete templete = enemyTempletes[templeteNum];
-
-            int floor = GameSceneContext.Instance.Floor;
 
             for (int i = 0; i < templete.EnemyData.Count; i++)
             {
@@ -73,10 +77,14 @@ namespace JW.DungeonSliding.GamePlay.Entities
         {
             Enemy enemy = Instantiate(_enemyPrefabList[enemyUID], this.transform);
             enemy.ReturnEvent = ReturnEnemy;
+            enemy._attackRequestListener = _attackRequestListener;
+            enemy._sensor = CombatantSensor;
             return enemy;
         }
         public void ReturnEnemy(Enemy enemy)
         {
+            PlayerRewardEvent?.Invoke(new RewardData(enemy.Xp));
+
             enemy.gameObject.SetActive(false);
 
             _enemyPoolDic[enemy.EnemyUID].Push(enemy);

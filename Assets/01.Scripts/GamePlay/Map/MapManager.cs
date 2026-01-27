@@ -1,4 +1,6 @@
+using JW.DungeonSliding.Core;
 using JW.DungeonSliding.GamePlay.Combat;
+using JW.Utility;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,7 +11,9 @@ namespace JW.DungeonSliding.Map
         [SerializeField] private TileGenerator _tileMap;
         [SerializeField] private EffectObjectGenerator _effectObjectGenerator;
 
-        public Action<EnemyTemplete[]> SetEnemyEvent;
+        private ShuffleBag<MapData> _mapBag;
+
+        public Action<EnemyTemplete[], int> SetEnemyEvent;
         
         private bool[] _tileMapData;
         private HashSet<Tile> _enemies = new HashSet<Tile>();
@@ -17,26 +21,30 @@ namespace JW.DungeonSliding.Map
         private MapData _currentMapData;
 
         private int[,] _dir = { {-1,0 }, {0,1 }, {1,0 }, {0,-1 } };
+        private ITilePosition _player;
 
-        public void Init()
+
+
+        public void Init(ITilePosition player)
         {
+            _player = player;
+            _mapBag = new ShuffleBag<MapData>(GameManager.Instance.Resource.MapData);
             _tileMap.Init(this);
             _effectObjectGenerator.SetBoard(this);
         }
 
-        public void SetMap(MapData mapData, ICombatant player)
+        public void SetMap(int floor)
         {
-            _currentMapData = mapData;
+            _currentMapData = _mapBag.GetItem();
 
-            _tileMapData = new bool[mapData.Height * mapData.Width];
+            _tileMapData = new bool[_currentMapData.Height * _currentMapData.Width];
 
-            _tileMap.SetMap(mapData.MapTiles, mapData.Height, mapData.Width);
-            _effectObjectGenerator.SetMap(mapData.effectTileDatas);
+            _tileMap.SetMap(_currentMapData.MapTiles, _currentMapData.Height, _currentMapData.Width);
+            _effectObjectGenerator.SetMap(_currentMapData.effectTileDatas);
 
-            SetEnemyEvent?.Invoke(mapData.EnemyTemplete);
-            player.SetPosition(mapData.PlayerPosition);
+            SetEnemyEvent?.Invoke(_currentMapData.EnemyTemplete, floor);
+            _player.SetPosition(_currentMapData.PlayerPosition);
         }
-        
         public MoveContext GetMoveContext(Tile startPoint, EDirectionType direction, ETileEnterType enterType)
         {
             MoveContext moveContext = new MoveContext(startPoint, direction, enterType);
@@ -75,7 +83,6 @@ namespace JW.DungeonSliding.Map
 
             return moveContext;
         }
-
         private bool IsInArea(Tile data)
         {
             if (data.XPos < 0 || data.XPos >= _currentMapData.Width || data.ZPos < 0 || data.ZPos >= _currentMapData.Height)
@@ -105,12 +112,10 @@ namespace JW.DungeonSliding.Map
         {
             _enemies.Clear();
         }
-
         public void RegisterEffectObject(Tile point, IEffectObject effectObj)
         {
             _effectTileDic.Add(point, effectObj);
         }
-
         public void UnRegisterEffectObject(Tile point)
         {
             _effectTileDic.Remove(point);
