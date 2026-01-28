@@ -4,8 +4,8 @@ namespace JW.DungeonSliding.Core.Flow
 {
     public enum EGameModeType
     {
-        None = 0,
-        MapLoading = 1 << 0,
+        Play = 0,
+        PrepareStage = 1 << 5,
         SettingEnemy = 1 << 1,
         Sliding = 1 << 2,
         Battle = 1 << 3,

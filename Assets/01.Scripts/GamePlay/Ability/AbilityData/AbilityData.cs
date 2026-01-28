@@ -12,7 +12,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
         public EAbilityRank AbilityRank;
         public EAbilityEffectKind EffectKind;
 
-        public EAbilityTriggerType AbilityTrigger;
+        public EGameTriggerType AbilityTrigger;
 
         public bool IsDisposable;
     }

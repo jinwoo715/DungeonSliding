@@ -14,9 +14,9 @@ namespace JW.DungeonSliding.GamePlay.Ability
             _combatant.GainBarrier();
         }
 
-        public override void ProcTrigger(EAbilityTriggerType triggerType)
+        public override void ProcTrigger(EGameTriggerType triggerType)
         {
-            if (triggerType == EAbilityTriggerType.EnterRoom)
+            if (triggerType == EGameTriggerType.EnterRoom)
             {
                 ExcuteAbility();
             }

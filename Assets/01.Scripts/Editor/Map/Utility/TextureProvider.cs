@@ -30,7 +30,7 @@ namespace JW.DungeonSliding
             for (int i = 0; i < enemyDatas.Count; i++)
             {
                 string imageName = enemyDatas[i].EnemyName + ".png";
-                string imagePath = Path.Combine("00.Resources/Sprites/", imageName);
+                string imagePath = Path.Combine("00.Resources/Sprites/Editor/Enemy", imageName);
                 _enemyTextureDic.Add(enemyDatas[i].EnemyUID, LoadLocalAsset.GetSingleTexture(imagePath));
             }
 
@@ -57,17 +57,14 @@ namespace JW.DungeonSliding
         {
             return _effectObjectTextureDic[type];
         }
-
         public Texture2D GetEnemyIcon(int enemyUid)
         {
             return _enemyTextureDic[enemyUid];
         }
-
         public Texture2D GetPlayerIcon()
         {
             return _playerIconTexture;
         }
-
         public Texture2D GetTileTexture(ETileType type)
         {
             try

@@ -8,10 +8,30 @@ namespace JW.DungeonSliding.GamePlay.Entities
     public class StoneStatueEnemy : Enemy
     {
         [SerializeField] GameObject _robber;
+
+        [SerializeField] Material _originMaterial;
         [SerializeField] Material _lightMaterial;
+
         [SerializeField] MeshRenderer _lightMesh;
         [SerializeField] protected Transform _avatar;
         [SerializeField] private GameObject _eyeLight;
+
+        private void Start()
+        {
+            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.ClearStage, ReturnPool);
+        }
+
+        public void ReturnPool()
+        {
+            StopAllCoroutines();
+
+            _avatar.gameObject.SetActive(true);
+            _robber.gameObject.SetActive(false);
+
+            _lightMesh.material = _originMaterial;
+
+            ReturnEvent?.Invoke(this);
+        }
 
         public override void Attack(ICombatant target)
         {
@@ -27,6 +47,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
         {
             base.OnDeath();
 
+            OnDeathEvent?.Invoke(this, false);
+
             var dust = ParticlePool.Instance.GetParticle("DestroyDust");
             dust.SetParticle(this.transform.position + Vector3.up * 0.5f, 2.0f);
 
@@ -34,7 +56,11 @@ namespace JW.DungeonSliding.GamePlay.Entities
             _robber.gameObject.SetActive(true);
 
             _lightMesh.material = _lightMaterial;
+
         }
+
+
+
         public override void GetHit(DamageInfo damageInfo)
         {
             base.GetHit(damageInfo);

@@ -6,7 +6,7 @@ namespace JW.DungeonSliding
 {
     public class RewardManager
     {
-        public Action<RewardData> GetRewardEvent;
+        public event Action<RewardData> GetRewardEvent;
 
         public void GainReward(RewardData rewardData)
         {

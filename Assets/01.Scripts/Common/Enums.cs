@@ -72,9 +72,9 @@ namespace JW.DungeonSliding
         Rare,
         Legend
     }
-    public enum EAbilityTriggerType
+    public enum EGameTriggerType
     {
-        Instant,
+        None,
 
         EnterRoom,
 
@@ -94,16 +94,15 @@ namespace JW.DungeonSliding
         OnStepEffectTile,
 
         OnDeathByHP,
-        OnDeathByMoveCount
-    }
-   
-    public enum EDurationType
-    {
-        None,
-        TurnCount,
-        AttackCount,
-        MoveCount,
-        HitTakenCount
+        OnDeathByMoveCount,
+
+        FadeOutStart,
+        FadeOutFin,
+
+        FadeInStart,
+        FadeInFin,
+
+        ClearStage,
     }
 
     public enum EAbilityEffectKind

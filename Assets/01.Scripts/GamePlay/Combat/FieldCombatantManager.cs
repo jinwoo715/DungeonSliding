@@ -1,18 +1,21 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Combat
 {
-    public class FieldCombatantSensor : ICombatantSensor
+    public class FieldCombatantManager : ICombatantSensor
     {
         private ICombatant _playerCombatant;
         private ICombatProvider _enemyCombatProvider;
 
-        public FieldCombatantSensor(ICombatProvider combatProvider, ICombatant player)
+        public FieldCombatantManager(ICombatProvider combatProvider, ICombatant player)
         {
             _enemyCombatProvider = combatProvider;
             _playerCombatant = player;
         }
 
+        public ICombatant PlayerCombatant { get => _playerCombatant;}
+        public List<ICombatant> AllEnemyCombatants => _enemyCombatProvider.GetAllActiveCombatant();
         public bool GetCombatant(Tile tile, ECretureType targetType, out ICombatant combatant)
         {
             switch (targetType)
@@ -36,7 +39,6 @@ namespace JW.DungeonSliding.GamePlay.Combat
             combatant = default;
             return false;
         }
-
         public int GetNearCambatantCount(ICombatant except)
         {
             return 0;

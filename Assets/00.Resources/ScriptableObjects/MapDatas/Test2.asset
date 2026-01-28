@@ -10,23 +10,26 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 247bacb3bfbbd3047bff856ba5f030ea, type: 3}
-  m_Name: 123
+  m_Name: Test2
   m_EditorClassIdentifier: 
   Width: 5
   Height: 5
-  MapTiles: 00000000000000000000000000000000000000000100000001000000010000000000000000000000010000000100000001000000000000000000000001000000010000000100000000000000000000000000000000000000000000000000000000000000
+  MapTiles: 01000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   PlayerPosition:
-    XPos: -1
-    ZPos: -1
+    XPos: 0
+    ZPos: 2
   EnemyTemplete:
   - EnemyData:
     - EnemyUID: 0
       Point:
-        XPos: 0
-        ZPos: 2
+        XPos: 2
+        ZPos: 0
     - EnemyUID: 1
       Point:
-        XPos: 1
-        ZPos: 3
-  - EnemyData: []
+        XPos: 3
+        ZPos: 0
+    - EnemyUID: 2
+      Point:
+        XPos: 4
+        ZPos: 0
   effectTileDatas: []

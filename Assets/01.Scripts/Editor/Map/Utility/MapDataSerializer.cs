@@ -19,6 +19,17 @@ namespace JW.DungeonSliding
 
             mapData.PlayerPosition = mapDataContext.PlayerPoint;
 
+            if(mapData.PlayerPosition.IsValid == false)
+            {
+                bool ok = UnityEditor.EditorUtility.DisplayDialog(
+                "맵 저장",
+                $"Player 위치를 지정해주세요.",
+                "확인"
+                );
+
+                return;
+            }
+
             var sheet = mapDataContext.EnemyTempleteSheet ?? new List<EnemyTempleteSheet>();
 
             mapData.EnemyTemplete = new EnemyTemplete[sheet.Count];

@@ -19,9 +19,9 @@ namespace JW.DungeonSliding.GamePlay.Ability
                 _combatant.ModifyStat(new ApplyStatContext(EPlayerStat.MoveCount, EApplyStatType.Add, _data.GainValue, EPlayerStat.None));
             }
         }
-        public override void ProcTrigger(EAbilityTriggerType triggerType)
+        public override void ProcTrigger(EGameTriggerType triggerType)
         {
-            if (triggerType == EAbilityTriggerType.OnDeathByMoveCount)
+            if (triggerType == EGameTriggerType.OnDeathByMoveCount)
             {
                 ExcuteAbility();
             }

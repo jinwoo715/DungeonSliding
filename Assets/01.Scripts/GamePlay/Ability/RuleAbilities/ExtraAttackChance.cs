@@ -14,9 +14,9 @@ namespace JW.DungeonSliding.GamePlay.Ability
             _combatant.CurrentAttackBuff.AddExtraAttack();
         }
 
-        public override void ProcTrigger(EAbilityTriggerType triggerType)
+        public override void ProcTrigger(EGameTriggerType triggerType)
         {
-            if (triggerType == EAbilityTriggerType.MoveEnd)
+            if (triggerType == EGameTriggerType.MoveEnd)
             {
                 int chanceValue = Random.Range(0, 101);
 

@@ -15,9 +15,9 @@ namespace JW.DungeonSliding.GamePlay.Ability
             _combatant.CurrentAttackBuff.AddDamage(addDamage);
         }
 
-        public override void ProcTrigger(EAbilityTriggerType triggerType)
+        public override void ProcTrigger(EGameTriggerType triggerType)
         {
-            if (triggerType == EAbilityTriggerType.MoveEnd)
+            if (triggerType == EGameTriggerType.MoveEnd)
             {
                 ExcuteAbility();
             }

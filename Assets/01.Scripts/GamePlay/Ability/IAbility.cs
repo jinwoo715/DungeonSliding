@@ -5,7 +5,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
         public IAbilityEntity Entity { get; }
 
         public void ExcuteAbility();
-        public void ProcTrigger(EAbilityTriggerType triggerType);
+        public void ProcTrigger(EGameTriggerType triggerType);
     }
 
 }

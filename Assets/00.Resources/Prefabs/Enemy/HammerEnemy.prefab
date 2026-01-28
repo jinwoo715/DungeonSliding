@@ -49,6 +49,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _animatorController: {fileID: 5750647025204057581}
   _robber: {fileID: 5060271969518776582}
+  _originMaterial: {fileID: 2100000, guid: 42b64fdb315e3054ea757d8d1c4bcfa7, type: 2}
   _lightMaterial: {fileID: 2100000, guid: 05d78106537b5814a8bb24ec34e3145d, type: 2}
   _lightMesh: {fileID: 1337573500788016506}
   _avatar: {fileID: 5895618724755450724}

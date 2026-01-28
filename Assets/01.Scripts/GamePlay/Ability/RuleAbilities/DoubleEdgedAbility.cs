@@ -14,6 +14,6 @@ namespace JW.DungeonSliding.GamePlay.Ability
         }
 
         public override void ExcuteAbility() { }
-        public override void ProcTrigger(EAbilityTriggerType triggerType) { }
+        public override void ProcTrigger(EGameTriggerType triggerType) { }
     }
 }

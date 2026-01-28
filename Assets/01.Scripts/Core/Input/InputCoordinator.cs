@@ -7,7 +7,7 @@ namespace JW.DungeonSliding.Core.Inputs
 {
     public class InputCoordinator
     {
-        public Func<bool> IsMoveableFlowFunc { get; set; }
+        public event Func<bool> IsMoveableFlowFunc;
         private IMoveable _moveable;
 
         public void Init(IMoveable moveable)

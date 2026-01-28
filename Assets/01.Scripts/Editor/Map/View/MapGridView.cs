@@ -71,12 +71,13 @@ public class MapGridView
 
     private void DrawTileGrid()
     {
+        float zStartPoint = _iconImageSize * (_mapState.zCount-1);
         for (int z = 0; z < _mapState.zCount; z++)
         {
             for (int x = 0; x < _mapState.xCount; x++)
             {
                 Texture2D buttonTexture = _textureProvider.GetTileTexture((ETileType)_mapState.GetTileType(x, z));
-                Rect buttonRect = new Rect(x * _iconImageSize, z * _iconImageSize, _iconImageSize, _iconImageSize);
+                Rect buttonRect = new Rect(x * _iconImageSize, zStartPoint - (z * _iconImageSize), _iconImageSize, _iconImageSize);
 
                 if (GUI.Button(buttonRect, buttonTexture, _tileButtonGUI))
                 {
@@ -120,11 +121,12 @@ public class MapGridView
 
     private Rect GetIconRect(Tile point)
     {
+        float zStartPoint = _iconImageSize * (_mapState.zCount - 1);
         float iconRatio = 0.5f;
         float iconSize = _iconImageSize * iconRatio;
 
         float x = point.XPos * _iconImageSize + iconSize * 0.5f;
-        float y = point.ZPos * _iconImageSize + iconSize * 0.5f;
+        float y = zStartPoint - (point.ZPos * _iconImageSize) + (iconSize * 0.5f);
 
         return new Rect(x, y, iconSize, iconSize);
     }

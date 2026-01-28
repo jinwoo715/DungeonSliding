@@ -21,7 +21,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
             Entity.ModifyStat(applyStatContext);
         }
 
-        public void ProcTrigger(EAbilityTriggerType triggerType)
+        public void ProcTrigger(EGameTriggerType triggerType)
         {
             if(triggerType == _data.AbilityTrigger)
             {

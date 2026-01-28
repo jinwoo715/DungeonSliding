@@ -6,7 +6,7 @@ namespace JW.DungeonSliding.Core.Flow
 
     public class GameModeController : IGameModeChanger
     {
-        private EGameModeType _gameFlowType = EGameModeType.None;
+        private EGameModeType _gameFlowType = EGameModeType.Play;
 
         public EGameModeType Flow => _gameFlowType;
 

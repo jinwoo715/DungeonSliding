@@ -11,8 +11,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public bool IsActive { get; private set; } = true;
         public EDirectionType Direction { get; private set; }
         public Tile TilePosition { get; private set; }
-        public ICombatant LastAttacker { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public ICombatant AttackTarget { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public ICombatant LastAttacker { get; private set; }
+        public ICombatant AttackTarget { get; private set; }
 
         public int CurrentHP => throw new NotImplementedException();
 
@@ -24,7 +24,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
         public float DamageDealtMultiplier { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public float DamageTakenMultiplier { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public IAttackRequestListener _attackRequestListener { get; set; }
 
         protected ICombatant _attackTarget;
 
@@ -37,7 +36,9 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public event Action<int, int> ChangeRemainHP;
         public event Action<int> ShowHitDamageUIEvent;
         public event Action<ICombatant, ICombatant> OnCounterRequestedEvent;
-        public ICombatantSensor _sensor;
+        public IAttackRequestListener _attackRequestListener { get; private set; }
+        public ICombatantSensor _sensor { get; private set; }
+        
         public virtual void Init() 
         {
             IsActive = true;
@@ -210,5 +211,17 @@ namespace JW.DungeonSliding.GamePlay.Entities
         }
 
         public abstract void RegisterAttack();
+
+        public void SetCombatSensor(ICombatantSensor combatantSensor)
+        {
+            if (combatantSensor == null) Debug.LogError("CombatSensor Is Null");
+            _sensor = combatantSensor;
+        }
+
+        public void SetAttackRequestListener(IAttackRequestListener requestListener)
+        {
+            if (requestListener == null) Debug.LogError("RequestListener Is Null");
+            _attackRequestListener = requestListener;
+        }
     }
 }

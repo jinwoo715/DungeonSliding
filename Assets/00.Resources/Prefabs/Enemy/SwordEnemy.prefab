@@ -49,6 +49,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _animatorController: {fileID: 5750647025204057581}
   _robber: {fileID: 5060271969518776582}
+  _originMaterial: {fileID: 2100000, guid: 42b64fdb315e3054ea757d8d1c4bcfa7, type: 2}
   _lightMaterial: {fileID: 2100000, guid: 05d78106537b5814a8bb24ec34e3145d, type: 2}
   _lightMesh: {fileID: 1337573500788016506}
   _avatar: {fileID: 5895618724755450724}
@@ -1179,6 +1180,58 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1556708312922740266}
     m_Modifications:
+    - target: {fileID: 108046, guid: 75925c365bd895145beefbc806717633, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 121406, guid: 75925c365bd895145beefbc806717633, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 122242, guid: 75925c365bd895145beefbc806717633, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 123430, guid: 75925c365bd895145beefbc806717633, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 124360, guid: 75925c365bd895145beefbc806717633, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 125054, guid: 75925c365bd895145beefbc806717633, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 126228, guid: 75925c365bd895145beefbc806717633, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 130174, guid: 75925c365bd895145beefbc806717633, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 133586, guid: 75925c365bd895145beefbc806717633, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 148708, guid: 75925c365bd895145beefbc806717633, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 151146, guid: 75925c365bd895145beefbc806717633, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 170220, guid: 75925c365bd895145beefbc806717633, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 179388, guid: 75925c365bd895145beefbc806717633, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 182410, guid: 75925c365bd895145beefbc806717633, type: 3}
       propertyPath: m_Name
       value: TT_HeavySwordman
@@ -1186,6 +1239,26 @@ PrefabInstance:
     - target: {fileID: 182410, guid: 75925c365bd895145beefbc806717633, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 186744, guid: 75925c365bd895145beefbc806717633, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 187272, guid: 75925c365bd895145beefbc806717633, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 188344, guid: 75925c365bd895145beefbc806717633, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 192048, guid: 75925c365bd895145beefbc806717633, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 193732, guid: 75925c365bd895145beefbc806717633, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 419716, guid: 75925c365bd895145beefbc806717633, type: 3}
       propertyPath: m_LocalScale.x

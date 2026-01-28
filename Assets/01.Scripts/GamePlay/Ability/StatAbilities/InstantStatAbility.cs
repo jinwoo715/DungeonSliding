@@ -22,7 +22,7 @@ public class InstantStatAbility : IAbility
         Entity.ModifyStat(applyStatContext);
     }
 
-    public void ProcTrigger(EAbilityTriggerType triggerType)
+    public void ProcTrigger(EGameTriggerType triggerType)
     {
 
     }

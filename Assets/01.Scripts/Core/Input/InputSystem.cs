@@ -6,7 +6,7 @@ namespace JW.DungeonSliding.Core.Inputs
 {
     public class InputSystem : MonoBehaviour
     {
-        public Action<EDirectionType> OnInputEvnet;
+        public event Action<EDirectionType> OnInputEvnet;
 
         private void Update()
         {

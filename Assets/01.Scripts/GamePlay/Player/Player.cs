@@ -16,7 +16,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         private RoutePlanner _route = new RoutePlanner();
         private ECharacterStateType _characterState = ECharacterStateType.Idle;
 
-        public Func<Tile, EDirectionType, ETileEnterType, MoveContext> GetMoveContextFunc;
+        public event Func<Tile, EDirectionType, ETileEnterType, MoveContext> GetMoveContextFunc;
         public event Action FinishSlideEvent;
         public event Action LevelUpEvent;
 
@@ -49,7 +49,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             }
         }
 
-        public void Init(IGameModeChanger modeChanger)
+        public void SetGameModeChanger(IGameModeChanger modeChanger)
         {
             _gameModeChanger = modeChanger;
         }

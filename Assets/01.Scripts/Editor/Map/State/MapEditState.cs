@@ -96,7 +96,7 @@ namespace JW.DungeonSliding
             if (_tileMap == null) return false;
             if (!IsBounds(point)) return false;
 
-            return _tileMap[ToIndex(point)] == 1;
+            return _tileMap[ToIndex(point)] == (int)ETileType.Route;
         }
 
         private bool IsBounds(Tile p)

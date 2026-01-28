@@ -40,7 +40,7 @@ namespace JW.DungeonSliding.Map
         {
             for (int i = 0; i < _activeTiles.Count; i++)
             {
-                _activeTiles[i].OnDespawn();
+                _activeTiles[i].Release();
             }
 
             _activeTiles.Clear();

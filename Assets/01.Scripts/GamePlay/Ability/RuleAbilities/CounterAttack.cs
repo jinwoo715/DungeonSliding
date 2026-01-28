@@ -14,9 +14,9 @@ namespace JW.DungeonSliding.GamePlay.Ability
             _combatant.RequestCounterAttack(_combatant.LastAttacker);
         }
 
-        public override void ProcTrigger(EAbilityTriggerType triggerType)
+        public override void ProcTrigger(EGameTriggerType triggerType)
         {
-            if (triggerType == EAbilityTriggerType.Hitted)
+            if (triggerType == EGameTriggerType.Hitted)
             {
                 int chanceValue = Random.Range(0, 101);
 

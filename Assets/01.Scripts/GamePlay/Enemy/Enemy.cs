@@ -8,7 +8,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
     public class Enemy : Creature
     {
         public Action<Enemy> ReturnEvent;
-        public Action<Enemy> OnDeathEvent;
+        public Action<Enemy, bool> OnDeathEvent;
 
         private EnemyData _enemyData;
         private int _rewardXp = 0;
@@ -32,11 +32,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             int RandomDir = UnityEngine.Random.Range(0, 4);
             SetCharacterRotation((EDirectionType)RandomDir);
         }
-        public override void OnDeath()
-        {
-            base.OnDeath();
-            OnDeathEvent?.Invoke(this);
-        }
+
         protected override DamageInfo CalculateRealAppliedDamage(DamageInfo damageInfo)
         {
             int damage = damageInfo.Damage;

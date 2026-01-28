@@ -8,26 +8,24 @@ namespace JW.DungeonSliding.GamePlay.Combat
 {
     public class BattleManager : MonoBehaviour, IAttackRequestListener
     {
-        private ICombatant _playerCombatant;
-        private ICombatProvider _enemyCombatProvider;
+        private ICombatantSensor _combatSensor;
+
         private IGameModeChanger _gameModeChanger;
 
         private Queue<ActPair> actPairs = new Queue<ActPair>();
 
-        public void Init(ICombatProvider combatProvider, ICombatant player, IGameModeChanger gameModeChanger)
+        public void Init(ICombatantSensor combatantSensor, IGameModeChanger gameModeChanger)
         {
+            _combatSensor = combatantSensor;
             _gameModeChanger = gameModeChanger;
-            _enemyCombatProvider = combatProvider;
-            _playerCombatant = player;
         }
         
         public void StartBattleSequence()
         {
             _gameModeChanger.EnterGameMode(EGameModeType.Battle);
+            _combatSensor.PlayerCombatant.RegisterAttack();
 
-            _playerCombatant.RegisterAttack();
-
-            List<ICombatant> enemies = _enemyCombatProvider.GetAllCombatant();
+            List<ICombatant> enemies = _combatSensor.AllEnemyCombatants;
 
             for (int i = 0; i < enemies.Count; i++)
             {

@@ -14,9 +14,9 @@ namespace JW.DungeonSliding.GamePlay.Ability
             _moveable.MoveStep(bounceDir);
         }
 
-        public override void ProcTrigger(EAbilityTriggerType triggerType)
+        public override void ProcTrigger(EGameTriggerType triggerType)
         {
-            if (triggerType == EAbilityTriggerType.MoveEnd &&
+            if (triggerType == EGameTriggerType.MoveEnd &&
                 _moveable.SlideTileCount() == 1 &&
                 _moveable.SlideResultType == ESlideResultType.EnemyStop)
             {

@@ -6,6 +6,7 @@ using JW.DungeonSliding.GamePlay.Combat;
 using JW.DungeonSliding.Map;
 using JW.DungeonSliding.GamePlay.Context;
 using System;
+using JW.DungeonSliding.Core;
 
 namespace JW.DungeonSliding.GamePlay.Entities
 {
@@ -14,53 +15,55 @@ namespace JW.DungeonSliding.GamePlay.Entities
         [SerializeField] private CretureStatController _cretureStatController;
         [SerializeField] private List<Enemy> _enemyPrefabList;
 
-        private Dictionary<int, Stack<Enemy>> _enemyPoolDic = new Dictionary<int, Stack<Enemy>>();
-        private Dictionary<Tile, ICombatant> _activeEnemyDic = new Dictionary<Tile, ICombatant>();
+        private Dictionary<int, Stack<Enemy>> _enemyPoolByUID = new Dictionary<int, Stack<Enemy>>();
+        
+        private Dictionary<Tile, ICombatant> _activeEnemyByTile = new Dictionary<Tile, ICombatant>();
 
-        private Dictionary<int, EnemyData> _enemyDataDic = new Dictionary<int, EnemyData>();
+        private Dictionary<int, EnemyData> _enemyDataByUID = new Dictionary<int, EnemyData>();
 
-        public Action<RewardData> PlayerRewardEvent;
+        public event Action<RewardData> OnEnemyRewardEvent;
 
         private IAttackRequestListener _attackRequestListener;
+        private ICombatantSensor _combatantSensor;
         private IBoard _board;
-        int templeteNum = 0;
 
-        [SerializeField] private TextAsset _enemyData;
-        public ICombatantSensor CombatantSensor;
-        public void Init(IBoard board, IAttackRequestListener attackRequestListener, ICombatantSensor sensor)
+        public void WireInterfaces(IBoard board, IAttackRequestListener attackRequestListener, ICombatantSensor sensor)
         {
             _board = board;
             _attackRequestListener = attackRequestListener;
-            CombatantSensor = sensor;
-
-            var enemyDatas = JsonConvert.DeserializeObject<List<EnemyData>>(_enemyData.text);
+            _combatantSensor = sensor;
+        }
+        public void LoadData()
+        {
+            string enemyJsonData = GameManager.Instance.Resource.GetTextData("EnemyData");
+            var enemyDatas = JsonConvert.DeserializeObject<List<EnemyData>>(enemyJsonData);
 
             for (int i = 0; i < enemyDatas.Count; i++)
             {
-                _enemyDataDic[i] = enemyDatas[i];
+                _enemyDataByUID[i] = enemyDatas[i];
             }
         }
 
         public void SetEnemy(EnemyTemplete[] enemyTempletes, int floor)
         {
-            templeteNum = UnityEngine.Random.Range(0, enemyTempletes.Length);
+            int templeteNum = UnityEngine.Random.Range(0, enemyTempletes.Length);
             EnemyTemplete templete = enemyTempletes[templeteNum];
 
             for (int i = 0; i < templete.EnemyData.Count; i++)
             {
                 EnemySettingData data = templete.EnemyData[i];
                 Enemy enemy = GetEnemy(data.EnemyUID);
-                enemy.SetData(_enemyDataDic[data.EnemyUID], floor);
+                enemy.SetData(_enemyDataByUID[data.EnemyUID], floor);
                 enemy.Init();
                 enemy.SetPosition(data.Point);
                 
-                _activeEnemyDic.Add(data.Point, enemy);
+                _activeEnemyByTile.Add(data.Point, enemy);
                 _board.RegisterEnemyBoard(data.Point, enemy);
             }
         }
         private Enemy GetEnemy(int enemyUID)
         {
-            if(_enemyPoolDic.TryGetValue(enemyUID, out Stack<Enemy> pool))
+            if(_enemyPoolByUID.TryGetValue(enemyUID, out Stack<Enemy> pool))
             {
                 if (pool.Count > 0)
                     return pool.Pop();
@@ -69,7 +72,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             }
             else
             {
-                _enemyPoolDic[enemyUID] = new Stack<Enemy>();
+                _enemyPoolByUID[enemyUID] = new Stack<Enemy>();
                 return SpawnEnemy(enemyUID);
             }
         }
@@ -77,27 +80,34 @@ namespace JW.DungeonSliding.GamePlay.Entities
         {
             Enemy enemy = Instantiate(_enemyPrefabList[enemyUID], this.transform);
             enemy.ReturnEvent = ReturnEnemy;
-            enemy._attackRequestListener = _attackRequestListener;
-            enemy._sensor = CombatantSensor;
+            enemy.OnDeathEvent = OnEnemyDeath;
+            enemy.SetAttackRequestListener(_attackRequestListener);
+            enemy.SetCombatSensor(_combatantSensor);
             return enemy;
         }
         public void ReturnEnemy(Enemy enemy)
         {
-            PlayerRewardEvent?.Invoke(new RewardData(enemy.Xp));
-
             enemy.gameObject.SetActive(false);
+            _enemyPoolByUID[enemy.EnemyUID].Push(enemy);
+        }
+        private void OnEnemyDeath(Enemy enemy, bool isUnRegisterOnBoard = true)
+        {
+            OnEnemyRewardEvent?.Invoke(new RewardData(enemy.Xp));
+            _activeEnemyByTile.Remove(enemy.TilePosition);
 
-            _enemyPoolDic[enemy.EnemyUID].Push(enemy);
+            if (_activeEnemyByTile.Count == 0)
+            {
+                Debug.Log("All Clear!");
+                GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.ClearStage);
+            }
 
-            _activeEnemyDic.Remove(enemy.TilePosition);
-
-            _board.UnRegisterEnemyBoard(enemy.TilePosition);
+            if(isUnRegisterOnBoard) _board.UnRegisterEnemyBoard(enemy.TilePosition);
         }
 
         //Interface
         public bool TryGetCombatant(Tile tilePoint, out ICombatant combatant)
         {
-            if(_activeEnemyDic.TryGetValue(tilePoint, out ICombatant value))
+            if(_activeEnemyByTile.TryGetValue(tilePoint, out ICombatant value))
             {
                 combatant = value;
                 return true;
@@ -108,10 +118,10 @@ namespace JW.DungeonSliding.GamePlay.Entities
                 return false;
             }
         }
-        public List<ICombatant> GetAllCombatant()
+        public List<ICombatant> GetAllActiveCombatant()
         {
             List<ICombatant> activeList = new List<ICombatant>();
-            foreach (var enemy in _activeEnemyDic)
+            foreach (var enemy in _activeEnemyByTile)
             {
                 activeList.Add(enemy.Value);
             }

@@ -15,11 +15,11 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
             isCunsumed = true;
         }
-        public override void ProcTrigger(EAbilityTriggerType triggerType)
+        public override void ProcTrigger(EGameTriggerType triggerType)
         {
             if (isCunsumed == true) return;
 
-            if (triggerType == EAbilityTriggerType.OnDeathByHP || triggerType == EAbilityTriggerType.OnDeathByMoveCount)
+            if (triggerType == EGameTriggerType.OnDeathByHP || triggerType == EGameTriggerType.OnDeathByMoveCount)
             {
                 ExcuteAbility();
             }

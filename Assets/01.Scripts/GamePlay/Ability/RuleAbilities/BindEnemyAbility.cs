@@ -20,9 +20,9 @@ namespace JW.DungeonSliding.GamePlay.Ability
             }
         }
 
-        public override void ProcTrigger(EAbilityTriggerType triggerType)
+        public override void ProcTrigger(EGameTriggerType triggerType)
         {
-            if (triggerType == EAbilityTriggerType.Attack || triggerType == EAbilityTriggerType.BackAttack)
+            if (triggerType == EGameTriggerType.Attack || triggerType == EGameTriggerType.BackAttack)
             {
                 ExcuteAbility();
             }
