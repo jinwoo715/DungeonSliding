@@ -1,7 +1,7 @@
 using UnityEngine;
 namespace JW.DungeonSliding.GamePlay.Ability
 {
-    [CreateAssetMenu(fileName = "StackableStatAbiltyData", menuName = "Create Ability/StackableStatAbiltyData", order = 0)]
+    [CreateAssetMenu(fileName = "RuleAbility", menuName = "Create Ability/RuleAbility", order = 0)]
     public class RuleAbilityData : AbilityData
     {
         public ERuleAbilityType RuleAbilityType;

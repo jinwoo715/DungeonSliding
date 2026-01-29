@@ -16,14 +16,13 @@ namespace JW.DungeonSliding.Map
         public Action<EnemyTemplete[], int> SetEnemyEvent;
         
         private bool[] _tileMapData;
-        private HashSet<Tile> _enemies = new HashSet<Tile>();
-        private Dictionary<Tile, IEffectObject> _effectTileDic = new Dictionary<Tile, IEffectObject>();
+        private HashSet<Tile> _enemyTiles = new HashSet<Tile>();
+        private HashSet<Tile> _obstacleTiles = new HashSet<Tile>();
+        private Dictionary<Tile, IEffectTile> _effectTileDic = new Dictionary<Tile, IEffectTile>();
         private MapData _currentMapData;
 
         private int[,] _dir = { {-1,0 }, {0,1 }, {1,0 }, {0,-1 } };
         private ITilePosition _player;
-
-
 
         public void Init(ITilePosition player)
         {
@@ -49,7 +48,7 @@ namespace JW.DungeonSliding.Map
         {
             MoveContext moveContext = new MoveContext(startPoint, direction, enterType);
 
-            if(_effectTileDic.TryGetValue(startPoint, out IEffectObject effectTile))
+            if(_effectTileDic.TryGetValue(startPoint, out IEffectTile effectTile))
             {
                 effectTile.OnEnterTile(ref moveContext);
 
@@ -66,13 +65,13 @@ namespace JW.DungeonSliding.Map
             destination.XPos += _dir[(int)moveContext.Direction, 0];
             destination.ZPos += _dir[(int)moveContext.Direction, 1];
 
-            if (!IsInArea(destination) || _tileMapData[GetTileIndex(destination)] == false)
+            if (!IsInArea(destination) || _tileMapData[GetTileIndex(destination)] == false || _obstacleTiles.Contains(destination))
             {
                 moveContext.ResultType = ESlideResultType.Stop;
                 return moveContext;
             }
 
-            if (_enemies.Contains(destination))
+            if (_enemyTiles.Contains(destination))
             {
                 moveContext.ResultType = ESlideResultType.EnemyStop;
                 return moveContext;
@@ -100,25 +99,35 @@ namespace JW.DungeonSliding.Map
         }
         private int GetTileIndex(int x, int z) => _currentMapData.Width * z + x;
         private int GetTileIndex(Tile point) => _currentMapData.Width * point.ZPos + point.XPos;
-        public void RegisterEnemyBoard(Tile point, ICombatant combatant)
+        public void RegisterEnemyTile(Tile point)
         {
-            _enemies.Add(point);
+            _enemyTiles.Add(point);
         }
-        public void UnRegisterEnemyBoard(Tile point)
+        public void UnRegisterEnemyTile(Tile point)
         {
-            _enemies.Remove(point);
+            _enemyTiles.Remove(point);
         }
         public void ClearEnemyBoard()
         {
-            _enemies.Clear();
+            _enemyTiles.Clear();
         }
-        public void RegisterEffectObject(Tile point, IEffectObject effectObj)
+        public void RegisterEffectObject(Tile point, IEffectTile effectObj)
         {
             _effectTileDic.Add(point, effectObj);
         }
         public void UnRegisterEffectObject(Tile point)
         {
             _effectTileDic.Remove(point);
+        }
+
+        public void RegisterObstacleTile(Tile point)
+        {
+            _obstacleTiles.Add(point);
+        }
+
+        public void UnRegisterObstacleTile(Tile point)
+        {
+            _obstacleTiles.Remove(point);
         }
     }
 }

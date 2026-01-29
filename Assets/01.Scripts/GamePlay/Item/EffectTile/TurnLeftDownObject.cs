@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace JW.DungeonSliding
 {
-    public class TurnLeftDownObject : EffectObjectBase, IEffectObject
+    public class TurnLeftDownObject : EffectObjectBase, IEffectTile
     {
         public override MoveContext OnEnterTile(ref MoveContext moveContext)
         {

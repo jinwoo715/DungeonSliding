@@ -8,7 +8,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
     public class Enemy : Creature
     {
         public Action<Enemy> ReturnEvent;
-        public Action<Enemy, bool> OnDeathEvent;
+        public Action<Enemy> OnDeathEvent;
 
         private EnemyData _enemyData;
         private int _rewardXp = 0;

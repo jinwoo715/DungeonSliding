@@ -1,3 +1,4 @@
+using JW.DungeonSliding.GamePlay.Ability;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,8 +9,12 @@ namespace JW.DungeonSliding.Core.Resource
     {
         [SerializeField] private List<MapData> _mapDatas;
         [SerializeField] private List<TextAsset> _textDatas;
+        [SerializeField] private List<AbilityData> _abilities;
+
         public List<MapData> MapData { get; private set; }
         public Dictionary<string, string> _textDataByName = new Dictionary<string, string>();
+        public List<AbilityData> AllAbility => _abilities;
+
         internal void Init()
         {
             MapData = _mapDatas;
@@ -19,7 +24,6 @@ namespace JW.DungeonSliding.Core.Resource
                 _textDataByName[textName] = _textDatas[i].text;
             }
         }
-
         public string GetTextData(string textName)
         {
             if (_textDataByName.ContainsKey(textName))

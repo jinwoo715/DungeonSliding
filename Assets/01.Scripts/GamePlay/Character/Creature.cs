@@ -188,6 +188,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public virtual void OnDeath()
         {
             IsActive = false;
+            OnHitDoneEvent?.Invoke();
         }
 
         public void ModifyStat(ApplyStatContext context)

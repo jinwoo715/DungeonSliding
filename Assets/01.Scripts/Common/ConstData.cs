@@ -6,7 +6,7 @@ namespace JW.DungeonSliding
         //Player Stat
         public static readonly float MOVE_LERP_SCALE = 4.0f;
         public static readonly int PLAYER_START_HP = 5;
-        public static readonly int PLAYER_START_DMG = 2;
+        public static readonly int PLAYER_START_DMG = 5;
         public static readonly int PLAYER_START_MOVECOUNT = 10;
 
         public static readonly int LEVELUP_XP_OFFSET = 3;

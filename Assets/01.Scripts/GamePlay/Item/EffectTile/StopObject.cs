@@ -1,7 +1,7 @@
 using UnityEngine;
 namespace JW.DungeonSliding
 {
-    public class StopObject : EffectObjectBase, IEffectObject
+    public class StopObject : EffectObjectBase, IEffectTile
     {
         public override MoveContext OnEnterTile(ref MoveContext moveContext)
         {

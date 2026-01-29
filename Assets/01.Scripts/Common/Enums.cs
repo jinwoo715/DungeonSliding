@@ -96,12 +96,6 @@ namespace JW.DungeonSliding
         OnDeathByHP,
         OnDeathByMoveCount,
 
-        FadeOutStart,
-        FadeOutFin,
-
-        FadeInStart,
-        FadeInFin,
-
         ClearStage,
     }
 
@@ -160,14 +154,6 @@ namespace JW.DungeonSliding
         ExtraAttack,    //추가 공격
         CounterAttack,  //공격 받으면 공격하기
         WallKnockBack,  //벽 방향으로 이동하면 반대쪽으로 한 칸 밀리기
-    }
-
-    public enum ERewardEffect
-    {
-        None,
-        RandomAbility,
-        HPBarrier,
-        MoveCountBarrier,
     }
 
     //Map Editor

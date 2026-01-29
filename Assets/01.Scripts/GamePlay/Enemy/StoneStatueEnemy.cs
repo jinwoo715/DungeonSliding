@@ -9,26 +9,12 @@ namespace JW.DungeonSliding.GamePlay.Entities
     {
         [SerializeField] GameObject _robber;
 
-        [SerializeField] Material _originMaterial;
-        [SerializeField] Material _lightMaterial;
-
-        [SerializeField] MeshRenderer _lightMesh;
         [SerializeField] protected Transform _avatar;
         [SerializeField] private GameObject _eyeLight;
-
-        private void Start()
-        {
-            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.ClearStage, ReturnPool);
-        }
 
         public void ReturnPool()
         {
             StopAllCoroutines();
-
-            _avatar.gameObject.SetActive(true);
-            _robber.gameObject.SetActive(false);
-
-            _lightMesh.material = _originMaterial;
 
             ReturnEvent?.Invoke(this);
         }
@@ -47,23 +33,17 @@ namespace JW.DungeonSliding.GamePlay.Entities
         {
             base.OnDeath();
 
-            OnDeathEvent?.Invoke(this, false);
+            OnDeathEvent?.Invoke(this);
 
-            var dust = ParticlePool.Instance.GetParticle("DestroyDust");
-            dust.SetParticle(this.transform.position + Vector3.up * 0.5f, 2.0f);
-
-            _avatar.gameObject.SetActive(false);
-            _robber.gameObject.SetActive(true);
-
-            _lightMesh.material = _lightMaterial;
-
+            ReturnPool();
         }
-
-
 
         public override void GetHit(DamageInfo damageInfo)
         {
             base.GetHit(damageInfo);
+
+            if (IsActive == false)
+                return;
 
             Vector3 punchScale = new Vector3(0.02f, 0f, 0.02f);
             _avatar.transform.DOPunchPosition(punchScale, 0.3f, 20);

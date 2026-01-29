@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace JW.DungeonSliding
 {
-    public abstract class EffectObjectBase : MonoBehaviour, IEffectObject, ITilePosition
+    public abstract class EffectObjectBase : MonoBehaviour, IEffectTile, ITilePosition
     {
         protected EffectObjectData _effectObjectData;
 

@@ -26,12 +26,15 @@ namespace JW.DungeonSliding.GamePlay.Entities
         private IAttackRequestListener _attackRequestListener;
         private ICombatantSensor _combatantSensor;
         private IBoard _board;
+        private IObstacleRequest _obstacleRequest;
 
-        public void WireInterfaces(IBoard board, IAttackRequestListener attackRequestListener, ICombatantSensor sensor)
+        public void WireInterfaces(IBoard board, IAttackRequestListener attackRequestListener,
+            ICombatantSensor sensor, IObstacleRequest obstacleRequest)
         {
             _board = board;
             _attackRequestListener = attackRequestListener;
             _combatantSensor = sensor;
+            _obstacleRequest = obstacleRequest;
         }
         public void LoadData()
         {
@@ -58,23 +61,28 @@ namespace JW.DungeonSliding.GamePlay.Entities
                 enemy.SetPosition(data.Point);
                 
                 _activeEnemyByTile.Add(data.Point, enemy);
-                _board.RegisterEnemyBoard(data.Point, enemy);
+                _board.RegisterEnemyTile(data.Point);
             }
         }
         private Enemy GetEnemy(int enemyUID)
         {
+            Enemy enemy = null;
+
             if(_enemyPoolByUID.TryGetValue(enemyUID, out Stack<Enemy> pool))
             {
                 if (pool.Count > 0)
-                    return pool.Pop();
+                    enemy = pool.Pop();
                 else
-                    return SpawnEnemy(enemyUID);
+                    enemy = SpawnEnemy(enemyUID);
             }
             else
             {
                 _enemyPoolByUID[enemyUID] = new Stack<Enemy>();
-                return SpawnEnemy(enemyUID);
+                enemy = SpawnEnemy(enemyUID);
             }
+
+            enemy.gameObject.SetActive(true);
+            return enemy;
         }
         private Enemy SpawnEnemy(int enemyUID)
         {
@@ -90,10 +98,12 @@ namespace JW.DungeonSliding.GamePlay.Entities
             enemy.gameObject.SetActive(false);
             _enemyPoolByUID[enemy.EnemyUID].Push(enemy);
         }
-        private void OnEnemyDeath(Enemy enemy, bool isUnRegisterOnBoard = true)
+        private void OnEnemyDeath(Enemy enemy)
         {
             OnEnemyRewardEvent?.Invoke(new RewardData(enemy.Xp));
             _activeEnemyByTile.Remove(enemy.TilePosition);
+
+            _obstacleRequest.SpawnObstacle(enemy.TilePosition, EObstacleObjectType.Rubble);
 
             if (_activeEnemyByTile.Count == 0)
             {
@@ -101,7 +111,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
                 GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.ClearStage);
             }
 
-            if(isUnRegisterOnBoard) _board.UnRegisterEnemyBoard(enemy.TilePosition);
+            _board.UnRegisterEnemyTile(enemy.TilePosition);
         }
 
         //Interface

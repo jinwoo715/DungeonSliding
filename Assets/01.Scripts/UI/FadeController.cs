@@ -10,20 +10,6 @@ namespace JW.DungeonSliding.UI
     {
         [SerializeField] private CanvasGroup _fadeImage;
 
-        public Action OnEndFadeOutEvent;
-        public Action OnEndFadeInEvent;
-
-        public void Init()
-        {
-            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.FadeOutStart, FadeOut);
-            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.FadeInStart, FadeIn);
-        }
-
-        public void FadeIn()
-        {
-            StartCoroutine(CoFadeIn());
-        }
-
         public IEnumerator CoFadeIn() 
         {
             Debug.Log("Fade In");
@@ -35,15 +21,7 @@ namespace JW.DungeonSliding.UI
                 yield return null;
             }
             _fadeImage.alpha = 0;
-            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.FadeInFin);
-            OnEndFadeOutEvent?.Invoke();
         }
-
-        public void FadeOut()
-        {
-            StartCoroutine(CoFadeOut());
-        }
-
         public IEnumerator CoFadeOut()
         {
             Debug.Log("Fade Out");
@@ -54,9 +32,10 @@ namespace JW.DungeonSliding.UI
                 _fadeImage.alpha = timer;
                 yield return null;
             }
+
+            yield return new WaitForSeconds(0.5f);
+
             _fadeImage.alpha = 1;
-            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.FadeOutFin);
-            OnEndFadeOutEvent?.Invoke();
         }
     }
 }

@@ -21,12 +21,12 @@ namespace JW.DungeonSliding.GamePlay.Context
         public InputSystem _inputSystem;
         public GameModeController _gameModeController;
         public IUIFader _uiFader;
-
+        public IObstacleRequest _obstacleRequest;
         public int Floor { get; private set; }
-        public RewardManager Reward => PlayerReward;
         public void Init(RewardManager reward, MapManager map, 
             Player player, EnemyManager enemyManager, BattleManager battleManager, 
-            InputSystem input, GameModeController gameModeController, IUIFader uiFader)
+            InputSystem input, GameModeController gameModeController, IUIFader uiFader
+            , IObstacleRequest obstacleRequest)
         {
             PlayerReward = reward;
             _mapManager = map;
@@ -36,40 +36,29 @@ namespace JW.DungeonSliding.GamePlay.Context
             _inputSystem = input;
             _gameModeController = gameModeController;
             _uiFader = uiFader;
+            _obstacleRequest = obstacleRequest;
+
             GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.ClearStage, PrepareStage);
         }
 
         public void PrepareStage() 
         {
-            _gameModeController.EnterGameMode(EGameModeType.PrepareStage);
-
             StartCoroutine(CoWaitStartStage());
         }
 
         public IEnumerator CoWaitStartStage()
         {
-            bool isFadeOutDone = false;
-
-            //GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.FadeOutFin, () => { isFadeOutDone = true; });
-            //GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.FadeOutStart);
+            yield return new WaitUntil(() => _gameModeController.Flow == EGameModeType.Play);
+            
+            _gameModeController.EnterGameMode(EGameModeType.PrepareStage);
 
             yield return _uiFader.FadeOut();
 
-            //yield return new WaitUntil(() => isFadeOutDone == true);
-
-            //GameTriggerEventBus.Instance.UnSubscribeTriggerEvent(EGameTriggerType.FadeOutFin, () => { isFadeOutDone = true; });
+            _obstacleRequest.ClearObstacles();
 
             _mapManager.SetMap(Floor);
 
             yield return _uiFader.FadeIn();
-            //bool isFadeInDone = false;
-
-            //GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.FadeInFin, () => { isFadeInDone = true; });
-            //GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.FadeInStart);
-
-            //yield return new WaitUntil(() => isFadeInDone == true);
-
-            //GameTriggerEventBus.Instance.UnSubscribeTriggerEvent(EGameTriggerType.FadeInFin, () => { isFadeInDone = true; });
 
             _gameModeController.ExitGameMode(EGameModeType.PrepareStage);
         }

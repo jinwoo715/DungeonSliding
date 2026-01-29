@@ -6,6 +6,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
     public class AbilityData : ScriptableObject
     {
         [Header("Default Ability Data")]
+        public int AbilityUID;
         public string Name;
         public string Description;
         public Sprite AbilitySprite;

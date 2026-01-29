@@ -1,7 +1,7 @@
 using UnityEngine;
 namespace JW.DungeonSliding
 {
-    public class TeleportObject : EffectObjectBase, IEffectObject
+    public class TeleportObject : EffectObjectBase, IEffectTile
     {
         private Tile deltaPoint;
 

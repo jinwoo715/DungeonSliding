@@ -1,3 +1,4 @@
+using JW.DungeonSliding.GamePlay.Ability;
 using System.Collections;
 using UnityEngine;
 
@@ -9,9 +10,15 @@ namespace JW.DungeonSliding.UI
         IEnumerator FadeIn();
     }
 
-    public class GameSceneUIManager : MonoBehaviour, IUIFader
+    public class GameSceneUIManager : MonoBehaviour, IUIFader, IAbilitySelectService
     {
         [SerializeField] private FadeController _fadeController;
+        [SerializeField] private AbilityUIController _abilityUIController;
+
+        public void Init()
+        {
+            _abilityUIController.Init();
+        }
 
         public IEnumerator FadeIn()
         {
@@ -22,15 +29,9 @@ namespace JW.DungeonSliding.UI
         {
             yield return _fadeController.CoFadeOut();
         }
-
-        public void Init()
+        public void SetAbilitySession(AbilitySession session)
         {
-            ChildInit();
+            _abilityUIController.OpenSelectAbilityView(session);
         }
-        private void ChildInit()
-        {
-            _fadeController.Init();
-        }
-
     }
 }

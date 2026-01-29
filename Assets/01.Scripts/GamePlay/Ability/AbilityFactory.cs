@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Ability
 {
-public class AbilityFactory : MonoBehaviour
+public class AbilityFactory
 {
     public IAbility GetAbility(AbilityData data)
     {

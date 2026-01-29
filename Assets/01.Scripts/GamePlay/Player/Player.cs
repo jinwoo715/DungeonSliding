@@ -48,21 +48,21 @@ namespace JW.DungeonSliding.GamePlay.Entities
                 _animatorController.SetInt(ConstString.PLAYER_STATE_KEY, (int)_characterState);
             }
         }
-
         public void SetGameModeChanger(IGameModeChanger modeChanger)
         {
             _gameModeChanger = modeChanger;
         }
-
         public override void Init()
         {
             base.Init();
             SetCretureStat(new CretureStat(ConstData.PLAYER_START_HP, ConstData.PLAYER_START_DMG));
-            _levelUpXp = MathUtil.GetFib(_level + ConstData.LEVELUP_XP_OFFSET);
+            _levelUpXp = 1;//MathUtil.GetFib(_level + ConstData.LEVELUP_XP_OFFSET);
         }
         public void GetReward(RewardData rewardData)
         {
             _currentXp += rewardData.Xp;
+
+            Debug.Log(_currentXp);
 
             while (_currentXp >= _levelUpXp)
             {
@@ -74,8 +74,12 @@ namespace JW.DungeonSliding.GamePlay.Entities
         }
         private void LevelUp()
         {
+            Debug.Log("Level Up");
             _level++;
             _levelUpXp = MathUtil.GetFib(_level + ConstData.LEVELUP_XP_OFFSET);
+
+            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.LevelUp);
+
             LevelUpEvent?.Invoke();
         }
         public void Move(EDirectionType inputDirection)
