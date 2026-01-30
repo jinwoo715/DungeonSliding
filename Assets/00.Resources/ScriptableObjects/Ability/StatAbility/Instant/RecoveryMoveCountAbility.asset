@@ -12,12 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ad0caa0e788f374894f0afd16175c1f, type: 3}
   m_Name: RecoveryMoveCountAbility
   m_EditorClassIdentifier: 
+  AbilityUID: 7
   Name: "\uC774\uB3D9 \uD69F\uC218 \uCC44\uC6C0"
   Description: "\uC774\uB3D9 \uD69F\uC218 \uC804\uBD80 \uCC44\uC6B0\uAE30"
   AbilitySprite: {fileID: 485823971, guid: 080cb6d98b00c2645b2c41df5f69bc78, type: 3}
-  EffectKind: 0
-  AbilityTrigger: 0
+  AbilityRank: 0
+  EAbilityEffectType: 0
+  AbilityTriggerTypes: 
   IsDisposable: 0
+  ApplyStatType: 0
   PlayerStat: 4
   ApplyType: 0
   RatioType: 5

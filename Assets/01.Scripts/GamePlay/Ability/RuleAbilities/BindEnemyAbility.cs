@@ -9,7 +9,10 @@ namespace JW.DungeonSliding.GamePlay.Ability
     {
         HashSet<ICombatant> _bindEenmies = new HashSet<ICombatant>();
         ICombatant _combatant;
-        public BindEnemyAbility(RuleAbilityData data, IAbilityEntity entity) : base(data, entity) { }
+        public BindEnemyAbility(RuleAbilityData data, IAbilityHost host) : base(data, host) 
+        {
+            BindService<ICombatant>(ref _combatant);
+        }
 
         public override void ExcuteAbility()
         {
@@ -25,6 +28,11 @@ namespace JW.DungeonSliding.GamePlay.Ability
             if (triggerType == EGameTriggerType.Attack || triggerType == EGameTriggerType.BackAttack)
             {
                 ExcuteAbility();
+            }
+
+            if(triggerType == EGameTriggerType.EnterRoom)
+            {
+                _bindEenmies.Clear();
             }
         }
     }

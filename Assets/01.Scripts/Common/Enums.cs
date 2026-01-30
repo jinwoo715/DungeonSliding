@@ -86,6 +86,8 @@ namespace JW.DungeonSliding
         MoveStart,
         MoveEnd,
 
+        MoveExceptBattle,
+
         LevelUp,
 
         BattleStart,
@@ -105,6 +107,12 @@ namespace JW.DungeonSliding
         Rule,
     }
 
+    public enum EAbilityApplyStatType
+    {
+        EntityStat,
+        NextActStat
+    }
+
     public enum ERuleAbilityType
     {
         // --- 생존/방어 ---
@@ -115,7 +123,7 @@ namespace JW.DungeonSliding
         WallBound,            // 벽 앞에서 반대쪽 이동
 
         // --- 공격/강화 ---
-        AroundEnemyBonus,    // 주변 적 비례 추가 데미지
+        SurroundEnemyBonus,    // 주변 적 비례 추가 데미지
         DoubleAttack,        // 확률적 2번 공격
         CounterAttack,       // 피격 시 확률 반격
         DistanceDamageBonus, // 이동한 타일 수만큼 공격 강화
@@ -126,7 +134,9 @@ namespace JW.DungeonSliding
 
         // --- 자원 역전 (부활과 구분 필요) ---
         LastResortMove,      // Move 0일 때 HP 소모 회복
-        LastResortHP         // HP 0일 때 Move 소모 회복
+        LastResortHP,         // HP 0일 때 Move 소모 회복
+
+        RerollPlus
     }
 
     public enum EPlayerStat

@@ -17,7 +17,7 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
         private GameModeController _modeController = new GameModeController();
         private InputCoordinator _inputCoordinator = new InputCoordinator();
         private GameTriggerEventBus _triggerEventBus = new GameTriggerEventBus();
-        private PlayerAbilitySystem _abilitySystem = new PlayerAbilitySystem();
+        private AbilitySystem _abilitySystem;
         private FieldCombatantManager _fieldCombatantManager;
 
         [SerializeField] private GameSceneManager _gameSceneManager;
@@ -59,6 +59,8 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
             _battleManager.Init(_fieldCombatantManager, _modeController);
 
             _gameSceneUIManager.Init();
+
+            _abilitySystem = new AbilitySystem(_gameSceneUIManager, _modeController, _player);
         }
 
         private void BindEvent()
@@ -77,8 +79,6 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
             
             _player.FinishSlideEvent += _battleManager.StartBattleSequence;
             _player.GetMoveContextFunc += _mapManager.GetMoveContext;
-
-            _abilitySystem.Wire(_gameSceneUIManager, _modeController);
         }
 
         private void OnDestroy()

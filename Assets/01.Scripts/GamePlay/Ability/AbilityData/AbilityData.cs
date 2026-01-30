@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Ability
@@ -11,10 +12,12 @@ namespace JW.DungeonSliding.GamePlay.Ability
         public string Description;
         public Sprite AbilitySprite;
         public EAbilityRank AbilityRank;
-        public EAbilityEffectKind EffectKind;
+        public EAbilityEffectKind EAbilityEffectType;
 
-        public EGameTriggerType AbilityTrigger;
+        public List<EGameTriggerType> AbilityTriggerTypes;
 
         public bool IsDisposable;
+
+        public virtual List<EGameTriggerType> GetEnrollTriggers => AbilityTriggerTypes;
     }
 }

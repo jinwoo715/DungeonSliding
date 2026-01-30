@@ -28,7 +28,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
         public event Action OnAttackDoneEvent;
         public IAttackRequestListener _attackRequestListener { get; }
         public ICombatant AttackTarget { get;}
-        public NextAttackBuff CurrentAttackBuff { get; }
+        public NextAttackBuff AttackBuff { get; }
         float DamageDealtMultiplier { get; set; }  // 가하는 피해 배율
         public void SetAttackRequestListener(IAttackRequestListener requestListener);
         public void RegisterAttack();

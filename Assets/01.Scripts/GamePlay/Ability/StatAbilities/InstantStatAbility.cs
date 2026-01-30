@@ -1,30 +1,30 @@
 using JW.DungeonSliding;
+using JW.DungeonSliding.GamePlay.Combat;
 using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Ability
 {
-public class InstantStatAbility : IAbility
-{
-    public readonly InstantStatAbiltyData _data;
-    public IAbilityEntity Entity { get; private set; }
-
-    public InstantStatAbility(IAbilityEntity entity, InstantStatAbiltyData data)
+    public class InstantStatAbility : IAbility
     {
-        Entity = entity;
-        _data = data;
-        ExcuteAbility();
-    }
+        public readonly InstantStatAbiltyData _data;
+        public IAbilityHost Host { get; private set; }
 
-    public void ExcuteAbility()
-    {
-        ApplyStatContext applyStatContext = new ApplyStatContext(
-            _data.PlayerStat, _data.ApplyType, _data.Value, _data.RatioType);
-        Entity.ModifyStat(applyStatContext);
-    }
+        public InstantStatAbility(IAbilityHost host, InstantStatAbiltyData data)
+        {
+            Host = host;
+            _data = data;
+            ExcuteAbility();
+        }
 
-    public void ProcTrigger(EGameTriggerType triggerType)
-    {
-
+        public void ExcuteAbility()
+        {
+            if (Host.TryGet<IStatModifier>(out var service))
+            {
+                ApplyStatContext applyStatContext = new ApplyStatContext(
+                _data.PlayerStat, _data.ApplyType, _data.Value, _data.RatioType);
+                service.ModifyStat(applyStatContext);
+            }
+        }
+        public void ProcTrigger(EGameTriggerType triggerType) {}
     }
-}
 }

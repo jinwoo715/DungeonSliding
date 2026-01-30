@@ -18,7 +18,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
         public int CurrentMoveCount => throw new NotImplementedException();
 
-        public NextAttackBuff CurrentAttackBuff => throw new NotImplementedException();
+        public NextAttackBuff AttackBuff => throw new NotImplementedException();
 
         public ECreatureStatus CreateStatus => throw new NotImplementedException();
 

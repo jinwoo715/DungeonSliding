@@ -1,14 +1,16 @@
 using JW.DungeonSliding.GamePlay.Combat;
-using JW.DungeonSliding.GamePlay.Entities;
-using UnityEngine;
+using JW.DungeonSliding.Map;
 
 namespace JW.DungeonSliding.GamePlay.Ability
 {
-    public class SecondWindAbility : RuleAbility
+    public class ConvertHpToMoveCount : RuleAbility
     {
         ICombatant _combatant;
-        public SecondWindAbility(RuleAbilityData data, Player player) : base(data, player)
+        IMoveable _moveable;
+        public ConvertHpToMoveCount(RuleAbilityData data, IAbilityHost host) : base(data, host)
         {
+            BindService<ICombatant>(ref _combatant);
+            BindService<IMoveable>(ref _moveable);
         }
 
         public override void ExcuteAbility()

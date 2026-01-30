@@ -12,12 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ad0caa0e788f374894f0afd16175c1f, type: 3}
   m_Name: AddFixDamageAbility
   m_EditorClassIdentifier: 
+  AbilityUID: 1
   Name: "\uB370\uBBF8\uC9C0 \uB367\uC148"
   Description: "\uB370\uBBF8\uC9C0 5\uC99D\uAC00"
   AbilitySprite: {fileID: 695775810, guid: 080cb6d98b00c2645b2c41df5f69bc78, type: 3}
-  EffectKind: 0
-  AbilityTrigger: 0
+  AbilityRank: 0
+  EAbilityEffectType: 0
+  AbilityTriggerTypes: 
   IsDisposable: 0
+  ApplyStatType: 0
   PlayerStat: 2
   ApplyType: 0
   RatioType: 0

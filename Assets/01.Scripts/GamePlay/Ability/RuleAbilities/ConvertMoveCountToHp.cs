@@ -1,15 +1,16 @@
 using JW.DungeonSliding.GamePlay.Combat;
-using JW.DungeonSliding.GamePlay.Entities;
 using JW.DungeonSliding.Map;
 
 namespace JW.DungeonSliding.GamePlay.Ability
 {
-    public class BloodDriveAbility : RuleAbility
+    public class ConvertMoveCountToHp : RuleAbility
     {
         ICombatant _combatant;
         IMoveable _moveable;
-        public BloodDriveAbility(RuleAbilityData data, Player player) : base(data, player)
+        public ConvertMoveCountToHp(RuleAbilityData data, IAbilityHost host) : base(data, host)
         {
+            BindService<ICombatant>(ref _combatant);
+            BindService<IMoveable>(ref _moveable);
         }
 
         public override void ExcuteAbility()

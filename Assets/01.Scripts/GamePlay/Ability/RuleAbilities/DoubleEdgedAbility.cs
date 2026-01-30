@@ -7,8 +7,10 @@ namespace JW.DungeonSliding.GamePlay.Ability
     public class DoubleEdgedAbility : RuleAbility
     {
         ICombatant _combatant;
-        public DoubleEdgedAbility(RuleAbilityData data, Player player) : base(data, player)
+        public DoubleEdgedAbility(RuleAbilityData data, IAbilityHost host) : base(data, host)
         {
+            BindService<ICombatant>(ref _combatant);
+
             _combatant.DamageDealtMultiplier = _data.GainValue;
             _combatant.DamageTakenMultiplier = _data.GainValue;
         }

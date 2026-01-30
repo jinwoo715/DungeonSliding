@@ -4,14 +4,14 @@ namespace JW.DungeonSliding.GamePlay.Ability
 {
     public class BarrierAbility : RuleAbility
     {
-        private ICombatant _combatant;
-
-        public BarrierAbility(RuleAbilityData data, IAbilityEntity entity) : base(data, entity) { }
+        public BarrierAbility(RuleAbilityData data, IAbilityHost host) : base(data, host) { }
 
         public override void ExcuteAbility()
         {
-            Entity.GainBarrier();
-            _combatant.GainBarrier();
+            if (Host.TryGet<IDamageable>(out var service))
+            {
+                service.GainBarrier();
+            }
         }
 
         public override void ProcTrigger(EGameTriggerType triggerType)

@@ -1,4 +1,5 @@
 using JW.DungeonSliding.GamePlay.Combat;
+using JW.DungeonSliding.Map;
 
 namespace JW.DungeonSliding.GamePlay.Ability
 {
@@ -6,18 +7,23 @@ namespace JW.DungeonSliding.GamePlay.Ability
     {
         private ICombatantSensor _sensor;
         private ICombatant _combatant;
-        public SurroundEmpowerAbility(RuleAbilityData data, IAbilityEntity entity) : base(data, entity) { }
+        private IMoveable _moveable;
+        public SurroundEmpowerAbility(RuleAbilityData data, IAbilityHost host) : base(data, host) 
+        {
+            BindService<ICombatantSensor>(ref _sensor);
+            BindService<ICombatant>(ref _combatant);
+            BindService<IMoveable>(ref _moveable);
+        }
 
         public override void ExcuteAbility()
         {
             int count = _sensor.GetNearCambatantCount(_combatant);
-
-            _combatant.CurrentAttackBuff.AddDamage(count);
+            _combatant.AttackBuff.AddDamage(count);
         }
 
         public override void ProcTrigger(EGameTriggerType triggerType)
         {
-            if (triggerType == EGameTriggerType.MoveEnd)
+            if (_moveable.SlideResultType == ESlideResultType.EnemyStop)
             {
                 ExcuteAbility();
             }

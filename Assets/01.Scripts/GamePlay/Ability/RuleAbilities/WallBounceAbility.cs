@@ -6,7 +6,10 @@ namespace JW.DungeonSliding.GamePlay.Ability
     {
         public IMoveable _moveable;
 
-        public WallBounceAbility(RuleAbilityData data, IAbilityEntity entity) : base(data, entity) { }
+        public WallBounceAbility(RuleAbilityData data, IAbilityHost host) : base(data, host)
+        {
+            BindService<IMoveable>(ref _moveable);
+        }
 
         public override void ExcuteAbility()
         {
@@ -16,9 +19,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         public override void ProcTrigger(EGameTriggerType triggerType)
         {
-            if (triggerType == EGameTriggerType.MoveEnd &&
-                _moveable.SlideTileCount() == 1 &&
-                _moveable.SlideResultType == ESlideResultType.EnemyStop)
+            if (_moveable.SlideTileCount() == 1 && _moveable.SlideResultType == ESlideResultType.EnemyStop)
             {
                 ExcuteAbility();
             }

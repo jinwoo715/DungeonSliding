@@ -10,6 +10,10 @@ namespace JW.DungeonSliding.GamePlay.Combat
         {
             NextExtraDamage += damage;
         }
+        public void AddDamageMulti(float multi)
+        {
+            NextExtraDamageMultiplier += multi;
+        }
         public void AddExtraAttack(int count = 1)
         {
             NextExtraAttackAcount += count;

@@ -7,11 +7,17 @@ namespace JW.DungeonSliding.GamePlay.Ability
     {
         ICombatant _combatant;
 
-        public ExtraAttackChance(RuleAbilityData data, IAbilityEntity entity) : base(data, entity) { }
+        public ExtraAttackChance(RuleAbilityData data, IAbilityHost host) : base(data, host) 
+        {
+            if (Host.TryGet<ICombatant>(out var service))
+            {
+                _combatant = service;
+            }
+        }
 
         public override void ExcuteAbility()
         {
-            _combatant.CurrentAttackBuff.AddExtraAttack();
+            _combatant.AttackBuff.AddExtraAttack();
         }
 
         public override void ProcTrigger(EGameTriggerType triggerType)

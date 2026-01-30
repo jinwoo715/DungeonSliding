@@ -7,20 +7,21 @@ namespace JW.DungeonSliding.GamePlay.Ability
     {
         ICombatant _combatant;
         IMoveable _moveable;
-        public SlideAmplifierAbility(RuleAbilityData data, IAbilityEntity entity) : base(data, entity) { }
+        public SlideAmplifierAbility(RuleAbilityData data, IAbilityHost host) : base(data, host) 
+        {
+            BindService<ICombatant>(ref _combatant);
+            BindService<IMoveable>(ref _moveable);
+        }
 
         public override void ExcuteAbility()
         {
             int addDamage = _moveable.SlideTileCount();
-            _combatant.CurrentAttackBuff.AddDamage(addDamage);
+            _combatant.AttackBuff.AddDamage(addDamage);
         }
 
         public override void ProcTrigger(EGameTriggerType triggerType)
         {
-            if (triggerType == EGameTriggerType.MoveEnd)
-            {
-                ExcuteAbility();
-            }
+            ExcuteAbility();
         }
     }
 }

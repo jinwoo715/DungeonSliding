@@ -7,7 +7,13 @@ namespace JW.DungeonSliding.GamePlay.Ability
     {
         ICombatant _combatant;
 
-        public CounterAttack(RuleAbilityData data, IAbilityEntity entity) : base(data, entity) { }
+        public CounterAttack(RuleAbilityData data, IAbilityHost host) : base(data, host) 
+        {
+            if (Host.TryGet<ICombatant>(out var service))
+            {
+                _combatant = service;
+            }
+        }
 
         public override void ExcuteAbility()
         {

@@ -1,5 +1,6 @@
 using DG.Tweening;
 using JW.DungeonSliding.Core.Flow;
+using JW.DungeonSliding.GamePlay.Ability;
 using JW.DungeonSliding.GamePlay.Combat;
 using JW.DungeonSliding.GamePlay.Context;
 using JW.DungeonSliding.Map;
@@ -11,7 +12,7 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Entities
 {
-    public class Player : Creature, IMoveable, IAbilityEntity
+    public class Player : Creature, IMoveable, IAbilityEntity, IAbilityHost
     {
         private RoutePlanner _route = new RoutePlanner();
         private ECharacterStateType _characterState = ECharacterStateType.Idle;
@@ -307,6 +308,12 @@ namespace JW.DungeonSliding.GamePlay.Entities
             {
                 _attackRequestListener.RegisterActpair(new ActPair(this, target));
             }
+        }
+
+        public bool TryGet<T>(out T service) where T : class
+        {
+            service = this as T;
+            return service != null;
         }
 
         private int GetMaxHP => _originCretureStat.HP + _addMaxHp;
