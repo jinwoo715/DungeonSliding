@@ -3,6 +3,7 @@ using JW.DungeonSliding.Core.Flow;
 using JW.DungeonSliding.GamePlay.Ability;
 using JW.DungeonSliding.GamePlay.Combat;
 using JW.DungeonSliding.GamePlay.Context;
+using JW.DungeonSliding.GamePlay.Stats;
 using JW.DungeonSliding.Map;
 using JW.Utility;
 using System;
@@ -12,11 +13,57 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Entities
 {
-    public class Player : Creature, IMoveable, IAbilityEntity, IAbilityHost
+    public class StatValue
+    {
+        public int Base;      // 기본값
+        public int Add;       // 덧셈 보너스(+)
+        public float Mul;     // 곱셈 보너스(×), 기본 1f
+
+        public Dictionary<EPlayerStat, float> RatioValueByStat;
+
+        public StatValue(int baseValue)
+        {
+            Base = baseValue;
+            Add = 0;
+            Mul = 1;
+
+            RatioValueByStat = new();
+        }
+
+        public void AddRatio(EPlayerStat stat, float value)
+        {
+            if (!RatioValueByStat.ContainsKey(stat))
+                RatioValueByStat.Add(stat, 0);
+
+            RatioValueByStat[stat] += value;
+        }
+
+        public int Final(IPlayerStatReadOnly StatReadOnly) 
+        {
+            float addRatioValue = 0;
+            foreach (var item in RatioValueByStat)
+            {
+                addRatioValue += StatReadOnly.Get(item.Key) * item.Value;
+            }
+
+            return Mathf.FloorToInt((Base + Add + addRatioValue) * Mul);
+        }
+
+        public void ResetBonus()
+        {
+            Add = 0;
+            Mul = 1f;
+            RatioValueByStat.Clear();
+        }
+    }
+
+    public class Player : Creature, IMoveable, IAbilityHost, INextAttackEnhancer, IPlayerStatReadOnly
     {
         private RoutePlanner _route = new RoutePlanner();
         private ECharacterStateType _characterState = ECharacterStateType.Idle;
-
+        public ESlideResultType SlideResultType => throw new NotImplementedException();
+        public EDirectionType MoveDir => throw new NotImplementedException();
+        public Action<EPlayerStat> OnStatChanged { get; set; }
         public event Func<Tile, EDirectionType, ETileEnterType, MoveContext> GetMoveContextFunc;
         public event Action FinishSlideEvent;
         public event Action LevelUpEvent;
@@ -28,17 +75,19 @@ namespace JW.DungeonSliding.GamePlay.Entities
         private int _currentXp = 0;
         private bool _isKnockbacking = false;
 
-        private int _maxMoveCount;
+        private NextAttackBuff _nextAttackBuff;
+
+        private StatValue MaxHp;
+        private StatValue Damage;
+        private StatValue MaxMoveCount;
         private int _currentMoveCount;
 
-        private int _addDamage = 0;
-        private float _multiDamage = 0;
-
-        private int _addMaxHp = 0;
-
-        private int _nextAttackAddDamage = 0;
-
         public Action OnDeathEvent;
+
+        //데미지를 받았을 때,
+        //Stat이 변경됐을 때,
+        //다음 공격에 대한 변경이 있을 때
+
         private void ChangeCharacterState(ECharacterStateType stateType)
         {
             if (_characterState == stateType) return;
@@ -56,8 +105,16 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public override void Init()
         {
             base.Init();
-            SetCretureStat(new CretureStat(ConstData.PLAYER_START_HP, ConstData.PLAYER_START_DMG));
             _levelUpXp = 1;//MathUtil.GetFib(_level + ConstData.LEVELUP_XP_OFFSET);
+            MaxHp = new StatValue(10);
+            MaxMoveCount = new StatValue(10);
+            Damage = new StatValue(3);
+
+            OnStatChanged?.Invoke(EPlayerStat.HP);
+            OnStatChanged?.Invoke(EPlayerStat.MoveCount);
+            OnStatChanged?.Invoke(EPlayerStat.Damage);
+
+            _nextAttackBuff.Reset();
         }
         public void GetReward(RewardData rewardData)
         {
@@ -77,7 +134,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         {
             Debug.Log("Level Up");
             _level++;
-            _levelUpXp = MathUtil.GetFib(_level + ConstData.LEVELUP_XP_OFFSET);
+            _levelUpXp = 1;//MathUtil.GetFib(_level + ConstData.LEVELUP_XP_OFFSET);
 
             GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.LevelUp);
 
@@ -110,7 +167,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
             {
                 MoveContext moveContext = moveContexts.Dequeue();
 
-                ApplyDamage(new DamageInfo(null, moveContext.Damage, false));
+                if(moveContext.Damage != 0)
+                    ApplyDamage(new DamageInfo(null, moveContext.Damage, false));
 
                 switch (moveContext.ResultType)
                 {
@@ -130,10 +188,10 @@ namespace JW.DungeonSliding.GamePlay.Entities
             ChangeCharacterState(ECharacterStateType.Idle);
             FinishMove();
         }
-
         public void FinishMove()
         {
             FinishSlideEvent?.Invoke();
+            ModifyStat(new ApplyStatContext(EPlayerStat.MoveCount, EApplyStatType.Add, -1, EPlayerStat.None));
             _gameModeChanger.ExitGameMode(EGameModeType.Sliding);
         }
         private IEnumerator CoMove(MoveContext moveContext)
@@ -214,7 +272,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             base.Attack(target);
             _animatorController.SetAnimationTrigger(ConstString.ONE_HAND_ATTACK_ANIM);
         }
-        public void ModifyStat(ApplyStatContext applyStatContext)
+        public override void ModifyStat(ApplyStatContext applyStatContext)
         {
             float floatValue = CalculateModifyValue(applyStatContext);
             int intValue = Mathf.RoundToInt(floatValue);
@@ -223,35 +281,63 @@ namespace JW.DungeonSliding.GamePlay.Entities
             {
                 case EPlayerStat.HP:
 
-                    _currentCretureStat.HP = Mathf.Min(_currentCretureStat.HP + intValue, _originCretureStat.HP + _addMaxHp);
+                    _currentHP = Mathf.Min(Get(EPlayerStat.HP) + intValue, Get(EPlayerStat.MaxHp));
 
                     break;
                 case EPlayerStat.MaxHp:
 
-                    _addMaxHp += intValue;
+                    switch (applyStatContext.ApplyType)
+                    {
+                        case EApplyStatType.Add:
+                            MaxHp.Add += (int)applyStatContext.Value;
+                            break;
+                        case EApplyStatType.Multiple:
+                            MaxHp.Mul += applyStatContext.Value;
+                            break;
+                        case EApplyStatType.Ratio:
+                            MaxHp.AddRatio(EPlayerStat.MaxHp, applyStatContext.Value);
+                            break;
+                    }
 
                     break;
                 case EPlayerStat.Damage:
 
-                    if(applyStatContext.ApplyType == EApplyStatType.Add)
+                    switch (applyStatContext.ApplyType)
                     {
-                        _addDamage += intValue;
-                    }
-                    else
-                    {
-                        _multiDamage += floatValue;
+                        case EApplyStatType.Add:
+                            Damage.Add += (int)applyStatContext.Value;
+                            break;
+                        case EApplyStatType.Multiple:
+                            Damage.Mul += applyStatContext.Value;
+                            break;
+                        case EApplyStatType.Ratio:
+                            Damage.AddRatio(EPlayerStat.MaxHp, applyStatContext.Value);
+                            break;
                     }
 
                     break;
                 case EPlayerStat.MoveCount:
 
-                    _currentMoveCount = Mathf.Min(_currentMoveCount + intValue, _maxMoveCount);
+                    _currentMoveCount = Mathf.Min(Get(EPlayerStat.MoveCount) + intValue, Get(EPlayerStat.MaxMoveCount));
 
                     break;
                 case EPlayerStat.MaxMoveCount:
-                    _maxMoveCount += intValue;
+                    switch (applyStatContext.ApplyType)
+                    {
+                        case EApplyStatType.Add:
+                            MaxMoveCount.Add += (int)applyStatContext.Value;
+                            break;
+                        case EApplyStatType.Multiple:
+                            MaxMoveCount.Mul += applyStatContext.Value;
+                            break;
+                        case EApplyStatType.Ratio:
+                            MaxMoveCount.AddRatio(EPlayerStat.MaxHp, applyStatContext.Value);
+                            break;
+                    }
                     break;
             }
+            OnStatChanged(applyStatContext.PlayerStat);
+            Debug.Log("Stat Modifier");
         }
         private float CalculateModifyValue(ApplyStatContext applyStatContext)
         {
@@ -259,24 +345,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
             if(applyStatContext.ApplyType == EApplyStatType.Ratio)
             {
-                switch (applyStatContext.RatioType)
-                {
-                    case EPlayerStat.HP:
-                        value = _currentCretureStat.HP * applyStatContext.Value;
-                        break;
-                    case EPlayerStat.MaxHp:
-                        value = GetMaxHP * applyStatContext.Value;
-                        break;
-                    case EPlayerStat.Damage:
-                        value = GetDamage * applyStatContext.Value;
-                        break;
-                    case EPlayerStat.MoveCount:
-                        value = _currentMoveCount * applyStatContext.Value;
-                        break;
-                    case EPlayerStat.MaxMoveCount:
-                        value = _maxMoveCount * applyStatContext.Value;
-                        break;
-                }
+                value = Get(applyStatContext.RatioStatType) * applyStatContext.Value;
             }
             else
             {
@@ -301,7 +370,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
         {
             throw new NotImplementedException();
         }
-
         public override void RegisterAttack()
         {
             if(_sensor.GetCombatant(TilePosition.GetNextTile(Direction), ECretureType.Enemy, out var target))
@@ -309,16 +377,65 @@ namespace JW.DungeonSliding.GamePlay.Entities
                 _attackRequestListener.RegisterActpair(new ActPair(this, target));
             }
         }
-
         public bool TryGet<T>(out T service) where T : class
         {
             service = this as T;
             return service != null;
         }
+        public int Get(EPlayerStat stat)
+        {
+            int value = 0;
 
-        private int GetMaxHP => _originCretureStat.HP + _addMaxHp;
-        private int GetDamage => Mathf.RoundToInt((_currentCretureStat.Damage + _addDamage) * _multiDamage);
-        public ESlideResultType SlideResultType => throw new NotImplementedException();
-        public EDirectionType MoveDir => throw new NotImplementedException();
+            switch (stat)
+            {
+                case EPlayerStat.HP:
+                    value = _currentHP;
+                    break;
+                case EPlayerStat.MaxHp:
+                    value = MaxHp.Final(this);
+                    break;
+                case EPlayerStat.Damage:
+
+                    int baseDamage = Damage.Final(this);
+                    int multiDamage = (int)((baseDamage + _nextAttackBuff.NextExtraDamage)* _nextAttackBuff.NextExtraDamageMultiplier);
+                    value = multiDamage;
+   
+                    break;
+                case EPlayerStat.MoveCount:
+
+                    value = _currentMoveCount;
+
+                    break;
+                case EPlayerStat.MaxMoveCount:
+                    value = (int)(MaxMoveCount.Final(this));
+                    break;
+            }
+
+
+            return value;
+        }
+        public void AddEnhance(ENextAttackEnhanceType nextAttackEnhanceType, float value)
+        {
+            switch (nextAttackEnhanceType)
+            {
+                case ENextAttackEnhanceType.Add:
+                    _nextAttackBuff.AddDamage((int)value);
+                    break;
+                case ENextAttackEnhanceType.Multi:
+                    _nextAttackBuff.AddDamageMulti(value);
+                    break;
+                case ENextAttackEnhanceType.ExtraAttack:
+                    _nextAttackBuff.AddExtraAttack((int)value);
+                    break;
+            }
+
+            OnStatChanged?.Invoke(EPlayerStat.Damage);
+        }
+
+        protected override DamageInfo CreateDamageInfo()
+        {
+            DamageInfo damageInfo = new DamageInfo(this, Get(EPlayerStat.Damage), false);
+            return damageInfo;
+        }
     }
 }

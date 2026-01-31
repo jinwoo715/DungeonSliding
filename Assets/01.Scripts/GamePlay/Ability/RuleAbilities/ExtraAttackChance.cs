@@ -5,19 +5,19 @@ namespace JW.DungeonSliding.GamePlay.Ability
 {
     public class ExtraAttackChance : RuleAbility
     {
-        ICombatant _combatant;
+        INextAttackEnhancer _service;
 
         public ExtraAttackChance(RuleAbilityData data, IAbilityHost host) : base(data, host) 
         {
-            if (Host.TryGet<ICombatant>(out var service))
+            if (Host.TryGet<INextAttackEnhancer>(out var service))
             {
-                _combatant = service;
+                _service = service;
             }
         }
 
         public override void ExcuteAbility()
         {
-            _combatant.AttackBuff.AddExtraAttack();
+            _service.AddEnhance(ENextAttackEnhanceType.ExtraAttack,1);
         }
 
         public override void ProcTrigger(EGameTriggerType triggerType)

@@ -1,6 +1,7 @@
 
 namespace JW.DungeonSliding
 {
+    [System.Serializable]
     public struct CretureStat
     {
         public int HP;

@@ -3,35 +3,20 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Stats
 {
-    public interface IStatReadOnly
+    public interface IPlayerStatReadOnly
     {
-        public float Get(EPlayerStat stat);
-        public float GetMax(EPlayerStat stat); // HP면 MaxHp 같은 매핑 처리
-        public event Action<EPlayerStat> OnStatChanged;
+        public int Get(EPlayerStat stat);
+        public Action<EPlayerStat> OnStatChanged { get; set; }
     }
-
-    public interface IStatModifier
+    public interface IEnemyStatReadOnly
     {
-        void ModifyStat(ApplyStatContext ctx);
+        public int Get(EEnemyStatType stat);
+        event Action<EEnemyStatType> OnStatChanged;
     }
-
-    public class PlayerStatSystem : IStatReadOnly, IStatModifier
+    public interface IEnemyStatUIService
     {
-        public event Action<EPlayerStat> OnStatChanged;
-
-        public float Get(EPlayerStat stat)
-        {
-            throw new NotImplementedException();
-        }
-
-        public float GetMax(EPlayerStat stat)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ModifyStat(ApplyStatContext ctx)
-        {
-            throw new NotImplementedException();
-        }
+        public void Attach(Transform transform, IEnemyStatReadOnly enemyStatReadOnly);
+        public void Detach(IEnemyStatReadOnly enemyStatReadOnly);
     }
+ 
 }

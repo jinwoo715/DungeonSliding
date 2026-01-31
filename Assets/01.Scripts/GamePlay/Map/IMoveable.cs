@@ -2,7 +2,6 @@ namespace JW.DungeonSliding.Map
 {
     public interface IMoveable : ITilePosition
     {
-        public int CurrentMoveCount { get; }
         public int SlideTileCount();
         public bool IsRoute(EDirectionType dir);
         public ESlideResultType SlideResultType { get; }

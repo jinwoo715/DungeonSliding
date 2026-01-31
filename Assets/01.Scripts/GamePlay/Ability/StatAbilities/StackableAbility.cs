@@ -28,7 +28,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
                     if(Host.TryGet<IStatModifier>(out var modifier))
                     {
                         ApplyStatContext applyStatContext = new ApplyStatContext(
-                   _data.PlayerStat, _data.ApplyType, _data.Value, _data.RatioType);
+                        _data.PlayerStat, _data.ApplyType, _data.Value, _data.RatioType);
                         
                         modifier.ModifyStat(applyStatContext);
                     }
@@ -36,15 +36,15 @@ namespace JW.DungeonSliding.GamePlay.Ability
                     break;
                 case EAbilityApplyStatType.NextActStat:
 
-                    if (Host.TryGet<IAttackable>(out var attackable))
+                    if (Host.TryGet<INextAttackEnhancer>(out var service))
                     {
                         switch (_data.ApplyType)
                         {
                             case EApplyStatType.Add:
-                                attackable.AttackBuff.AddDamage((int)_data.Value);
+                                service.AddEnhance(ENextAttackEnhanceType.Add, _data.Value);
                                 break;
                             case EApplyStatType.Multiple:
-                                attackable.AttackBuff.AddDamageMulti(_data.Value);
+                                service.AddEnhance(ENextAttackEnhanceType.Multi, _data.Value);
                                 break;
                         }
                     }

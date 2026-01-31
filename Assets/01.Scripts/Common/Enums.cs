@@ -57,7 +57,7 @@ namespace JW.DungeonSliding
         Enemy
     }
 
-    public enum ECretureStatType
+    public enum EEnemyStatType
     {
         HP,
         Damage
@@ -147,8 +147,6 @@ namespace JW.DungeonSliding
         Damage,
         MoveCount,
         MaxMoveCount,
-        NextAttackDamage,
-        RerollCount,
     }
 
     public enum EApplyStatType

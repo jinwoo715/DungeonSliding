@@ -10,11 +10,6 @@ namespace JW.DungeonSliding
     {
         bool TryGet<T>(out T service) where T : class;
     }
-    public interface IAbilityEntity
-    {
-        public void ModifyStat(ApplyStatContext applyStatContext);
-        public void GainBarrier();
-    }
 
     //Query
 
@@ -22,7 +17,7 @@ namespace JW.DungeonSliding
     {
         public readonly EPlayerStat PlayerStat;
         public readonly EApplyStatType ApplyType;
-        public readonly EPlayerStat RatioType;
+        public readonly EPlayerStat RatioStatType;
         public readonly float Value;
 
         public ApplyStatContext(EPlayerStat playerStat, EApplyStatType applyType, float value, EPlayerStat ratio)
@@ -30,7 +25,7 @@ namespace JW.DungeonSliding
             PlayerStat = playerStat;
             ApplyType = applyType;
             Value = value;
-            RatioType = ratio;
+            RatioStatType = ratio;
         }
     }
 }

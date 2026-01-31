@@ -5,18 +5,18 @@ namespace JW.DungeonSliding.GamePlay.Ability
 {
     public class SlideAmplifierAbility : RuleAbility
     {
-        ICombatant _combatant;
+        INextAttackEnhancer _nextAttackEnhancer;
         IMoveable _moveable;
         public SlideAmplifierAbility(RuleAbilityData data, IAbilityHost host) : base(data, host) 
         {
-            BindService<ICombatant>(ref _combatant);
+            BindService<INextAttackEnhancer>(ref _nextAttackEnhancer);
             BindService<IMoveable>(ref _moveable);
         }
 
         public override void ExcuteAbility()
         {
             int addDamage = _moveable.SlideTileCount();
-            _combatant.AttackBuff.AddDamage(addDamage);
+            _nextAttackEnhancer.AddEnhance(ENextAttackEnhanceType.Add, addDamage);
         }
 
         public override void ProcTrigger(EGameTriggerType triggerType)

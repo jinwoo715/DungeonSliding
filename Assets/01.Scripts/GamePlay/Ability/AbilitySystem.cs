@@ -41,7 +41,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
     public class AbilitySystem : IRerollService
     {
         private ShuffleBag<AbilityData> _abilityBag;
-        private Dictionary<int, AbilityData> _abilityDataByUID;
+        private Dictionary<int, AbilityData> _abilityDataByUID = new();
         
         private Dictionary<EGameTriggerType, List<IAbility>> _hasAbilitiesByTrigger = new Dictionary<EGameTriggerType, List<IAbility>>();
         private Dictionary<IAbility, List<EGameTriggerType>> _hasTriggersByAbility = new Dictionary<IAbility, List<EGameTriggerType>>();
@@ -61,6 +61,8 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
             _abilityHost = new AbilityHost(host);
             _abilityHost.Register<IRerollService>(this);
+
+            Init();
         }
 
         public void Init()

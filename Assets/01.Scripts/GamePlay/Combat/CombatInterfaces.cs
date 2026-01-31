@@ -1,4 +1,5 @@
 using JW.DungeonSliding.GamePlay.Entities;
+using JW.DungeonSliding.GamePlay.Stats;
 using System;
 using System.Collections.Generic;
 
@@ -15,7 +16,6 @@ namespace JW.DungeonSliding.GamePlay.Combat
     {
         public event Action OnHitDoneEvent;
         public event Action<ICombatant, ICombatant> OnCounterRequestedEvent;
-        public int CurrentHP { get; }
         public float DamageTakenMultiplier { get; set; }  // 받는 피해 배율
         public ICombatant LastAttacker { get;}
         public void GainBarrier();
@@ -28,11 +28,23 @@ namespace JW.DungeonSliding.GamePlay.Combat
         public event Action OnAttackDoneEvent;
         public IAttackRequestListener _attackRequestListener { get; }
         public ICombatant AttackTarget { get;}
-        public NextAttackBuff AttackBuff { get; }
+        
         float DamageDealtMultiplier { get; set; }  // 가하는 피해 배율
         public void SetAttackRequestListener(IAttackRequestListener requestListener);
         public void RegisterAttack();
         public void Attack(ICombatant target);
+    }
+
+    public interface INextAttackEnhancer
+    {
+        public void AddEnhance(ENextAttackEnhanceType nextAttackEnhanceType, float value);
+    }
+    
+    public enum ENextAttackEnhanceType
+    {
+        Add,
+        Multi,
+        ExtraAttack
     }
 
     // 3. 상태 및 버프 (선택 사항)

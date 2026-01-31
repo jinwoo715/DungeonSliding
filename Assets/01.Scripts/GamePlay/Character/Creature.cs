@@ -1,4 +1,5 @@
 using JW.DungeonSliding.GamePlay.Combat;
+using JW.DungeonSliding.GamePlay.Stats;
 using System;
 using UnityEngine;
 
@@ -14,31 +15,23 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public ICombatant LastAttacker { get; private set; }
         public ICombatant AttackTarget { get; private set; }
 
-        public int CurrentHP => throw new NotImplementedException();
-
-        public int CurrentMoveCount => throw new NotImplementedException();
-
-        public NextAttackBuff AttackBuff => throw new NotImplementedException();
-
+        public float DamageDealtMultiplier { get; set; }
+        public float DamageTakenMultiplier { get; set; }
+        
         public ECreatureStatus CreateStatus => throw new NotImplementedException();
-
-        public float DamageDealtMultiplier { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public float DamageTakenMultiplier { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
         protected ICombatant _attackTarget;
-
-        protected CretureStat _originCretureStat;
-        protected CretureStat _currentCretureStat;
+        
+        [SerializeField] protected int _currentHP;
 
         public event Action OnAttackDoneEvent;
         public event Action OnHitDoneEvent;
-
-        public event Action<int, int> ChangeRemainHP;
         public event Action<int> ShowHitDamageUIEvent;
         public event Action<ICombatant, ICombatant> OnCounterRequestedEvent;
+        
+
         public IAttackRequestListener _attackRequestListener { get; private set; }
         public ICombatantSensor _sensor { get; private set; }
-        
+
         public virtual void Init() 
         {
             IsActive = true;
@@ -53,17 +46,12 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
             _attackTarget = null;
 
-            ChangeRemainHP = null;
             ShowHitDamageUIEvent = null;
 
             OnAttackDoneEvent = null;
             OnHitDoneEvent = null;
         }
-        public virtual void SetCretureStat(CretureStat stat)
-        {
-            _originCretureStat = stat;
-            _currentCretureStat = stat;
-        }
+
         public void SetPosition(Tile point)
         {
             TilePosition = point;
@@ -126,25 +114,26 @@ namespace JW.DungeonSliding.GamePlay.Entities
         protected void ApplyDamage(DamageInfo damageInfo)
         {
             DamageInfo info = CalculateRealAppliedDamage(damageInfo);
-            _currentCretureStat.HP -= info.Damage;
 
-            if (_currentCretureStat.HP <= 0)
+            Debug.Log($"Damage {info.Damage}");
+
+            if (info.Damage <= 0) return;
+
+            ModifyStat(new ApplyStatContext(EPlayerStat.HP, EApplyStatType.Add, -info.Damage, EPlayerStat.None));
+
+            if (_currentHP <= 0)
             {
                 OnDeath();
             }
 
             ShowHitDamageUIEvent?.Invoke(info.Damage);
-            ChangeRemainHP?.Invoke(_originCretureStat.HP, _currentCretureStat.HP);
         }
         protected virtual DamageInfo CalculateRealAppliedDamage(DamageInfo damageInfo)
         {
             return damageInfo;
         }
-        protected virtual DamageInfo CreateDamageInfo()
-        {
-            DamageInfo damageInfo = new DamageInfo(this, _currentCretureStat.Damage, false);
-            return damageInfo;
-        }
+        protected abstract DamageInfo CreateDamageInfo();
+      
         private void BindAnimEvent()
         {
             _animatorController.OnEndAttackAnimationEvent += EndAttackAnimation;
@@ -190,39 +179,30 @@ namespace JW.DungeonSliding.GamePlay.Entities
             IsActive = false;
             OnHitDoneEvent?.Invoke();
         }
-
-        public void ModifyStat(ApplyStatContext context)
-        {
-            throw new NotImplementedException();
-        }
-
+        public abstract void ModifyStat(ApplyStatContext context);
         public void GainBarrier()
         {
             throw new NotImplementedException();
         }
-
         public void RequestCounterAttack(ICombatant target)
         {
             throw new NotImplementedException();
         }
-
         public void ApplyBind(ECreatureStatus State, int duration)
         {
             throw new NotImplementedException();
         }
-
         public abstract void RegisterAttack();
-
         public void SetCombatSensor(ICombatantSensor combatantSensor)
         {
             if (combatantSensor == null) Debug.LogError("CombatSensor Is Null");
             _sensor = combatantSensor;
         }
-
         public void SetAttackRequestListener(IAttackRequestListener requestListener)
         {
             if (requestListener == null) Debug.LogError("RequestListener Is Null");
             _attackRequestListener = requestListener;
         }
+        
     }
 }

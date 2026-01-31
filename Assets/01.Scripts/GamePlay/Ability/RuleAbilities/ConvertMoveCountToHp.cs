@@ -1,4 +1,5 @@
 using JW.DungeonSliding.GamePlay.Combat;
+using JW.DungeonSliding.GamePlay.Stats;
 using JW.DungeonSliding.Map;
 
 namespace JW.DungeonSliding.GamePlay.Ability
@@ -6,16 +7,16 @@ namespace JW.DungeonSliding.GamePlay.Ability
     public class ConvertMoveCountToHp : RuleAbility
     {
         ICombatant _combatant;
-        IMoveable _moveable;
+        IPlayerStatReadOnly _statReadOnly;
         public ConvertMoveCountToHp(RuleAbilityData data, IAbilityHost host) : base(data, host)
         {
             BindService<ICombatant>(ref _combatant);
-            BindService<IMoveable>(ref _moveable);
+            BindService<IPlayerStatReadOnly>(ref _statReadOnly);
         }
 
         public override void ExcuteAbility()
         {
-            if (_moveable.CurrentMoveCount > _data.CostValue)
+            if (_statReadOnly.Get(EPlayerStat.MoveCount) > _data.CostValue)
             {
                 _combatant.ModifyStat(new ApplyStatContext(EPlayerStat.HP, EApplyStatType.Add, _data.GainValue, EPlayerStat.None));
                 _combatant.ModifyStat(new ApplyStatContext(EPlayerStat.MoveCount, EApplyStatType.Add, -_data.CostValue, EPlayerStat.None));

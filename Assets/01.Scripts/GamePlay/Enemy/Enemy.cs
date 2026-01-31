@@ -2,10 +2,11 @@ using System;
 using UnityEngine;
 using JW.DungeonSliding.GamePlay.Context;
 using JW.DungeonSliding.GamePlay.Combat;
+using JW.DungeonSliding.GamePlay.Stats;
 
 namespace JW.DungeonSliding.GamePlay.Entities
 {
-    public class Enemy : Creature
+    public class Enemy : Creature, IEnemyStatReadOnly
     {
         public Action<Enemy> ReturnEvent;
         public Action<Enemy> OnDeathEvent;
@@ -13,8 +14,12 @@ namespace JW.DungeonSliding.GamePlay.Entities
         private EnemyData _enemyData;
         private int _rewardXp = 0;
 
+        [SerializeField] private CretureStat _baseStat;
+
         public int Xp => _rewardXp;
         public int EnemyUID => _enemyData.EnemyUID;
+
+        public event Action<EEnemyStatType> OnStatChanged;
 
         public void SetData(EnemyData data, int floor)
         {
@@ -26,13 +31,17 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
             SetCretureStat(new CretureStat(hp, dmg));
         }
+
+        public virtual void SetCretureStat(CretureStat stat)
+        {
+            _baseStat = stat;
+        }
         public override void Init()
         {
             base.Init();
             int RandomDir = UnityEngine.Random.Range(0, 4);
             SetCharacterRotation((EDirectionType)RandomDir);
         }
-
         protected override DamageInfo CalculateRealAppliedDamage(DamageInfo damageInfo)
         {
             int damage = damageInfo.Damage;
@@ -76,6 +85,45 @@ namespace JW.DungeonSliding.GamePlay.Entities
             {
                 _attackRequestListener.RegisterActpair(new ActPair(this, target));
             }
+        }
+
+        public override void ModifyStat(ApplyStatContext context)
+        {
+            switch (context.PlayerStat)
+            {
+                case EPlayerStat.HP:
+                    _currentHP += (int)context.Value;
+                    OnStatChanged?.Invoke(EEnemyStatType.HP);
+                    break;
+                case EPlayerStat.Damage:
+                    _baseStat.Damage += (int)context.Value;
+                    OnStatChanged?.Invoke(EEnemyStatType.Damage);
+
+                    break;
+            }
+
+        }
+
+        public int Get(EEnemyStatType stat)
+        {
+            int returnValue = 0;
+            switch (stat)
+            {
+                case EEnemyStatType.HP:
+                    returnValue = _currentHP;
+                    break;
+                case EEnemyStatType.Damage:
+                    returnValue = _baseStat.Damage;
+                    break;
+            }
+
+            return returnValue;
+        }
+
+        protected override DamageInfo CreateDamageInfo()
+        {
+            DamageInfo damageInfo = new DamageInfo(this, Get(EEnemyStatType.Damage), false);
+            return damageInfo;
         }
     }
 }

@@ -7,6 +7,7 @@ using JW.DungeonSliding.Map;
 using JW.DungeonSliding.GamePlay.Context;
 using System;
 using JW.DungeonSliding.Core;
+using JW.DungeonSliding.GamePlay.Stats;
 
 namespace JW.DungeonSliding.GamePlay.Entities
 {
@@ -27,14 +28,15 @@ namespace JW.DungeonSliding.GamePlay.Entities
         private ICombatantSensor _combatantSensor;
         private IBoard _board;
         private IObstacleRequest _obstacleRequest;
-
+        private IEnemyStatUIService _enemyStatUIService;
         public void WireInterfaces(IBoard board, IAttackRequestListener attackRequestListener,
-            ICombatantSensor sensor, IObstacleRequest obstacleRequest)
+            ICombatantSensor sensor, IObstacleRequest obstacleRequest, IEnemyStatUIService enemyStatUIService)
         {
             _board = board;
             _attackRequestListener = attackRequestListener;
             _combatantSensor = sensor;
             _obstacleRequest = obstacleRequest;
+            _enemyStatUIService = enemyStatUIService;
         }
         public void LoadData()
         {
@@ -59,7 +61,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
                 enemy.SetData(_enemyDataByUID[data.EnemyUID], floor);
                 enemy.Init();
                 enemy.SetPosition(data.Point);
-                
+
                 _activeEnemyByTile.Add(data.Point, enemy);
                 _board.RegisterEnemyTile(data.Point);
             }
@@ -82,6 +84,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
             }
 
             enemy.gameObject.SetActive(true);
+            _enemyStatUIService.Attach(enemy.transform, enemy);
+
             return enemy;
         }
         private Enemy SpawnEnemy(int enemyUID)
@@ -104,6 +108,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
             _activeEnemyByTile.Remove(enemy.TilePosition);
 
             _obstacleRequest.SpawnObstacle(enemy.TilePosition, EObstacleObjectType.Rubble);
+
+            _enemyStatUIService.Detach(enemy);
 
             if (_activeEnemyByTile.Count == 0)
             {
