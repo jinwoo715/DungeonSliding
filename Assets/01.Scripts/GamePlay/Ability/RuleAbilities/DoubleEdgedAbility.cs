@@ -11,8 +11,8 @@ namespace JW.DungeonSliding.GamePlay.Ability
         {
             BindService<ICombatant>(ref _combatant);
 
-            _combatant.DamageDealtMultiplier = _data.GainValue;
-            _combatant.DamageTakenMultiplier = _data.GainValue;
+            _combatant.AddDamageDealtMultiplier(_data.GainValue);
+            _combatant.AddDamageTakenMultiplier(_data.GainValue);
         }
 
         public override void ExcuteAbility() { }

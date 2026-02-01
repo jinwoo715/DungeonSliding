@@ -7,8 +7,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
 {
     public class StoneStatueEnemy : Enemy
     {
-        [SerializeField] GameObject _robber;
-
         [SerializeField] protected Transform _avatar;
         [SerializeField] private GameObject _eyeLight;
 
@@ -38,9 +36,9 @@ namespace JW.DungeonSliding.GamePlay.Entities
             ReturnPool();
         }
 
-        public override void GetHit(DamageInfo damageInfo)
+        public override void TakeDamage(DamageContext damageInfo)
         {
-            base.GetHit(damageInfo);
+            base.TakeDamage(damageInfo);
 
             if (IsActive == false)
                 return;

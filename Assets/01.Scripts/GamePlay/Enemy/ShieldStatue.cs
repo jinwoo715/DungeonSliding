@@ -11,7 +11,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             _animatorController.SetAnimationTrigger(ConstString.ONE_HAND_ATTACK_ANIM);
         }
 
-        protected override DamageInfo CalculateRealAppliedDamage(DamageInfo damageInfo)
+        protected override DamageContext CalculateRealAppliedDamage(DamageContext damageInfo)
         {
             if (damageInfo.Attacker.Direction == ReverseDirection(Direction))
             {

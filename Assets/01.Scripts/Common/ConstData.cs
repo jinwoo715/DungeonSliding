@@ -24,6 +24,8 @@ namespace JW.DungeonSliding
         public static readonly string TWO_HAND_ATTACK_ANIM = "TwoHandAttack";
         public static readonly string HIT_ANIM = "Hitted";
 
+        public static readonly string STOP_ALL_TRIGGER_ANIMATION = "ExitAllTriggerAnimation";
+
         public static readonly string PLAYER_STATE_KEY = "CharacterState";
     }
 }

@@ -5,19 +5,17 @@ namespace JW.DungeonSliding.GamePlay.Ability
 {
     public class CounterAttack : RuleAbility
     {
-        ICombatant _combatant;
-
+        IDamageable _idamageable;
+        ICounterAttackable _counterAttackable;
         public CounterAttack(RuleAbilityData data, IAbilityHost host) : base(data, host) 
         {
-            if (Host.TryGet<ICombatant>(out var service))
-            {
-                _combatant = service;
-            }
+            BindService<ICounterAttackable>(ref _counterAttackable);
+            BindService<IDamageable>(ref _idamageable);
         }
 
         public override void ExcuteAbility()
         {
-            _combatant.RequestCounterAttack(_combatant.LastAttacker);
+            _counterAttackable.RequestCounterAttack(_idamageable.LastAttacker);
         }
 
         public override void ProcTrigger(EGameTriggerType triggerType)

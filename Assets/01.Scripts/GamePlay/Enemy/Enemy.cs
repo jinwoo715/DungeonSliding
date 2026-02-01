@@ -8,6 +8,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
 {
     public class Enemy : Creature, IEnemyStatReadOnly
     {
+        [SerializeField] private Transform _statUITransform;
+
         public Action<Enemy> ReturnEvent;
         public Action<Enemy> OnDeathEvent;
 
@@ -18,6 +20,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
         public int Xp => _rewardXp;
         public int EnemyUID => _enemyData.EnemyUID;
+
+        public Transform UITransform => _statUITransform;
 
         public event Action<EEnemyStatType> OnStatChanged;
 
@@ -35,6 +39,9 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public virtual void SetCretureStat(CretureStat stat)
         {
             _baseStat = stat;
+            _currentHP = _baseStat.HP;
+            OnStatChanged?.Invoke(EEnemyStatType.HP);
+            OnStatChanged?.Invoke(EEnemyStatType.Damage);
         }
         public override void Init()
         {
@@ -42,7 +49,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             int RandomDir = UnityEngine.Random.Range(0, 4);
             SetCharacterRotation((EDirectionType)RandomDir);
         }
-        protected override DamageInfo CalculateRealAppliedDamage(DamageInfo damageInfo)
+        protected override DamageContext CalculateRealAppliedDamage(DamageContext damageInfo)
         {
             int damage = damageInfo.Damage;
             bool critical = damageInfo.IsCritical;
@@ -53,7 +60,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
                 critical = true;
             }
 
-            DamageInfo info = new DamageInfo(damageInfo.Attacker, damage, critical);
+            DamageContext info = new DamageContext(damageInfo.Attacker, damage, critical);
 
             return info;
         }
@@ -79,23 +86,34 @@ namespace JW.DungeonSliding.GamePlay.Entities
             return Mathf.Max(baseValue, scaled);
         }
 
-        public override void RegisterAttack()
+        public override bool TrySubmitAttackRequest()
         {
             if (_sensor.GetCombatant(TilePosition.GetNextTile(Direction), ECretureType.Player, out var target))
             {
-                _attackRequestListener.RegisterActpair(new ActPair(this, target));
+                AttackRequestListener.EnqueueActPair(new ActPair(this, target));
+                return true;
             }
+            else return false;
         }
 
-        public override void ModifyStat(ApplyStatContext context)
+        public void ModifyStat(EnemyApplyStatContext context)
         {
-            switch (context.PlayerStat)
+            switch (context.EnemyStat)
             {
-                case EPlayerStat.HP:
+                case EEnemyStatType.HP:
                     _currentHP += (int)context.Value;
+
+                    _currentHP = Mathf.Clamp(_currentHP, 0, _baseStat.HP);
+
                     OnStatChanged?.Invoke(EEnemyStatType.HP);
+
+                    if (_currentHP <= 0)
+                    {
+                        OnDeath();
+                    }
+
                     break;
-                case EPlayerStat.Damage:
+                case EEnemyStatType.Damage:
                     _baseStat.Damage += (int)context.Value;
                     OnStatChanged?.Invoke(EEnemyStatType.Damage);
 
@@ -120,10 +138,15 @@ namespace JW.DungeonSliding.GamePlay.Entities
             return returnValue;
         }
 
-        protected override DamageInfo CreateDamageInfo()
+        protected override DamageContext CreateDamageContext()
         {
-            DamageInfo damageInfo = new DamageInfo(this, Get(EEnemyStatType.Damage), false);
+            DamageContext damageInfo = new DamageContext(this, Get(EEnemyStatType.Damage), false);
             return damageInfo;
+        }
+
+        public override void ReduceHP(int damage)
+        {
+            ModifyStat(new EnemyApplyStatContext(EEnemyStatType.HP, EApplyStatType.Add, -damage, EEnemyStatType.None));
         }
     }
 }

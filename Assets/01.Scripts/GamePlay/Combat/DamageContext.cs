@@ -2,14 +2,14 @@
 namespace JW.DungeonSliding.GamePlay.Combat
 {
     [System.Serializable]
-    public struct DamageInfo
+    public struct DamageContext
     {
         public ICombatant Attacker;
         public int Damage;
         public bool IsCritical;
         public EStatusEffectType StatusEffect;
         public int StatusAmount;
-        public DamageInfo(ICombatant attacker, int amount, bool isCritical, EStatusEffectType effectType = EStatusEffectType.None, int statusAmount = 0)
+        public DamageContext(ICombatant attacker, int amount, bool isCritical, EStatusEffectType effectType = EStatusEffectType.None, int statusAmount = 0)
         {
             Attacker = attacker;
             Damage = amount;

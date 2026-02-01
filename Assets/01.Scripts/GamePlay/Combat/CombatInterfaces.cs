@@ -7,32 +7,45 @@ namespace JW.DungeonSliding.GamePlay.Combat
 {
     public interface IAttackRequestListener
     {
-        
-        public void RegisterActpair(ActPair pair);
-
+        void EnqueueActPair(ActPair pair);
+        void EnqueueCounterActPair(ActPair pair);
     }
 
     public interface IDamageable
     {
-        public event Action OnHitDoneEvent;
-        public event Action<ICombatant, ICombatant> OnCounterRequestedEvent;
-        public float DamageTakenMultiplier { get; set; }  // 받는 피해 배율
-        public ICombatant LastAttacker { get;}
-        public void GainBarrier();
-        public void GetHit(DamageInfo damageInfo);
-        public void RequestCounterAttack(ICombatant target);
-        public void OnDeath();
+        event Action OnHitDoneEvent;
+
+        float DamageTakenMultiplier { get;}  // 받는 피해 배율
+        ICombatant LastAttacker { get;}
+
+        void AddDamageTakenMultiplier(float value);
+        void TakeDamage(DamageContext damageInfo);
+        void OnDeath();
     }
     public interface IAttackable
     {
-        public event Action OnAttackDoneEvent;
-        public IAttackRequestListener _attackRequestListener { get; }
-        public ICombatant AttackTarget { get;}
-        
-        float DamageDealtMultiplier { get; set; }  // 가하는 피해 배율
-        public void SetAttackRequestListener(IAttackRequestListener requestListener);
-        public void RegisterAttack();
-        public void Attack(ICombatant target);
+        event Action OnAttackDoneEvent;
+        IAttackRequestListener AttackRequestListener { get; }
+        ICombatant AttackTarget { get;}
+
+        float DamageDealtMultiplier { get; }  // 가하는 피해 배율
+
+        void AddDamageDealtMultiplier(float value);
+        void SetAttackRequestListener(IAttackRequestListener requestListener);
+        bool TrySubmitAttackRequest();
+        void StartAttackAnimation();
+    }
+
+    public interface ICounterAttackable
+    {
+        public event Action<ICombatant, ICombatant> OnCounterRequestedEvent;
+        public void RequestCounterAttack(ICombatant target);
+    }
+
+    public interface IBarrierable
+    {
+        public void GainBarrier();
+        public void ReleaseBarrier();
     }
 
     public interface INextAttackEnhancer
@@ -50,20 +63,22 @@ namespace JW.DungeonSliding.GamePlay.Combat
     // 3. 상태 및 버프 (선택 사항)
     public interface IStatusEffectable
     {
-        public ECreatureStatus CreateStatus { get; }
-        void ApplyBind(ECreatureStatus State, int duration);
+        public ECreatureStatus StatusFlags { get; }
+        bool HasStatus(ECreatureStatus status);
+        void ApplyStatus(ECreatureStatus status, int durationTurnCount);
+        void RemoveStatus(ECreatureStatus status);
     }
 
-    public interface IStatModifier
+    public interface IPlayerStatModifier
     {
-        public void ModifyStat(ApplyStatContext context);
+        public void ModifyStat(PlayerApplyStatContext context);
     }
 
-    public interface ICombatant : ITilePosition, IAttackable, IDamageable, IStatusEffectable, IStatModifier
+    public interface ICombatant : ITilePosition, IAttackable, IDamageable, IStatusEffectable
     {
         public bool IsActive { get; }
         public EDirectionType Direction { get; }
-        public void SetCombatSensor(ICombatantSensor combatantSensor);
+        public void SetCombatSensor(ICombatantSensor exceptCombatant);
     }
 
     public interface ICombatProvider
@@ -78,4 +93,11 @@ namespace JW.DungeonSliding.GamePlay.Combat
         public bool GetCombatant(Tile tile, ECretureType targetType, out ICombatant combatant);
         public int GetNearCambatantCount(ICombatant except);
     }
+
+    public class CombatEventBus
+    {
+
+    }
+
+    
 }

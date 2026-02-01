@@ -282,6 +282,7 @@ RectTransform:
   - {fileID: 1639111205}
   - {fileID: 1609511855}
   - {fileID: 800245481}
+  - {fileID: 1561256669}
   m_Father: {fileID: 1735015357}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -1191,6 +1192,7 @@ MonoBehaviour:
   _abilityUIController: {fileID: 1639111207}
   _playerStatUI: {fileID: 1609511856}
   _enemyStatUIManager: {fileID: 800245482}
+  _hitDamageViewer: {fileID: 1561256670}
 --- !u!1 &657829997
 GameObject:
   m_ObjectHideFlags: 0
@@ -1401,6 +1403,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _animatorController: {fileID: 726333317}
   _currentHP: 0
+  _playerData: {fileID: 11400000, guid: ad06b226f7d30a34f9ab64dfe9ab3fd0, type: 2}
 --- !u!114 &726333317
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2769,6 +2772,55 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!1 &1561256668
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1561256669}
+  - component: {fileID: 1561256670}
+  m_Layer: 5
+  m_Name: HitDamageViewer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1561256669
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1561256668}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 126687103}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1561256670
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1561256668}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f629f5bb6c57ef14d9172d0904395a40, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _hitDamageItem: {fileID: 5160173676901368412, guid: 7e11cd762ae911b4397e471deb9c0cb6, type: 3}
 --- !u!1 &1587966578
 GameObject:
   m_ObjectHideFlags: 0

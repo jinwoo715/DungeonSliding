@@ -27,10 +27,6 @@ namespace JW.DungeonSliding.UI
             }
 
             _rerollButton.onClick.AddListener(() => RerollEvent?.Invoke());
-
-            _abilityCards[0].Init();
-            _abilityCards[1].Init();
-            _abilityCards[2].Init();
         }
 
         internal void Bind(Action<int> selectAbility, Action reroll)

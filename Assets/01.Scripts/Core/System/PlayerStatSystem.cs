@@ -18,5 +18,10 @@ namespace JW.DungeonSliding.GamePlay.Stats
         public void Attach(Transform transform, IEnemyStatReadOnly enemyStatReadOnly);
         public void Detach(IEnemyStatReadOnly enemyStatReadOnly);
     }
+
+    public interface IHitDamageUIService
+    {
+        void ShowDamage(Vector3 showPosition, int damage);
+    }
  
 }

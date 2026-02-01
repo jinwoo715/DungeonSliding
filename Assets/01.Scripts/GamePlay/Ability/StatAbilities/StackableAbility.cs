@@ -25,9 +25,9 @@ namespace JW.DungeonSliding.GamePlay.Ability
                 case EAbilityApplyStatType.EntityStat:
 
 
-                    if(Host.TryGet<IStatModifier>(out var modifier))
+                    if(Host.TryGet<IPlayerStatModifier>(out var modifier))
                     {
-                        ApplyStatContext applyStatContext = new ApplyStatContext(
+                        PlayerApplyStatContext applyStatContext = new PlayerApplyStatContext(
                         _data.PlayerStat, _data.ApplyType, _data.Value, _data.RatioType);
                         
                         modifier.ModifyStat(applyStatContext);

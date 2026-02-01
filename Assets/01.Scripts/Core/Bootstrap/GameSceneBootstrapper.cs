@@ -28,7 +28,6 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
         [SerializeField] private BattleManager _battleManager;
         [SerializeField] private InputSystem _inputSystem;
         [SerializeField] private ObstacleObjectController _obstacleController;
-
         private void Start()
         {
             _gameSceneManager.Init(_rewardManager, _mapManager, _player, _enemyManager, _battleManager, _inputSystem, _modeController, _gameSceneUIManager, _obstacleController);
@@ -41,22 +40,24 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
 
         private void ChildInit()
         {
+            _gameSceneUIManager.Init(_player);
+
             _player.Init();
 
             _player.SetGameModeChanger(_modeController);
             _player.SetCombatSensor(_fieldCombatantManager);
             _player.SetAttackRequestListener(_battleManager);
+            _player.SetShowHitDamageUIEvent(_gameSceneUIManager.HitDamageUIService.ShowDamage);
 
             _inputCoordinator.Init(_player);
             
-            _enemyManager.WireInterfaces(_mapManager, _battleManager, _fieldCombatantManager, _obstacleController, _gameSceneUIManager.EnemyStatUIService);
+            _enemyManager.WireInterfaces(_mapManager, _battleManager, _fieldCombatantManager, _obstacleController, _gameSceneUIManager.EnemyStatUIService, _gameSceneUIManager.HitDamageUIService);
             _enemyManager.LoadData();
 
             _mapManager.Init(_player);
             
             _battleManager.Init(_fieldCombatantManager, _modeController);
 
-            _gameSceneUIManager.Init(_player);
 
             _abilitySystem = new AbilitySystem(_gameSceneUIManager, _modeController, _player);
         }

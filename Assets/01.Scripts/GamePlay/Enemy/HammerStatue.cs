@@ -11,9 +11,9 @@ namespace JW.DungeonSliding.GamePlay.Entities
             _animatorController.SetAnimationTrigger(ConstString.TWO_HAND_ATTACK_ANIM);
         }
 
-        protected override DamageInfo CreateDamageInfo()
+        protected override DamageContext CreateDamageContext()
         {
-            DamageInfo info = base.CreateDamageInfo();
+            DamageContext info = base.CreateDamageContext();
             info.StatusEffect = EStatusEffectType.KnockBack;
             info.StatusAmount = 1;
 

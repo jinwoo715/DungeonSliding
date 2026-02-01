@@ -7,12 +7,12 @@ namespace JW.DungeonSliding.GamePlay.Ability
     public class ConvertHpToMoveCount : RuleAbility
     {
         IPlayerStatReadOnly _statReadOnly;
-        IStatModifier _statModifier;
+        IPlayerStatModifier _statModifier;
         IMoveable _moveable;
         public ConvertHpToMoveCount(RuleAbilityData data, IAbilityHost host) : base(data, host)
         {
             BindService<IPlayerStatReadOnly>(ref _statReadOnly);
-            BindService<IStatModifier>(ref _statModifier);
+            BindService<IPlayerStatModifier>(ref _statModifier);
             BindService<IMoveable>(ref _moveable);
         }
 
@@ -20,8 +20,8 @@ namespace JW.DungeonSliding.GamePlay.Ability
         {
             if (_statReadOnly.Get(EPlayerStat.HP) > _data.CostValue)
             {
-                _statModifier.ModifyStat(new ApplyStatContext(EPlayerStat.HP, EApplyStatType.Add, -_data.CostValue, EPlayerStat.None));
-                _statModifier.ModifyStat(new ApplyStatContext(EPlayerStat.MoveCount, EApplyStatType.Add, _data.GainValue, EPlayerStat.None));
+                _statModifier.ModifyStat(new PlayerApplyStatContext(EPlayerStat.HP, EApplyStatType.Add, -_data.CostValue, EPlayerStat.None));
+                _statModifier.ModifyStat(new PlayerApplyStatContext(EPlayerStat.MoveCount, EApplyStatType.Add, _data.GainValue, EPlayerStat.None));
             }
         }
         public override void ProcTrigger(EGameTriggerType triggerType)

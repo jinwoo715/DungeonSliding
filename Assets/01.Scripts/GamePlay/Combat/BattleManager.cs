@@ -12,7 +12,9 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
         private IGameModeChanger _gameModeChanger;
 
-        private Queue<ActPair> actPairs = new Queue<ActPair>();
+        private Queue<ActPair> _actPairs = new Queue<ActPair>();
+        private Queue<ActPair> _counterActPairs = new Queue<ActPair>();
+        private HashSet<(ICombatant, ICombatant)> _counterActs = new ();
 
         public void Init(ICombatantSensor combatantSensor, IGameModeChanger gameModeChanger)
         {
@@ -23,22 +25,34 @@ namespace JW.DungeonSliding.GamePlay.Combat
         public void StartBattleSequence()
         {
             _gameModeChanger.EnterGameMode(EGameModeType.Battle);
-            _combatSensor.PlayerCombatant.RegisterAttack();
+            _combatSensor.PlayerCombatant.TrySubmitAttackRequest();
 
             List<ICombatant> enemies = _combatSensor.AllEnemyCombatants;
 
             for (int i = 0; i < enemies.Count; i++)
             {
-                enemies[i].RegisterAttack();
+                enemies[i].TrySubmitAttackRequest();
             }
 
             StartCoroutine(CoStartSequence());
         }
         private IEnumerator CoStartSequence()
         {
-            while (actPairs.Count > 0)
+            while (_actPairs.Count > 0 || _counterActPairs.Count > 0)
             {
-                ActPair act = actPairs.Dequeue();
+                ActPair act;
+                if (_counterActPairs.Count > 0)
+                {
+                    act = _counterActPairs.Dequeue();
+
+                    if (!_counterActs.Add((act.Attacker, act.Target)))
+                        continue;
+                }
+                else
+                {
+                    act = _actPairs.Dequeue();
+                }
+
 
                 if (act.Attacker.IsActive == false || act.Target.IsActive == false)
                     continue;
@@ -82,11 +96,20 @@ namespace JW.DungeonSliding.GamePlay.Combat
             }
 
             _gameModeChanger.ExitGameMode(EGameModeType.Battle);
+
+            _actPairs.Clear();
+            _counterActPairs.Clear();
+            _counterActs.Clear();
         }
 
-        public void RegisterActpair(ActPair pair)
+        public void EnqueueActPair(ActPair pair)
         {
-            actPairs.Enqueue(pair);
+            _actPairs.Enqueue(pair);
+        }
+
+        public void EnqueueCounterActPair(ActPair pair)
+        {
+            _counterActPairs.Enqueue(pair);
         }
     }
 }

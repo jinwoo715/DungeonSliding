@@ -1,6 +1,7 @@
 using JW.DungeonSliding.GamePlay.Combat;
 using JW.DungeonSliding.GamePlay.Stats;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Entities
@@ -14,44 +15,38 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public Tile TilePosition { get; private set; }
         public ICombatant LastAttacker { get; private set; }
         public ICombatant AttackTarget { get; private set; }
-
-        public float DamageDealtMultiplier { get; set; }
-        public float DamageTakenMultiplier { get; set; }
-        
-        public ECreatureStatus CreateStatus => throw new NotImplementedException();
-        protected ICombatant _attackTarget;
-        
-        [SerializeField] protected int _currentHP;
+        public ECreatureStatus StatusFlags { get; private set; }
+        private Dictionary<ECreatureStatus, int> _statusDurations = new();
+        public float DamageDealtMultiplier { get; private set; } = 1;
+        public float DamageTakenMultiplier { get; private set; } = 1;
+        protected int _currentHP;
 
         public event Action OnAttackDoneEvent;
         public event Action OnHitDoneEvent;
-        public event Action<int> ShowHitDamageUIEvent;
-        public event Action<ICombatant, ICombatant> OnCounterRequestedEvent;
-        
+        private Action<Vector3, int> ShowHitDamageUIEvent;
 
-        public IAttackRequestListener _attackRequestListener { get; private set; }
+        public IAttackRequestListener AttackRequestListener { get; private set; }
         public ICombatantSensor _sensor { get; private set; }
 
         public virtual void Init() 
         {
             IsActive = true;
-
-            UnBindAnimEvent();
-
             BindAnimEvent();
+        }
+        private void OnEnable()
+        {
+            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.BattleEnd, TurnEnd);
         }
         private void OnDisable()
         {
+            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.BattleEnd, TurnEnd);
+        }
+        private void OnDestroy()
+        {
             UnBindAnimEvent();
-
-            _attackTarget = null;
-
-            ShowHitDamageUIEvent = null;
-
-            OnAttackDoneEvent = null;
-            OnHitDoneEvent = null;
         }
 
+        #region Position And Rotation
         public void SetPosition(Tile point)
         {
             TilePosition = point;
@@ -69,22 +64,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         }
         public float GetEulerYByDirection(EDirectionType direction)
         {
-            float rotation = 0;
-            switch (direction)
-            {
-                case EDirectionType.Left:
-                    rotation = 270;
-                    break;
-                case EDirectionType.Up:
-                    rotation = 0;
-                    break;
-                case EDirectionType.Right:
-                    rotation = 90;
-                    break;
-                case EDirectionType.Down:
-                    rotation = 180;
-                    break;
-            }
+            float rotation = (int)direction * 90;
 
             return rotation;
         }
@@ -111,88 +91,76 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
             return (EDirectionType)reverse;
         }
-        protected void ApplyDamage(DamageInfo damageInfo)
-        {
-            DamageInfo info = CalculateRealAppliedDamage(damageInfo);
+        #endregion
 
-            Debug.Log($"Damage {info.Damage}");
+        #region Combat
+        //Attack
+        public abstract bool TrySubmitAttackRequest();
+        public abstract void StartAttackAnimation();
+        protected abstract DamageContext CreateDamageContext();
+
+        //Take Damage
+        public virtual void TakeDamage(DamageContext damageInfo)
+        {
+            LastAttacker = damageInfo.Attacker;
+            ApplyDamage(damageInfo);
+        }
+        protected void ApplyDamage(DamageContext damageInfo)
+        {
+            DamageContext info = CalculateRealAppliedDamage(damageInfo);
 
             if (info.Damage <= 0) return;
 
-            ModifyStat(new ApplyStatContext(EPlayerStat.HP, EApplyStatType.Add, -info.Damage, EPlayerStat.None));
+            ReduceHP(info.Damage);
 
-            if (_currentHP <= 0)
-            {
-                OnDeath();
-            }
-
-            ShowHitDamageUIEvent?.Invoke(info.Damage);
+            ShowHitDamageUIEvent?.Invoke(this.transform.position + (Vector3.up * 2), info.Damage);
         }
-        protected virtual DamageInfo CalculateRealAppliedDamage(DamageInfo damageInfo)
+        protected abstract DamageContext CalculateRealAppliedDamage(DamageContext damageInfo);
+        protected abstract void ReduceHP(int damage);
+        public virtual void OnDeath()
         {
-            return damageInfo;
+            IsActive = false;
+            _animatorController.SetAnimationTrigger(ConstString.STOP_ALL_TRIGGER_ANIMATION);
+            OnHitDoneEvent?.Invoke();
         }
-        protected abstract DamageInfo CreateDamageInfo();
-      
+        #endregion
+
+
+        #region Animation
+        protected virtual void ApplyAttack()
+        {
+            if (!IsActive || AttackTarget == null || !AttackTarget.IsActive) return;
+
+            AttackTarget.TakeDamage(CreateDamageContext());
+        }
+        public virtual void EndHittedAnimation()
+        {
+            OnHitDoneEvent?.Invoke();
+        }
+        public virtual void EndAttackAnimation()
+        {
+            OnAttackDoneEvent?.Invoke();
+        }
         private void BindAnimEvent()
         {
             _animatorController.OnEndAttackAnimationEvent += EndAttackAnimation;
             _animatorController.OnEndHittedAnimationEvent += EndHittedAnimation;
-            _animatorController.OnHitTimeingEvent += ApplyAttackDamage;
+            _animatorController.OnHitTimeingEvent += ApplyAttack;
         }
         private void UnBindAnimEvent()
         {
             _animatorController.OnEndAttackAnimationEvent -= EndAttackAnimation;
             _animatorController.OnEndHittedAnimationEvent -= EndHittedAnimation;
-            _animatorController.OnHitTimeingEvent -= ApplyAttackDamage;
+            _animatorController.OnHitTimeingEvent -= ApplyAttack;
+        }
+        #endregion
+
+        public virtual void TurnEnd()
+        {
+            UpdateStatusDuration();
         }
 
-        //Bind Animation Event Trigger
-        private void ApplyAttackDamage()
-        {
-            if (!IsActive || _attackTarget == null || !_attackTarget.IsActive) return;
-            
-            _attackTarget.GetHit(CreateDamageInfo());
-        }
-        public virtual void EndHittedAnimation()
-        {
-            Debug.Log("EndHittedAnimation");
-            OnHitDoneEvent?.Invoke();
-        }
-        public virtual void EndAttackAnimation()
-        {
-            Debug.Log("EndAttackAnimation");
-            OnAttackDoneEvent?.Invoke();
-        }
-
-        //Interface
-        public virtual void Attack(ICombatant target)
-        {
-            _attackTarget = target;
-        }
-        public virtual void GetHit(DamageInfo damageInfo)
-        {
-            ApplyDamage(damageInfo);
-        }
-        public virtual void OnDeath()
-        {
-            IsActive = false;
-            OnHitDoneEvent?.Invoke();
-        }
-        public abstract void ModifyStat(ApplyStatContext context);
-        public void GainBarrier()
-        {
-            throw new NotImplementedException();
-        }
-        public void RequestCounterAttack(ICombatant target)
-        {
-            throw new NotImplementedException();
-        }
-        public void ApplyBind(ECreatureStatus State, int duration)
-        {
-            throw new NotImplementedException();
-        }
-        public abstract void RegisterAttack();
+        //Wire
         public void SetCombatSensor(ICombatantSensor combatantSensor)
         {
             if (combatantSensor == null) Debug.LogError("CombatSensor Is Null");
@@ -201,8 +169,54 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public void SetAttackRequestListener(IAttackRequestListener requestListener)
         {
             if (requestListener == null) Debug.LogError("RequestListener Is Null");
-            _attackRequestListener = requestListener;
+            AttackRequestListener = requestListener;
         }
-        
+        public void SetShowHitDamageUIEvent(Action<Vector3, int> ShowHitDamageUIEvent)
+        {
+            this.ShowHitDamageUIEvent = ShowHitDamageUIEvent;
+        }
+        public void AddDamageDealtMultiplier(float value)
+        {
+            DamageDealtMultiplier += value;
+        }
+        public void AddDamageTakenMultiplier(float value)
+        {
+            DamageTakenMultiplier += value;
+        }
+
+        #region Status
+        public bool HasStatus(ECreatureStatus status)
+        {
+            return status != ECreatureStatus.None && (StatusFlags & status) == status;
+        }
+        public void ApplyStatus(ECreatureStatus status, int duration)
+        {
+            if (duration <= 0 || status == ECreatureStatus.None) return;
+
+            StatusFlags |= status;
+            _statusDurations[status] = Mathf.Max(_statusDurations.GetValueOrDefault(status), duration);
+        }
+        public void RemoveStatus(ECreatureStatus status)
+        {
+            StatusFlags &= ~status;
+
+            _statusDurations.Remove(status);
+        }
+        private void UpdateStatusDuration()
+        {
+            if (_statusDurations.Count == 0) return;
+
+            foreach (var status in _statusDurations)
+            {
+                ECreatureStatus key = status.Key;
+                _statusDurations[key]--;
+                if (_statusDurations[key] <= 0)
+                {
+                    StatusFlags &= ~key;
+                    _statusDurations.Remove(key);
+                }
+            }
+        }
+        #endregion
     }
 }

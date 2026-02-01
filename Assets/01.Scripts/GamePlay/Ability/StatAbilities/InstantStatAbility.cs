@@ -18,9 +18,9 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         public void ExcuteAbility()
         {
-            if (Host.TryGet<IStatModifier>(out var service))
+            if (Host.TryGet<IPlayerStatModifier>(out var service))
             {
-                ApplyStatContext applyStatContext = new ApplyStatContext(
+                PlayerApplyStatContext applyStatContext = new PlayerApplyStatContext(
                 _data.PlayerStat, _data.ApplyType, _data.Value, _data.RatioType);
                 service.ModifyStat(applyStatContext);
             }

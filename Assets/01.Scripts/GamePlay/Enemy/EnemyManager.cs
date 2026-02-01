@@ -29,14 +29,17 @@ namespace JW.DungeonSliding.GamePlay.Entities
         private IBoard _board;
         private IObstacleRequest _obstacleRequest;
         private IEnemyStatUIService _enemyStatUIService;
+        private IHitDamageUIService _hitDamageUIService;
         public void WireInterfaces(IBoard board, IAttackRequestListener attackRequestListener,
-            ICombatantSensor sensor, IObstacleRequest obstacleRequest, IEnemyStatUIService enemyStatUIService)
+            ICombatantSensor sensor, IObstacleRequest obstacleRequest, IEnemyStatUIService enemyStatUIService,
+            IHitDamageUIService hitDamageUIService)
         {
             _board = board;
             _attackRequestListener = attackRequestListener;
             _combatantSensor = sensor;
             _obstacleRequest = obstacleRequest;
             _enemyStatUIService = enemyStatUIService;
+            _hitDamageUIService = hitDamageUIService;
         }
         public void LoadData()
         {
@@ -84,7 +87,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             }
 
             enemy.gameObject.SetActive(true);
-            _enemyStatUIService.Attach(enemy.transform, enemy);
+            _enemyStatUIService.Attach(enemy.UITransform, enemy);
 
             return enemy;
         }
@@ -93,6 +96,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             Enemy enemy = Instantiate(_enemyPrefabList[enemyUID], this.transform);
             enemy.ReturnEvent = ReturnEnemy;
             enemy.OnDeathEvent = OnEnemyDeath;
+            enemy.SetShowHitDamageUIEvent(_hitDamageUIService.ShowDamage);
             enemy.SetAttackRequestListener(_attackRequestListener);
             enemy.SetCombatSensor(_combatantSensor);
             return enemy;

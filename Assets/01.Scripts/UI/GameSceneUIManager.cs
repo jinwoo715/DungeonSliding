@@ -19,14 +19,17 @@ namespace JW.DungeonSliding.UI
         [SerializeField] private AbilityUIController _abilityUIController;
         [SerializeField] private PlayerStatUIContoller _playerStatUI;
         [SerializeField] private EnemyStatUIManager _enemyStatUIManager;
+        [SerializeField] private HitDamageViewer _hitDamageViewer;
 
         public IEnemyStatUIService EnemyStatUIService => _enemyStatUIManager;
+        public IHitDamageUIService HitDamageUIService => _hitDamageViewer;
 
         public void Init(IPlayerStatReadOnly statReadOnly)
         {
             _abilityUIController.Init();
             _playerStatUI.Init(statReadOnly);
             _enemyStatUIManager.Init();
+            _hitDamageViewer.Init();
         }
 
         public IEnumerator FadeIn()

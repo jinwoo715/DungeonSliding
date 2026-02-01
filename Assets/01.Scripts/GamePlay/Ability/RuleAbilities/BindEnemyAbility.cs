@@ -19,7 +19,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
             if (!_bindEenmies.Contains(_combatant.AttackTarget))
             {
                 _bindEenmies.Add(_combatant.AttackTarget);
-                _combatant.AttackTarget.ApplyBind(ECreatureStatus.Bind, 1);
+                _combatant.AttackTarget.ApplyStatus(ECreatureStatus.Bind, 1);
             }
         }
 

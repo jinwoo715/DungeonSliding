@@ -3,10 +3,10 @@ namespace JW.DungeonSliding
 {
     public enum EDirectionType
     {
-        Left,
         Up,
         Right,
         Down,
+        Left,
         None,
     }
 
@@ -59,6 +59,7 @@ namespace JW.DungeonSliding
 
     public enum EEnemyStatType
     {
+        None,
         HP,
         Damage
     }
@@ -92,6 +93,8 @@ namespace JW.DungeonSliding
 
         BattleStart,
         BattleEnd,
+
+        TurnEnd,
 
         OnStepEffectTile,
 
