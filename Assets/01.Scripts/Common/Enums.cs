@@ -84,8 +84,8 @@ namespace JW.DungeonSliding
         Hitted, 
         Kill,
 
-        MoveStart,
-        MoveEnd,
+        SlideStart,
+        SlideEnd,
 
         MoveExceptBattle,
 

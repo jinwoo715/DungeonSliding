@@ -7,13 +7,13 @@ namespace JW.DungeonSliding.UI
     {
         [SerializeField] private PlayerStatViewer _viewer;
 
-        private IPlayerStatReadOnly _statReadOnly;
+        private IPlayerStatProvider _statReadOnly;
         
-        public void Init(IPlayerStatReadOnly statReadOnly)
+        public void Init(IPlayerStatProvider statReadOnly)
         {
             Bind(statReadOnly);
         }
-        private void Bind(IPlayerStatReadOnly statReadOnly)
+        private void Bind(IPlayerStatProvider statReadOnly)
         {
             UnBind();
 
@@ -31,7 +31,6 @@ namespace JW.DungeonSliding.UI
 
         public void ChangePlayerStat(EPlayerStat changedStat)
         {
-            Debug.Log($"Stat UI {changedStat}");
             switch (changedStat)
             {
                 case EPlayerStat.HP:

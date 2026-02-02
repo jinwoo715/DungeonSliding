@@ -2,27 +2,17 @@
 namespace JW.DungeonSliding
 {
     [System.Serializable]
-    public struct CretureStat
+    public struct EnemyStat
     {
         public int HP;
         public int Damage;
+        public int XP;
 
-        public CretureStat(int hp, int damage)
+        public EnemyStat(int hp, int damage, int xp)
         {
             HP = hp;
             Damage = damage;
-        }
-    }
-
-    public struct PlayerStat
-    {
-        public CretureStat Base;
-        public int MoveCount;
-
-        public PlayerStat(CretureStat cretureStat, int moveCount)
-        {
-            Base = cretureStat;
-            MoveCount = moveCount;
+            XP = xp;
         }
     }
 }

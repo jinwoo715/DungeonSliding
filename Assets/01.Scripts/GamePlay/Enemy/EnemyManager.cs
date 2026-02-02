@@ -24,22 +24,17 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
         public event Action<RewardData> OnEnemyRewardEvent;
 
-        private IAttackRequestListener _attackRequestListener;
-        private ICombatantSensor _combatantSensor;
         private IBoard _board;
         private IObstacleRequest _obstacleRequest;
         private IEnemyStatUIService _enemyStatUIService;
-        private IHitDamageUIService _hitDamageUIService;
-        public void WireInterfaces(IBoard board, IAttackRequestListener attackRequestListener,
-            ICombatantSensor sensor, IObstacleRequest obstacleRequest, IEnemyStatUIService enemyStatUIService,
-            IHitDamageUIService hitDamageUIService)
+        private ICombatEventListener _combatEventListener;
+        public void WireInterfaces(IBoard board, IObstacleRequest obstacleRequest, IEnemyStatUIService enemyStatUIService,
+            ICombatEventListener combatEventListener)
         {
             _board = board;
-            _attackRequestListener = attackRequestListener;
-            _combatantSensor = sensor;
             _obstacleRequest = obstacleRequest;
             _enemyStatUIService = enemyStatUIService;
-            _hitDamageUIService = hitDamageUIService;
+            _combatEventListener = combatEventListener;
         }
         public void LoadData()
         {
@@ -62,7 +57,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
                 EnemySettingData data = templete.EnemyData[i];
                 Enemy enemy = GetEnemy(data.EnemyUID);
                 enemy.SetData(_enemyDataByUID[data.EnemyUID], floor);
-                enemy.Init();
+                
                 enemy.SetPosition(data.Point);
 
                 _activeEnemyByTile.Add(data.Point, enemy);
@@ -87,18 +82,16 @@ namespace JW.DungeonSliding.GamePlay.Entities
             }
 
             enemy.gameObject.SetActive(true);
-            _enemyStatUIService.Attach(enemy.UITransform, enemy);
+            _enemyStatUIService.Attach(enemy.StatUITransform, enemy);
 
             return enemy;
         }
         private Enemy SpawnEnemy(int enemyUID)
         {
             Enemy enemy = Instantiate(_enemyPrefabList[enemyUID], this.transform);
-            enemy.ReturnEvent = ReturnEnemy;
-            enemy.OnDeathEvent = OnEnemyDeath;
-            enemy.SetShowHitDamageUIEvent(_hitDamageUIService.ShowDamage);
-            enemy.SetAttackRequestListener(_attackRequestListener);
-            enemy.SetCombatSensor(_combatantSensor);
+            enemy.OnDeathEvent += OnEnemyDeath;
+            enemy.Init(_combatEventListener, ECretureType.Enemy);
+
             return enemy;
         }
         public void ReturnEnemy(Enemy enemy)
@@ -108,20 +101,17 @@ namespace JW.DungeonSliding.GamePlay.Entities
         }
         private void OnEnemyDeath(Enemy enemy)
         {
-            OnEnemyRewardEvent?.Invoke(new RewardData(enemy.Xp));
+            ReturnEnemy(enemy);
+
             _activeEnemyByTile.Remove(enemy.TilePosition);
-
             _obstacleRequest.SpawnObstacle(enemy.TilePosition, EObstacleObjectType.Rubble);
-
             _enemyStatUIService.Detach(enemy);
+            _board.UnRegisterEnemyTile(enemy.TilePosition);
 
             if (_activeEnemyByTile.Count == 0)
             {
-                Debug.Log("All Clear!");
                 GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.ClearStage);
             }
-
-            _board.UnRegisterEnemyTile(enemy.TilePosition);
         }
 
         //Interface

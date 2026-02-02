@@ -3,60 +3,57 @@ using UnityEngine;
 using JW.DungeonSliding.GamePlay.Context;
 using JW.DungeonSliding.GamePlay.Combat;
 using JW.DungeonSliding.GamePlay.Stats;
+using JW.DungeonSliding.Core;
 
 namespace JW.DungeonSliding.GamePlay.Entities
 {
-    public class Enemy : Creature, IEnemyStatReadOnly
+    public abstract class Enemy : Creature, IEnemyStatModifier
     {
         [SerializeField] private Transform _statUITransform;
 
-        public Action<Enemy> ReturnEvent;
-        public Action<Enemy> OnDeathEvent;
-
         private EnemyData _enemyData;
-        private int _rewardXp = 0;
+        private EnemyStat _enemyStat;
 
-        [SerializeField] private CretureStat _baseStat;
+        public event Action<Enemy> OnDeathEvent;
+        public event Action<EEnemyStatType> OnStatChangedEvent;
+        
+        private float _backAttackMultiplier;
 
-        public int Xp => _rewardXp;
         public int EnemyUID => _enemyData.EnemyUID;
+        public Transform StatUITransform => _statUITransform;
 
-        public Transform UITransform => _statUITransform;
+        public override void Init(ICombatEventListener combatEventListener, ECretureType cretureType)
+        {
+            base.Init(combatEventListener, cretureType);
 
-        public event Action<EEnemyStatType> OnStatChanged;
-
+            int RandomDir = UnityEngine.Random.Range(0, 4);
+            SetCharacterRotation((EDirectionType)RandomDir);
+            
+            _backAttackMultiplier = GameManager.Configs.GameConfig.BackAttackDamageMultiplier;
+        }
         public void SetData(EnemyData data, int floor)
         {
+            IsActive = true;
+
             _enemyData = data;
 
             int hp = CalculateHP(_enemyData.BaseHP, floor);
-            int dmg = CalculateDamage(_enemyData.BaseDamage, floor);
-            _rewardXp = CalculateXp(_enemyData.Xp, floor);
+            int dmg = CalculateDamage(_enemyData.BaseAttack, floor);
+            int xp = CalculateXp(_enemyData.Xp, floor);
 
-            SetCretureStat(new CretureStat(hp, dmg));
-        }
+            _enemyStat = new EnemyStat(hp, dmg, xp);
 
-        public virtual void SetCretureStat(CretureStat stat)
-        {
-            _baseStat = stat;
-            _currentHP = _baseStat.HP;
-            OnStatChanged?.Invoke(EEnemyStatType.HP);
-            OnStatChanged?.Invoke(EEnemyStatType.Damage);
-        }
-        public override void Init()
-        {
-            base.Init();
-            int RandomDir = UnityEngine.Random.Range(0, 4);
-            SetCharacterRotation((EDirectionType)RandomDir);
+            OnStatChangedEvent?.Invoke(EEnemyStatType.HP);
+            OnStatChangedEvent?.Invoke(EEnemyStatType.Damage);
         }
         protected override DamageContext CalculateRealAppliedDamage(DamageContext damageInfo)
         {
             int damage = damageInfo.Damage;
             bool critical = damageInfo.IsCritical;
 
-            if(damageInfo.Attacker.Direction == this.Direction)
+            if(IsBackAttack(damageInfo.Attacker))
             {
-                damage *= 2;
+                damage = (int)(damage * _backAttackMultiplier);
                 critical = true;
             }
 
@@ -64,6 +61,64 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
             return info;
         }
+        bool IsBackAttack(ICombatant attacker)
+        {
+            var behindTile = TilePosition.GetNextTile(ReverseDirection(Direction));
+            return behindTile != null && attacker.TilePosition == behindTile;
+        }
+        public void ModifyStat(EnemyApplyStatContext context)
+        {
+            switch (context.EnemyStat)
+            {
+                case EEnemyStatType.HP:
+                    
+                    _enemyStat.HP += (int)context.Value;
+                    _enemyStat.HP = Mathf.Max(0, _enemyStat.HP);
+
+                    OnStatChangedEvent?.Invoke(EEnemyStatType.HP);
+
+                    if (_enemyStat.HP <= 0)
+                    {
+                        OnDeath();
+                    }
+
+                    break;
+
+                case EEnemyStatType.Damage:
+                    _enemyStat.Damage += (int)context.Value;
+                    OnStatChangedEvent?.Invoke(EEnemyStatType.Damage);
+
+                    break;
+            }
+
+        }
+        public int Get(EEnemyStatType stat)
+        {
+            int returnValue = 0;
+            switch (stat)
+            {
+                case EEnemyStatType.HP:
+                    returnValue = _enemyStat.HP;
+                    break;
+                case EEnemyStatType.Damage:
+                    returnValue = _enemyStat.Damage;
+                    break;
+            }
+
+            return returnValue;
+        }
+        protected override void ReduceHP(int damage)
+        {
+            ModifyStat(new EnemyApplyStatContext(EEnemyStatType.HP, EApplyStatType.Add, -damage, EEnemyStatType.None));
+        }
+        public override void OnDeath()
+        {
+            base.OnDeath();
+            OnDeathEvent?.Invoke(this);
+        }
+        public override void StartAttackAnimation() { }
+
+        #region Calculate Stat
         public int CalculateHP(int baseHP, int floor)
         { 
             return ScaleStat(baseHP, ConstData.ENEMY_HP_POW, floor, ceil: true);   // HP는 올림 추천
@@ -85,68 +140,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
             int scaled = ceil ? Mathf.CeilToInt(v) : Mathf.RoundToInt(v);
             return Mathf.Max(baseValue, scaled);
         }
-
-        public override bool TrySubmitAttackRequest()
-        {
-            if (_sensor.GetCombatant(TilePosition.GetNextTile(Direction), ECretureType.Player, out var target))
-            {
-                AttackRequestListener.EnqueueActPair(new ActPair(this, target));
-                return true;
-            }
-            else return false;
-        }
-
-        public void ModifyStat(EnemyApplyStatContext context)
-        {
-            switch (context.EnemyStat)
-            {
-                case EEnemyStatType.HP:
-                    _currentHP += (int)context.Value;
-
-                    _currentHP = Mathf.Clamp(_currentHP, 0, _baseStat.HP);
-
-                    OnStatChanged?.Invoke(EEnemyStatType.HP);
-
-                    if (_currentHP <= 0)
-                    {
-                        OnDeath();
-                    }
-
-                    break;
-                case EEnemyStatType.Damage:
-                    _baseStat.Damage += (int)context.Value;
-                    OnStatChanged?.Invoke(EEnemyStatType.Damage);
-
-                    break;
-            }
-
-        }
-
-        public int Get(EEnemyStatType stat)
-        {
-            int returnValue = 0;
-            switch (stat)
-            {
-                case EEnemyStatType.HP:
-                    returnValue = _currentHP;
-                    break;
-                case EEnemyStatType.Damage:
-                    returnValue = _baseStat.Damage;
-                    break;
-            }
-
-            return returnValue;
-        }
-
-        protected override DamageContext CreateDamageContext()
-        {
-            DamageContext damageInfo = new DamageContext(this, Get(EEnemyStatType.Damage), false);
-            return damageInfo;
-        }
-
-        public override void ReduceHP(int damage)
-        {
-            ModifyStat(new EnemyApplyStatContext(EEnemyStatType.HP, EApplyStatType.Add, -damage, EEnemyStatType.None));
-        }
+        #endregion
     }
 }

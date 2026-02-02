@@ -17,6 +17,7 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
         private GameModeController _modeController = new GameModeController();
         private InputCoordinator _inputCoordinator = new InputCoordinator();
         private GameTriggerEventBus _triggerEventBus = new GameTriggerEventBus();
+        private CombatEventBus _combatEventBus = new();
         private AbilitySystem _abilitySystem;
         private FieldCombatantManager _fieldCombatantManager;
 
@@ -28,6 +29,7 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
         [SerializeField] private BattleManager _battleManager;
         [SerializeField] private InputSystem _inputSystem;
         [SerializeField] private ObstacleObjectController _obstacleController;
+
         private void Start()
         {
             _gameSceneManager.Init(_rewardManager, _mapManager, _player, _enemyManager, _battleManager, _inputSystem, _modeController, _gameSceneUIManager, _obstacleController);
@@ -40,24 +42,21 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
 
         private void ChildInit()
         {
-            _gameSceneUIManager.Init(_player);
+            _gameSceneUIManager.Init(_player, _combatEventBus);
 
-            _player.Init();
-
+            _player.Init(_combatEventBus, ECretureType.Player);
             _player.SetGameModeChanger(_modeController);
-            _player.SetCombatSensor(_fieldCombatantManager);
-            _player.SetAttackRequestListener(_battleManager);
-            _player.SetShowHitDamageUIEvent(_gameSceneUIManager.HitDamageUIService.ShowDamage);
 
             _inputCoordinator.Init(_player);
             
-            _enemyManager.WireInterfaces(_mapManager, _battleManager, _fieldCombatantManager, _obstacleController, _gameSceneUIManager.EnemyStatUIService, _gameSceneUIManager.HitDamageUIService);
+            _enemyManager.WireInterfaces(_mapManager, _obstacleController, _gameSceneUIManager.EnemyStatUIService, _combatEventBus);
             _enemyManager.LoadData();
 
             _mapManager.Init(_player);
             
             _battleManager.Init(_fieldCombatantManager, _modeController);
 
+            _rewardManager.Init(_combatEventBus);
 
             _abilitySystem = new AbilitySystem(_gameSceneUIManager, _modeController, _player);
         }
@@ -72,11 +71,6 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
             
             _mapManager.SetEnemyEvent += _enemyManager.SetEnemy;
 
-            _enemyManager.OnEnemyRewardEvent += _rewardManager.GainReward;
-
-            _rewardManager.GetRewardEvent += _player.GetReward;
-            
-            _player.FinishSlideEvent += _battleManager.StartBattleSequence;
             _player.GetMoveContextFunc += _mapManager.GetMoveContext;
         }
 

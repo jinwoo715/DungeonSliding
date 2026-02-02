@@ -1,4 +1,5 @@
 using JW.DungeonSliding.GamePlay.Ability;
+using JW.DungeonSliding.GamePlay.Combat;
 using JW.DungeonSliding.GamePlay.Entities;
 using JW.DungeonSliding.GamePlay.Stats;
 using System;
@@ -22,14 +23,13 @@ namespace JW.DungeonSliding.UI
         [SerializeField] private HitDamageViewer _hitDamageViewer;
 
         public IEnemyStatUIService EnemyStatUIService => _enemyStatUIManager;
-        public IHitDamageUIService HitDamageUIService => _hitDamageViewer;
 
-        public void Init(IPlayerStatReadOnly statReadOnly)
+        public void Init(GamePlay.Stats.IPlayerStatProvider statReadOnly, ICombatEventPresenter combatEventPresenter)
         {
             _abilityUIController.Init();
             _playerStatUI.Init(statReadOnly);
             _enemyStatUIManager.Init();
-            _hitDamageViewer.Init();
+            _hitDamageViewer.Init(combatEventPresenter);
         }
 
         public IEnumerator FadeIn()

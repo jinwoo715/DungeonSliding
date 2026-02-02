@@ -28,8 +28,8 @@ namespace JW.DungeonSliding
 
         public Tile GetNextTile(EDirectionType directionType)
         {
-            int[] xDir = { -1, 0, 1, 0 };
-            int[] zDir = { 0, 1, 0, -1 };
+            int[] xDir = { 0, 1, 0, -1 };
+            int[] zDir = { 1, 0, -1, 0 };
 
             return new Tile(XPos + xDir[(int)directionType], ZPos + zDir[(int)directionType]);
         }

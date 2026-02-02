@@ -21,7 +21,7 @@ namespace JW.DungeonSliding.Map
         private Dictionary<Tile, IEffectTile> _effectTileDic = new Dictionary<Tile, IEffectTile>();
         private MapData _currentMapData;
 
-        private int[,] _dir = { {-1,0 }, {0,1 }, {1,0 }, {0,-1 } };
+        private int[,] _dir = { { 0,1 }, {1,0 }, {0,-1 }, { -1, 0 } };
         private ITilePosition _player;
 
         public void Init(ITilePosition player)

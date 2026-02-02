@@ -25,14 +25,12 @@ namespace JW.DungeonSliding.GamePlay.Combat
     public interface IAttackable
     {
         event Action OnAttackDoneEvent;
-        IAttackRequestListener AttackRequestListener { get; }
         ICombatant AttackTarget { get;}
 
         float DamageDealtMultiplier { get; }  // 가하는 피해 배율
 
         void AddDamageDealtMultiplier(float value);
-        void SetAttackRequestListener(IAttackRequestListener requestListener);
-        bool TrySubmitAttackRequest();
+        bool TrySubmitAttackRequest(ICombatantSensor sensor, IAttackRequestListener attackRequestListener);
         void StartAttackAnimation();
     }
 
@@ -78,7 +76,6 @@ namespace JW.DungeonSliding.GamePlay.Combat
     {
         public bool IsActive { get; }
         public EDirectionType Direction { get; }
-        public void SetCombatSensor(ICombatantSensor exceptCombatant);
     }
 
     public interface ICombatProvider
@@ -94,10 +91,4 @@ namespace JW.DungeonSliding.GamePlay.Combat
         public int GetNearCambatantCount(ICombatant except);
     }
 
-    public class CombatEventBus
-    {
-
-    }
-
-    
 }

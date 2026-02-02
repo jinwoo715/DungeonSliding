@@ -1402,7 +1402,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _animatorController: {fileID: 726333317}
-  _currentHP: 0
   _playerData: {fileID: 11400000, guid: ad06b226f7d30a34f9ab64dfe9ab3fd0, type: 2}
 --- !u!114 &726333317
 MonoBehaviour:
@@ -3430,6 +3429,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b2eb811fb46e1b44bb372db110ea0f01, type: 2}
   - {fileID: 11400000, guid: 612d91d16a8d2f64989598ca123d3123, type: 2}
   - {fileID: 11400000, guid: b53674461ba339040bc4737c86fc6501, type: 2}
+  _gameConfig: {fileID: 11400000, guid: af371193289e7284aa7e3bc27acbdb07, type: 2}
 --- !u!1 &1793553404
 GameObject:
   m_ObjectHideFlags: 0

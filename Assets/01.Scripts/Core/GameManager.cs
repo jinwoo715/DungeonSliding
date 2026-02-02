@@ -1,5 +1,6 @@
 using UnityEngine;
 using JW.DungeonSliding.Core.Resource;
+using JW.DungeonSliding.GamePlay;
 
 namespace JW.DungeonSliding.Core
 {
@@ -10,6 +11,9 @@ namespace JW.DungeonSliding.Core
 
         [SerializeField] private ResourceManager _resource;
         public ResourceManager Resource => _resource;
+
+        public static Configs _configs = new Configs();
+        public static Configs Configs => _configs;
 
         private void Awake()
         {
@@ -25,10 +29,10 @@ namespace JW.DungeonSliding.Core
             // 하위 매니저 초기화
             InitManagers();
         }
-
         private void InitManagers()
         {
             Resource.Init();
+            _configs.Init(Resource.GameConfig);
         }
     }
 }

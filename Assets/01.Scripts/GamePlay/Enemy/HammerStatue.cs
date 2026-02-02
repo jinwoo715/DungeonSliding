@@ -5,9 +5,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
 {
     public class HammerStatue : StoneStatueEnemy
     {
-        public override void Attack(ICombatant target)
+        public override void StartAttackAnimation()
         {
-            base.Attack(target);
             _animatorController.SetAnimationTrigger(ConstString.TWO_HAND_ATTACK_ANIM);
         }
 

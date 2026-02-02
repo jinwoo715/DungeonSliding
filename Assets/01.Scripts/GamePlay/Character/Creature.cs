@@ -10,36 +10,39 @@ namespace JW.DungeonSliding.GamePlay.Entities
     {
         [SerializeField] protected AnimatorController _animatorController;
 
-        public bool IsActive { get; private set; } = true;
+        public bool IsActive { get; protected set; } = true;
         public EDirectionType Direction { get; private set; }
         public Tile TilePosition { get; private set; }
         public ICombatant LastAttacker { get; private set; }
-        public ICombatant AttackTarget { get; private set; }
+        public ICombatant AttackTarget { get; protected set; }
         public ECreatureStatus StatusFlags { get; private set; }
         private Dictionary<ECreatureStatus, int> _statusDurations = new();
+        private readonly List<ECreatureStatus> _statusKeys = new();
+
         public float DamageDealtMultiplier { get; private set; } = 1;
         public float DamageTakenMultiplier { get; private set; } = 1;
-        protected int _currentHP;
+        
 
         public event Action OnAttackDoneEvent;
         public event Action OnHitDoneEvent;
-        private Action<Vector3, int> ShowHitDamageUIEvent;
 
-        public IAttackRequestListener AttackRequestListener { get; private set; }
-        public ICombatantSensor _sensor { get; private set; }
+        private ECretureType _cretureType;
+        private ICombatEventListener _combatEventListener;
 
-        public virtual void Init() 
+        public virtual void Init(ICombatEventListener combatEventListener, ECretureType cretureType) 
         {
+            _combatEventListener = combatEventListener;
+            _cretureType = cretureType;
             IsActive = true;
             BindAnimEvent();
         }
         private void OnEnable()
         {
-            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.BattleEnd, TurnEnd);
+            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.BattleEnd, EndBattle);
         }
         private void OnDisable()
         {
-            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.BattleEnd, TurnEnd);
+            GameTriggerEventBus.Instance?.UnSubscribeTriggerEvent(EGameTriggerType.BattleEnd, EndBattle);
         }
         private void OnDestroy()
         {
@@ -95,9 +98,25 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
         #region Combat
         //Attack
-        public abstract bool TrySubmitAttackRequest();
+        public bool TrySubmitAttackRequest(ICombatantSensor sensor, IAttackRequestListener attackRequestListener)
+        {
+            ECretureType searchType = _cretureType == ECretureType.Player ? ECretureType.Enemy : ECretureType.Player;
+         
+            if (sensor.GetCombatant(TilePosition.GetNextTile(Direction), searchType, out var target))
+            {
+                AttackTarget = target;
+                attackRequestListener.EnqueueActPair(new ActPair(this, target));
+                return true;
+            }
+
+            else return false;
+        }
         public abstract void StartAttackAnimation();
-        protected abstract DamageContext CreateDamageContext();
+        protected virtual DamageContext CreateDamageContext()
+        {
+            DamageContext damageInfo = new DamageContext(this, Get(EEnemyStatType.Damage), false);
+            return damageInfo;
+        }
 
         //Take Damage
         public virtual void TakeDamage(DamageContext damageInfo)
@@ -113,7 +132,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
             ReduceHP(info.Damage);
 
-            ShowHitDamageUIEvent?.Invoke(this.transform.position + (Vector3.up * 2), info.Damage);
+            _combatEventListener.RaiseDamageEvent(new DamageEvent(LastAttacker, this, info.Damage));
         }
         protected abstract DamageContext CalculateRealAppliedDamage(DamageContext damageInfo);
         protected abstract void ReduceHP(int damage);
@@ -121,10 +140,13 @@ namespace JW.DungeonSliding.GamePlay.Entities
         {
             IsActive = false;
             _animatorController.SetAnimationTrigger(ConstString.STOP_ALL_TRIGGER_ANIMATION);
+            
+            _combatEventListener.RaiseDeathEvent(new DeathEvent(LastAttacker, this));
+            
             OnHitDoneEvent?.Invoke();
+            OnAttackDoneEvent?.Invoke();
         }
         #endregion
-
 
         #region Animation
         protected virtual void ApplyAttack()
@@ -155,26 +177,12 @@ namespace JW.DungeonSliding.GamePlay.Entities
         }
         #endregion
 
-        public virtual void TurnEnd()
+        public virtual void EndBattle()
         {
             UpdateStatusDuration();
         }
 
-        //Wire
-        public void SetCombatSensor(ICombatantSensor combatantSensor)
-        {
-            if (combatantSensor == null) Debug.LogError("CombatSensor Is Null");
-            _sensor = combatantSensor;
-        }
-        public void SetAttackRequestListener(IAttackRequestListener requestListener)
-        {
-            if (requestListener == null) Debug.LogError("RequestListener Is Null");
-            AttackRequestListener = requestListener;
-        }
-        public void SetShowHitDamageUIEvent(Action<Vector3, int> ShowHitDamageUIEvent)
-        {
-            this.ShowHitDamageUIEvent = ShowHitDamageUIEvent;
-        }
+        #region Stat
         public void AddDamageDealtMultiplier(float value)
         {
             DamageDealtMultiplier += value;
@@ -183,6 +191,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         {
             DamageTakenMultiplier += value;
         }
+        #endregion
 
         #region Status
         public bool HasStatus(ECreatureStatus status)
@@ -206,14 +215,18 @@ namespace JW.DungeonSliding.GamePlay.Entities
         {
             if (_statusDurations.Count == 0) return;
 
-            foreach (var status in _statusDurations)
+            _statusKeys.Clear();
+            foreach (var kv in _statusDurations)
+                _statusKeys.Add(kv.Key);
+
+            foreach (var key in _statusKeys)
             {
-                ECreatureStatus key = status.Key;
                 _statusDurations[key]--;
+
                 if (_statusDurations[key] <= 0)
                 {
-                    StatusFlags &= ~key;
                     _statusDurations.Remove(key);
+                    StatusFlags &= ~key;
                 }
             }
         }

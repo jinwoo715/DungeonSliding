@@ -1,27 +1,33 @@
 using JW.DungeonSliding.GamePlay.Stats;
 using UnityEngine;
 using JW.Utility;
+using JW.DungeonSliding.GamePlay.Combat;
 
 namespace JW.DungeonSliding.UI
 {
-    public class HitDamageViewer : MonoBehaviour, IHitDamageUIService
+    public class HitDamageViewer : MonoBehaviour
     {
         [SerializeField] private HitDamageItem _hitDamageItem;
 
         ObjectPool<HitDamageItem> objectPool;
 
-        public void Init()
+        public void Init(ICombatEventPresenter combatEventPresenter)
         {
             objectPool = new ObjectPool<HitDamageItem>(_hitDamageItem, 5, this.transform);
+
+            combatEventPresenter.DamageEvent += ShowDamage;
         }
 
-        public void ShowDamage(Vector3 showPosition, int damage)
+        public void ShowDamage(DamageEvent damageEvent)
         {
             var obj = objectPool.GetObject();
 
-            obj.transform.position = Camera.main.WorldToScreenPoint(showPosition);
+            Vector3 spawnPosition = damageEvent.Target.TilePosition.GetPosition;
+            spawnPosition += Vector3.up;
 
-            obj.Init(damage, 0.5f);
+            obj.transform.position = Camera.main.WorldToScreenPoint(spawnPosition);
+
+            obj.Init(damageEvent.Damage, 0.5f);
         }
     }
 }

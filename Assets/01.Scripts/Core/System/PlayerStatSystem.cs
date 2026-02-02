@@ -3,25 +3,20 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Stats
 {
-    public interface IPlayerStatReadOnly
+    public interface IPlayerStatProvider
     {
         public int Get(EPlayerStat stat);
         public Action<EPlayerStat> OnStatChanged { get; set; }
     }
-    public interface IEnemyStatReadOnly
+    public interface IEnemyStatModifier
     {
         public int Get(EEnemyStatType stat);
-        event Action<EEnemyStatType> OnStatChanged;
+        event Action<EEnemyStatType> OnStatChangedEvent;
     }
     public interface IEnemyStatUIService
     {
-        public void Attach(Transform transform, IEnemyStatReadOnly enemyStatReadOnly);
-        public void Detach(IEnemyStatReadOnly enemyStatReadOnly);
+        public void Attach(Transform transform, IEnemyStatModifier enemyStatReadOnly);
+        public void Detach(IEnemyStatModifier enemyStatReadOnly);
     }
 
-    public interface IHitDamageUIService
-    {
-        void ShowDamage(Vector3 showPosition, int damage);
-    }
- 
 }

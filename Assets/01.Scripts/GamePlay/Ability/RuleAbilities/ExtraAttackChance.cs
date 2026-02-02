@@ -22,7 +22,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         public override void ProcTrigger(EGameTriggerType triggerType)
         {
-            if (triggerType == EGameTriggerType.MoveEnd)
+            if (triggerType == EGameTriggerType.SlideEnd)
             {
                 int chanceValue = Random.Range(0, 101);
 

@@ -48,7 +48,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _animatorController: {fileID: 5750647025204057581}
-  _currentHP: 0
+  _cretureType: 1
   _statUITransform: {fileID: 2611346491530896480}
   _baseStat:
     HP: 0

@@ -12,7 +12,6 @@ namespace JW.DungeonSliding.UI
 
         public IEnumerator CoFadeIn() 
         {
-            Debug.Log("Fade In");
             float timer = _fadeImage.alpha;
             while (timer >= 0)
             {
@@ -24,7 +23,6 @@ namespace JW.DungeonSliding.UI
         }
         public IEnumerator CoFadeOut()
         {
-            Debug.Log("Fade Out");
             float timer = _fadeImage.alpha;
             while (timer < 1)
             {

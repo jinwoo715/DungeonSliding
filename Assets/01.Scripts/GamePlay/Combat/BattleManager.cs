@@ -20,18 +20,25 @@ namespace JW.DungeonSliding.GamePlay.Combat
         {
             _combatSensor = combatantSensor;
             _gameModeChanger = gameModeChanger;
+
+            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.SlideEnd, StartBattleSequence);
         }
-        
+
+        private void OnDestroy()
+        {
+            GameTriggerEventBus.Instance.UnSubscribeTriggerEvent(EGameTriggerType.SlideEnd, StartBattleSequence);
+        }
+
         public void StartBattleSequence()
         {
             _gameModeChanger.EnterGameMode(EGameModeType.Battle);
-            _combatSensor.PlayerCombatant.TrySubmitAttackRequest();
+            _combatSensor.PlayerCombatant.TrySubmitAttackRequest(_combatSensor, this);
 
             List<ICombatant> enemies = _combatSensor.AllEnemyCombatants;
 
             for (int i = 0; i < enemies.Count; i++)
             {
-                enemies[i].TrySubmitAttackRequest();
+                enemies[i].TrySubmitAttackRequest(_combatSensor, this);
             }
 
             StartCoroutine(CoStartSequence());
@@ -66,7 +73,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
                 act.Attacker.OnAttackDoneEvent += OnAttackEnd;
                 act.Target.OnHitDoneEvent += OnHitEnd;
 
-                act.Attacker.Attack(act.Target);
+                act.Attacker.StartAttackAnimation();
 
                 float timer = 0;
                 const float timeOut = 3.0f;
@@ -91,8 +98,6 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
                 act.Attacker.OnAttackDoneEvent -= OnAttackEnd;
                 act.Target.OnHitDoneEvent -= OnHitEnd;
-
-                Debug.Log("End Sequence");
             }
 
             _gameModeChanger.ExitGameMode(EGameModeType.Battle);

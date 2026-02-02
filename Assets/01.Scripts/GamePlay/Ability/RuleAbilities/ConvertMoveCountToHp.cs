@@ -6,12 +6,12 @@ namespace JW.DungeonSliding.GamePlay.Ability
 {
     public class ConvertMoveCountToHp : RuleAbility
     {
-        IPlayerStatModifier _playerStatModifier;
-        IPlayerStatReadOnly _statReadOnly;
+        Combat.IPlayerStatModifier _playerStatModifier;
+        Stats.IPlayerStatProvider _statReadOnly;
         public ConvertMoveCountToHp(RuleAbilityData data, IAbilityHost host) : base(data, host)
         {
-            BindService<IPlayerStatModifier>(ref _playerStatModifier);
-            BindService<IPlayerStatReadOnly>(ref _statReadOnly);
+            BindService(ref _playerStatModifier);
+            BindService(ref _statReadOnly);
         }
 
         public override void ExcuteAbility()

@@ -12,14 +12,11 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
         public void ReturnPool()
         {
-            StopAllCoroutines();
-
-            ReturnEvent?.Invoke(this);
+            
         }
 
-        public override void Attack(ICombatant target)
+        public override void StartAttackAnimation()
         {
-            base.Attack(target);
             _eyeLight.SetActive(true);
         }
         public override void EndAttackAnimation()
@@ -30,10 +27,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public override void OnDeath()
         {
             base.OnDeath();
-
-            OnDeathEvent?.Invoke(this);
-
-            ReturnPool();
+            StopAllCoroutines();
         }
 
         public override void TakeDamage(DamageContext damageInfo)

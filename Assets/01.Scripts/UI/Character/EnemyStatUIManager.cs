@@ -10,7 +10,7 @@ namespace JW.DungeonSliding
         [SerializeField] private EnemyStatViewItem _enemyStatViewItem;
         
         private ObjectPool<EnemyStatViewItem> _statViewItemPool;
-        private Dictionary<IEnemyStatReadOnly, EnemyStatViewItem> _activeEnemyStatItemByEnemy = new();
+        private Dictionary<IEnemyStatModifier, EnemyStatViewItem> _activeEnemyStatItemByEnemy = new();
         public void Init()
         {
             _statViewItemPool = new ObjectPool<EnemyStatViewItem>(_enemyStatViewItem, 3, this.transform);
@@ -21,14 +21,14 @@ namespace JW.DungeonSliding
             item.Release();
         }
 
-        public void Attach(Transform transform, IEnemyStatReadOnly enemyStatReadOnly)
+        public void Attach(Transform transform, IEnemyStatModifier enemyStatReadOnly)
         {
             EnemyStatViewItem item = _statViewItemPool.GetObject();
             item.Init(transform, enemyStatReadOnly);
             _activeEnemyStatItemByEnemy.Add(enemyStatReadOnly, item);
         }
 
-        public void Detach(IEnemyStatReadOnly enemyStatReadOnly)
+        public void Detach(IEnemyStatModifier enemyStatReadOnly)
         {
             if(_activeEnemyStatItemByEnemy.TryGetValue(enemyStatReadOnly, out var value))
             {

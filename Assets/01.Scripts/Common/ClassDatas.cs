@@ -33,7 +33,7 @@ namespace JW.DungeonSliding
         public int EnemyUID;
         public string EnemyName;
         public int BaseHP;
-        public int BaseDamage;
+        public int BaseAttack;
         public int Xp;
     }
 
