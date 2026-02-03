@@ -7,6 +7,7 @@ namespace JW.DungeonSliding
         // /
         public override MoveContext OnEnterTile(ref MoveContext moveContext)
         {
+            base.OnEnterTile(ref moveContext);
             // ¡æ ¡è
             // ¡é ¡ç      ¢É
             // ¡è ¡æ

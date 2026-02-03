@@ -6,6 +6,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
     {
         None = 0,
         Bind = 1 << 0,
-        Stun = 1 << 1
+        Stun = 1 << 1,
+        Knockback = 1 << 2,
     }
 }

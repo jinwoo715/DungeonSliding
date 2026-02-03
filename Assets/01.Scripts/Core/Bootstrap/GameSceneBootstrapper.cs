@@ -1,3 +1,4 @@
+using JW.DungeonSliding.Core;
 using JW.DungeonSliding.Core.Flow;
 using JW.DungeonSliding.Core.Inputs;
 using JW.DungeonSliding.GamePlay.Ability;
@@ -20,6 +21,7 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
         private CombatEventBus _combatEventBus = new();
         private AbilitySystem _abilitySystem;
         private FieldCombatantManager _fieldCombatantManager;
+        private RouteBuilder _routeBuilder;
 
         [SerializeField] private GameSceneManager _gameSceneManager;
         [SerializeField] private GameSceneUIManager _gameSceneUIManager;
@@ -42,10 +44,13 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
 
         private void ChildInit()
         {
+            _routeBuilder = new RouteBuilder(_mapManager);
+            _abilitySystem = new AbilitySystem(_gameSceneUIManager, _modeController, _player);
+            
             _gameSceneUIManager.Init(_player, _combatEventBus);
 
             _player.Init(_combatEventBus, ECretureType.Player);
-            _player.SetGameModeChanger(_modeController);
+            _player.SetData(GameManager.Instance.Resource.PlayerData, _routeBuilder, _mapManager);
 
             _inputCoordinator.Init(_player);
             
@@ -57,8 +62,6 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
             _battleManager.Init(_fieldCombatantManager, _modeController);
 
             _rewardManager.Init(_combatEventBus);
-
-            _abilitySystem = new AbilitySystem(_gameSceneUIManager, _modeController, _player);
         }
 
         private void BindEvent()
@@ -70,8 +73,6 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
             _inputCoordinator.IsMoveableFlowFunc += () => _modeController.IsCanMove;
             
             _mapManager.SetEnemyEvent += _enemyManager.SetEnemy;
-
-            _player.GetMoveContextFunc += _mapManager.GetMoveContext;
         }
 
         private void OnDestroy()

@@ -10,18 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1ad0caa0e788f374894f0afd16175c1f, type: 3}
-  m_Name: LuckyDiceAbility
+  m_Name: AddMaxHPAbilty
   m_EditorClassIdentifier: 
-  AbilityUID: 5
-  Name: "\uD589\uC6B4\uC758 \uC8FC\uC0AC\uC704"
-  Description: "\uBB34\uB8CC \uB9AC\uB864 1\uD68C \uCD94\uAC00"
-  AbilitySprite: {fileID: -1611920951, guid: 080cb6d98b00c2645b2c41df5f69bc78, type: 3}
+  AbilityUID: 3
+  Name: "\uCD5C\uB300 \uCCB4\uB825 \uC99D\uAC00"
+  Description: "\uCD5C\uB300 \uCCB4\uB825 10\uC99D\uAC00"
+  AbilitySprite: {fileID: -651057808, guid: 080cb6d98b00c2645b2c41df5f69bc78, type: 3}
   AbilityRank: 0
   EAbilityEffectType: 0
   AbilityTriggerTypes: 
   IsDisposable: 0
   ApplyStatType: 0
-  PlayerStat: 7
+  PlayerStat: 2
   ApplyType: 0
   RatioType: 0
-  Value: 1
+  Value: 10

@@ -34,11 +34,8 @@ namespace JW.DungeonSliding.UI
 
         public void SelectAbility(int abilityUid)
         {
-            Debug.Log($"currentSession : {_currentSession}");
             _currentSession.SelectAbiltyUIDEvent(abilityUid);
-
             _abilitySelectView.gameObject.SetActive(false);
-
             _currentSession = null;
         }
     }

@@ -18,7 +18,7 @@ namespace JW.DungeonSliding
         public readonly EPlayerStat PlayerStat;
         public readonly EApplyStatType ApplyType;
         public readonly EPlayerStat RatioStatType;
-        public readonly float Value;
+        public float Value;
 
         public PlayerApplyStatContext(EPlayerStat playerStat, EApplyStatType applyType, float value, EPlayerStat ratio)
         {
@@ -26,6 +26,11 @@ namespace JW.DungeonSliding
             ApplyType = applyType;
             Value = value;
             RatioStatType = ratio;
+        }
+
+        public void AddValue(float value)
+        {
+            Value = value;
         }
     }
     public struct EnemyApplyStatContext

@@ -14,12 +14,15 @@ namespace JW.DungeonSliding.GamePlay.Ability
             Host = host;
             _data = data;
             ExcuteAbility();
+            Debug.Log("Instant Ability");
         }
 
         public void ExcuteAbility()
         {
+            Debug.Log("Excute");
             if (Host.TryGet<IPlayerStatModifier>(out var service))
             {
+                Debug.Log("Excute!");
                 PlayerApplyStatContext applyStatContext = new PlayerApplyStatContext(
                 _data.PlayerStat, _data.ApplyType, _data.Value, _data.RatioType);
                 service.ModifyStat(applyStatContext);

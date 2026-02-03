@@ -31,7 +31,8 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
         public void StartBattleSequence()
         {
-            _gameModeChanger.EnterGameMode(EGameModeType.Battle);
+            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.BattleStart);
+
             _combatSensor.PlayerCombatant.TrySubmitAttackRequest(_combatSensor, this);
 
             List<ICombatant> enemies = _combatSensor.AllEnemyCombatants;
@@ -101,6 +102,8 @@ namespace JW.DungeonSliding.GamePlay.Combat
             }
 
             _gameModeChanger.ExitGameMode(EGameModeType.Battle);
+
+            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.BattleEnd);
 
             _actPairs.Clear();
             _counterActPairs.Clear();

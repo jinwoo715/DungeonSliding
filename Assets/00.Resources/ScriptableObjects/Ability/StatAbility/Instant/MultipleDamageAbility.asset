@@ -10,18 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1ad0caa0e788f374894f0afd16175c1f, type: 3}
-  m_Name: RecoveryHPAbility
+  m_Name: MultipleDamageAbility
   m_EditorClassIdentifier: 
-  AbilityUID: 6
-  Name: "\uCCB4\uB825\uD68C\uBCF5"
-  Description: "\uCCB4\uB825 \uC804\uBD80 \uD68C\uBCF5"
-  AbilitySprite: {fileID: -651057808, guid: 080cb6d98b00c2645b2c41df5f69bc78, type: 3}
+  AbilityUID: 7
+  Name: "\uB370\uBBF8\uC9C0 \uACF1\uC148"
+  Description: "\uB370\uBBF8\uC9C0\uAC00 10\uD504\uB85C \uC99D\uAC00"
+  AbilitySprite: {fileID: 695775810, guid: 080cb6d98b00c2645b2c41df5f69bc78, type: 3}
   AbilityRank: 0
   EAbilityEffectType: 0
   AbilityTriggerTypes: 
   IsDisposable: 0
   ApplyStatType: 0
-  PlayerStat: 1
-  ApplyType: 0
-  RatioType: 2
-  Value: 1
+  PlayerStat: 3
+  ApplyType: 1
+  RatioType: 0
+  Value: 0.1

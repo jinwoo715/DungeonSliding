@@ -2,6 +2,8 @@ using JW.DungeonSliding.GamePlay.Stats;
 using UnityEngine;
 using JW.Utility;
 using JW.DungeonSliding.GamePlay.Combat;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace JW.DungeonSliding.UI
 {
@@ -9,7 +11,9 @@ namespace JW.DungeonSliding.UI
     {
         [SerializeField] private HitDamageItem _hitDamageItem;
 
-        ObjectPool<HitDamageItem> objectPool;
+        private ObjectPool<HitDamageItem> objectPool;
+        private Queue<DamageEvent> _showDamageUIStack = new Queue<DamageEvent>();
+        private Coroutine _showUICoroutine;
 
         public void Init(ICombatEventPresenter combatEventPresenter)
         {
@@ -20,14 +24,31 @@ namespace JW.DungeonSliding.UI
 
         public void ShowDamage(DamageEvent damageEvent)
         {
-            var obj = objectPool.GetObject();
+            _showDamageUIStack.Enqueue(damageEvent);
 
-            Vector3 spawnPosition = damageEvent.Target.TilePosition.GetPosition;
-            spawnPosition += Vector3.up;
+            if(_showUICoroutine == null)
+                _showUICoroutine = StartCoroutine(CoSpawnDamageUI());
+        }
 
-            obj.transform.position = Camera.main.WorldToScreenPoint(spawnPosition);
+        private IEnumerator CoSpawnDamageUI()
+        {
+            while (_showDamageUIStack.Count > 0)
+            {
+                DamageEvent damageEvent = _showDamageUIStack.Dequeue();
 
-            obj.Init(damageEvent.Damage, 0.5f);
+                var obj = objectPool.GetObject();
+
+                Vector3 spawnPosition = damageEvent.Target.TilePosition.GetPosition;
+                spawnPosition += Vector3.up;
+
+                obj.transform.position = Camera.main.WorldToScreenPoint(spawnPosition);
+
+                obj.Init(damageEvent.Damage, 0.5f);
+
+                yield return new WaitForSeconds(0.2f);
+            }
+
+            _showUICoroutine = null;
         }
     }
 }

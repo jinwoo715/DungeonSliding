@@ -12,15 +12,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad667a569af33ef4e954427c169b9afc, type: 3}
   m_Name: PathMastery
   m_EditorClassIdentifier: 
+  AbilityUID: 1
   Name: "\uC5EC\uC815\uC758 \uC219\uB828"
-  Description: "\uBC29\uC744 3\uAC1C \uD1B5\uACFC\uD560 \uB54C \uB9C8\uB2E4 MaxMove\uC99D\uAC00"
+  Description: "\uBC29\uC744 3\uAC1C \uD1B5\uACFC\uD560 \uB54C \uB9C8\uB2E4 MaxMove
+    1\uC99D\uAC00"
   AbilitySprite: {fileID: 485823971, guid: 080cb6d98b00c2645b2c41df5f69bc78, type: 3}
-  EffectKind: 0
-  AbilityTrigger: 7
+  AbilityRank: 0
+  EAbilityEffectType: 0
+  AbilityTriggerTypes: 01000000
   IsDisposable: 0
-  PlayerStat: 0
+  ApplyStatType: 0
+  PlayerStat: 4
   ApplyType: 0
   RatioType: 0
-  Value: 0
-  IsReleaseStat: 0
-  StackCount: 0
+  Value: 1
+  ExcuteTriggerCount: 3
+  IsResetEnabled: 0
+  ResetOnTriggerTypes: 
+  ResetOnOtherTriggerCount: 0

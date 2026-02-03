@@ -10,6 +10,8 @@ namespace JW.DungeonSliding
             if (moveContext.EnterType != ETileEnterType.Slide)
                 return moveContext;
 
+            base.OnEnterTile(ref moveContext);
+
             moveContext.ResultType = ESlideResultType.Teleport;
             moveContext.DestTile = _effectObjectData.TeleportPoint;
             moveContext.EnterType = ETileEnterType.Teleport;

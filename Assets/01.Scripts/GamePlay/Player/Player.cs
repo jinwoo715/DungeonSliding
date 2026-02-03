@@ -61,15 +61,12 @@ namespace JW.DungeonSliding.GamePlay.Entities
         private ECharacterStateType _characterState = ECharacterStateType.Idle;
         public ESlideResultType SlideResultType { get; private set; }
         public EDirectionType MoveDir { get; private set; }
+        public event Action<EPlayerStat> OnStatChanged;
 
-        private RoutePlanner _route = new RoutePlanner();
-        public Action<EPlayerStat> OnStatChanged { get; set; }
+        private ITileCheckService _tileCheckService;
+        private IRouteService _routeService;
 
-        public event Func<Tile, EDirectionType, ETileEnterType, MoveContext> GetMoveContextFunc;
-
-        private IGameModeChanger _gameModeChanger;
-
-        private bool _isKnockbacking = false;
+        private bool _isPushed = false;
 
         private StatValue MaxHp;
         private StatValue Damage;
@@ -93,20 +90,14 @@ namespace JW.DungeonSliding.GamePlay.Entities
                 _animatorController.SetInt(ConstString.PLAYER_STATE_KEY, (int)_characterState);
             }
         }
-        public void SetGameModeChanger(IGameModeChanger modeChanger)
-        {
-            _gameModeChanger = modeChanger;
-        }
         public override void Init(ICombatEventListener combatEventListener, ECretureType cretureType)
         {
             base.Init(combatEventListener, cretureType);
             _levelUpXp = 1;//MathUtil.GetFib(_level + ConstData.LEVELUP_XP_OFFSET);
             _nextAttackBuff.Reset();
         }
-        public void SetData(PlayerData playerData, IGameModeChanger gameModeChanger)
+        public void SetData(PlayerData playerData, IRouteService routeService, ITileCheckService tileCheckService)
         {
-            IGameModeChanger _gameModeChanger = gameModeChanger;
-
             MaxHp = new StatValue(playerData.HP);
             MaxMoveCount = new StatValue(playerData.MoveCount);
             Damage = new StatValue(playerData.Damage);
@@ -117,12 +108,13 @@ namespace JW.DungeonSliding.GamePlay.Entities
             OnStatChanged?.Invoke(EPlayerStat.HP);
             OnStatChanged?.Invoke(EPlayerStat.MoveCount);
             OnStatChanged?.Invoke(EPlayerStat.Damage);
+
+            _tileCheckService = tileCheckService;
+            _routeService = routeService;
         }
         public void AddReward(RewardData rewardData)
         {
             _currentXp += rewardData.Xp;
-
-            Debug.Log(_currentXp);
 
             while (_currentXp >= _levelUpXp)
             {
@@ -139,14 +131,17 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
             GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.LevelUp);
         }
-        public void Move(EDirectionType inputDirection)
+
+        #region Move
+        public void SlideRoute(EDirectionType inputDirection)
         {
-            _gameModeChanger.EnterGameMode(EGameModeType.Sliding);
+            if (_isPushed) return;
 
-            if (_characterState != ECharacterStateType.Idle)
-                return;
+            if (_characterState != ECharacterStateType.Idle) return;
 
-            Queue<MoveContext> moveQueue = _route.BuildRoute(TilePosition, inputDirection, GetMoveContextFunc);
+            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.SlideStart);
+
+            Queue<MoveContext> moveQueue = _routeService.BuildRoute(TilePosition, inputDirection);
 
             if(moveQueue.Count == 1)
             {
@@ -166,12 +161,10 @@ namespace JW.DungeonSliding.GamePlay.Entities
             {
                 MoveContext moveContext = moveContexts.Dequeue();
 
-                if(moveContext.Damage != 0)
-                    ApplyDamage(new DamageContext(null, moveContext.Damage, false));
-
                 switch (moveContext.ResultType)
                 {
                     case ESlideResultType.Move:
+                        SetCharacterRotation(moveContext.Direction);
                         yield return StartCoroutine(CoMove(moveContext));
                         break;
                     case ESlideResultType.Stop:
@@ -182,6 +175,9 @@ namespace JW.DungeonSliding.GamePlay.Entities
                         SetPosition(moveContext.DestTile);
                         break;
                 }
+
+                if (moveContext.OnEnterEffectTile)
+                    GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnStepEffectTile);
             }
 
             ChangeCharacterState(ECharacterStateType.Idle);
@@ -190,14 +186,13 @@ namespace JW.DungeonSliding.GamePlay.Entities
         private IEnumerator CoMove(MoveContext moveContext)
         {
             float lerpScale = 0;
-
-            SetCharacterRotation(moveContext.Direction);
+            
             Vector3 startPosition = this.transform.position;
-
+            Vector3 endPosition = moveContext.DestTile.GetPosition;
             while (lerpScale < 1)
             {
                 lerpScale += Time.deltaTime * ConstData.MOVE_LERP_SCALE;
-                this.transform.position = Vector3.Lerp(startPosition, moveContext.DestTile.GetPosition, lerpScale);
+                this.transform.position = Vector3.Lerp(startPosition, endPosition, lerpScale);
 
                 yield return null;
             }
@@ -208,34 +203,27 @@ namespace JW.DungeonSliding.GamePlay.Entities
         {
             GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.SlideEnd);
             ModifyStat(new PlayerApplyStatContext(EPlayerStat.MoveCount, EApplyStatType.Add, -1, EPlayerStat.None));
-            _gameModeChanger.ExitGameMode(EGameModeType.Sliding);
         }
-        public override void OnDeath()
+        public int SlideTileCount()
         {
-            base.OnDeath();
+            return _routeService.LastMoveTileCount;
         }
-        public override void TakeDamage(DamageContext damageInfo)
+        public void MoveStep(EDirectionType dir, int stepCount = 1)
         {
-            base.TakeDamage(damageInfo);
+            Tile nextTile = TilePosition.GetNextTile(dir);
 
-            SetCharacterRotation(ToTargetDirection(damageInfo.Attacker.TilePosition));
-
-            if(damageInfo.StatusEffect == EStatusEffectType.KnockBack)
-            {
-                MoveContext context = _route.GetBackRoute(TilePosition, damageInfo.Attacker.Direction, GetMoveContextFunc);
-    
-                if(context.DestTile != TilePosition)
-                    StartCoroutine(CoKnockBack(context));
-            }
-
-            _animatorController.SetAnimationTrigger(ConstString.HIT_ANIM);
+            if (_tileCheckService.IsRouteTile(nextTile))
+                StartCoroutine(CoPushed(nextTile));
         }
-        private IEnumerator CoKnockBack(MoveContext moveContext)
+        private IEnumerator CoPushed(Tile backTile)
         {
-            _isKnockbacking = true;
+            _isPushed = true;
 
             float elapsed = 0f;
             float duration = 0.45f;
+
+            Vector3 startPosition = TilePosition.GetPosition;
+            Vector3 endPosition = backTile.GetPosition;
 
             while (elapsed < duration)
             {
@@ -245,30 +233,96 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
                 float eased = MathUtil.EaseOutCubic(t); // OutQuart/OutExpo·Î ¹Ù²ãµµ µÊ
 
-                this.transform.position = Vector3.LerpUnclamped(TilePosition.GetPosition, moveContext.DestTile.GetPosition, eased);
+                this.transform.position = Vector3.LerpUnclamped(startPosition, endPosition, eased);
 
                 yield return null;
             }
 
-            _isKnockbacking = false;
-            SetPosition(moveContext.DestTile);
+            _isPushed = false;
+            SetPosition(backTile);
+        }
+        #endregion
+
+        #region Combat
+        public override void OnDeath()
+        {
+            base.OnDeath();
+            _isPushed = false;
+        }
+        public override void TakeDamage(DamageContext damageInfo)
+        {
+            base.TakeDamage(damageInfo);
+
+            SetCharacterRotation(ToTargetDirection(damageInfo.Attacker.TilePosition));
+
+            if(damageInfo.StatusEffect == EStatusEffectType.KnockBack)
+            {
+                EDirectionType toAttackDir = ToTargetDirection(damageInfo.Attacker.TilePosition);
+                EDirectionType backDirection = ReverseDirection(toAttackDir);
+                Tile backTile = TilePosition.GetNextTile(backDirection);
+
+                if (_tileCheckService.IsRouteTile(backTile))
+                {
+                    StartCoroutine(CoPushed(backTile));
+                }
+            }
+
+            _animatorController.SetAnimationTrigger(ConstString.HIT_ANIM);
         }
         public override void EndHittedAnimation()
         {
-            if (_isKnockbacking == true)
+            if (_isPushed == false)
                 base.EndHittedAnimation();
             else
                 StartCoroutine(CoWaitEndAction());
-        }
-        private IEnumerator CoWaitEndAction()
-        {
-            yield return new WaitUntil(()=> _isKnockbacking == false);
-            base.EndHittedAnimation();
         }
         public override void StartAttackAnimation()
         {
             _animatorController.SetAnimationTrigger(ConstString.ONE_HAND_ATTACK_ANIM);
         }
+
+        protected override void ApplyAttack()
+        {
+            for (int i = 0; i < 1 + _nextAttackBuff.NextExtraAttackAcount; i++)
+            {
+                base.ApplyAttack();
+            }
+
+            ClearEnhance();
+        }
+        protected override void ReduceHP(int damage)
+        {
+            ModifyStat(new PlayerApplyStatContext(EPlayerStat.HP, EApplyStatType.Add, -damage, EPlayerStat.None));
+        }
+        public override void EndBattle()
+        {
+            base.EndBattle();
+            if(_currentHP == 0)
+                GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnDeathByHP);
+
+            if(_currentMoveCount == 0)
+                GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnDeathByMoveCount);
+        }
+        private IEnumerator CoWaitEndAction()
+        {
+            yield return new WaitUntil(()=> _isPushed == false);
+            base.EndHittedAnimation();
+        }
+
+
+        protected override DamageContext CreateDamageContext()
+        {
+            DamageContext damageInfo = new DamageContext(this, Get(EPlayerStat.Damage), false);
+            return damageInfo;
+        }
+        protected override DamageContext CalculateRealAppliedDamage(DamageContext damageInfo)
+        {
+            damageInfo.Damage = (int)(damageInfo.Damage * DamageTakenMultiplier);
+            return damageInfo;
+        }
+        #endregion
+
+        #region Stat
         public void ModifyStat(PlayerApplyStatContext applyStatContext)
         {
             float floatValue = CalculateModifyValue(applyStatContext);
@@ -292,7 +346,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
                             MaxHp.Mul += applyStatContext.Value;
                             break;
                         case EApplyStatType.Ratio:
-                            MaxHp.AddRatio(EPlayerStat.MaxHp, applyStatContext.Value);
+                            MaxHp.AddRatio(applyStatContext.RatioStatType, applyStatContext.Value);
                             break;
                     }
 
@@ -308,7 +362,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
                             Damage.Mul += applyStatContext.Value;
                             break;
                         case EApplyStatType.Ratio:
-                            Damage.AddRatio(EPlayerStat.MaxHp, applyStatContext.Value);
+                            Damage.AddRatio(applyStatContext.RatioStatType, applyStatContext.Value);
                             break;
                     }
 
@@ -328,12 +382,12 @@ namespace JW.DungeonSliding.GamePlay.Entities
                             MaxMoveCount.Mul += applyStatContext.Value;
                             break;
                         case EApplyStatType.Ratio:
-                            MaxMoveCount.AddRatio(EPlayerStat.MaxHp, applyStatContext.Value);
+                            MaxMoveCount.AddRatio(applyStatContext.RatioStatType, applyStatContext.Value);
                             break;
                     }
                     break;
             }
-            OnStatChanged(applyStatContext.PlayerStat);
+            OnStatChanged?.Invoke(applyStatContext.PlayerStat);
         }
         private float CalculateModifyValue(PlayerApplyStatContext applyStatContext)
         {
@@ -349,27 +403,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
             }
 
             return value;
-        }
-        public void GainBarrier()
-        {
-            throw new NotImplementedException();
-        }
-        public int SlideTileCount()
-        {
-            throw new NotImplementedException();
-        }
-        public bool IsRoute(EDirectionType dir)
-        {
-            return true;
-        }
-        public void MoveStep(EDirectionType dir, int stepCount = 1)
-        {
-            
-        }
-        public bool TryGet<T>(out T service) where T : class
-        {
-            service = this as T;
-            return service != null;
         }
         public int Get(EPlayerStat stat)
         {
@@ -387,7 +420,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
                     int baseDamage = Damage.Final(this);
                     int multiDamage = (int)((baseDamage + _nextAttackBuff.NextExtraDamage)* _nextAttackBuff.NextExtraDamageMultiplier);
-                    value = multiDamage;
+                    int finalDamage = (int)(multiDamage * DamageDealtMultiplier);
+                    value = finalDamage;
 
                     break;
                 case EPlayerStat.MoveCount:
@@ -403,44 +437,44 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
             return value;
         }
-        public void AddEnhance(ENextAttackEnhanceType nextAttackEnhanceType, float value)
+        public void AddEnhance(EnextAttackEnhanceType nextAttackEnhanceType, float value)
         {
             switch (nextAttackEnhanceType)
             {
-                case ENextAttackEnhanceType.Add:
+                case EnextAttackEnhanceType.Add:
                     _nextAttackBuff.AddDamage((int)value);
                     break;
-                case ENextAttackEnhanceType.Multi:
+                case EnextAttackEnhanceType.Multi:
                     _nextAttackBuff.AddDamageMulti(value);
                     break;
-                case ENextAttackEnhanceType.ExtraAttack:
+                case EnextAttackEnhanceType.ExtraAttack:
                     _nextAttackBuff.AddExtraAttack((int)value);
                     break;
             }
 
             OnStatChanged?.Invoke(EPlayerStat.Damage);
         }
-        protected override DamageContext CreateDamageContext()
+        public void ClearEnhance()
         {
-            DamageContext damageInfo = new DamageContext(this, Get(EPlayerStat.Damage), false);
-            return damageInfo;
+            _nextAttackBuff.Reset();
+            OnStatChanged?.Invoke(EPlayerStat.Damage);
         }
-        protected override void ReduceHP(int damage)
-        {
-            ModifyStat(new PlayerApplyStatContext(EPlayerStat.HP, EApplyStatType.Add, -damage, EPlayerStat.None));
-        }
-        public override void EndBattle()
-        {
-            base.EndBattle();
-            if(_currentHP == 0)
-                GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnDeathByHP);
+        #endregion
 
-            if(_currentMoveCount == 0)
-                GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnDeathByMoveCount);
-        }
-        protected override DamageContext CalculateRealAppliedDamage(DamageContext damageInfo)
+        public void GainBarrier()
         {
-            return damageInfo;
+            throw new NotImplementedException();
+        }
+        public bool TryGet<T>(out T service) where T : class
+        {
+            service = this as T;
+            return service != null;
+        }
+
+        private void OnDisable()
+        {
+            _isPushed = false;
         }
     }
+
 }

@@ -10,18 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1ad0caa0e788f374894f0afd16175c1f, type: 3}
-  m_Name: IncreaseMaxMoveCountAbilty
+  m_Name: RatioRecoveryHPAbility
   m_EditorClassIdentifier: 
-  AbilityUID: 4
-  Name: "\uCD5C\uB300 \uC774\uB3D9 \uC99D\uAC00"
-  Description: "\uCD5C\uB300 \uC774\uB3D9 \uD69F\uC218 3 \uC99D\uAC00"
-  AbilitySprite: {fileID: 485823971, guid: 080cb6d98b00c2645b2c41df5f69bc78, type: 3}
-  AbilityRank: 0
+  AbilityUID: 2
+  Name: "\uCCB4\uB825\uD68C\uBCF5"
+  Description: "\uCCB4\uB825 \uC804\uBD80 \uD68C\uBCF5"
+  AbilitySprite: {fileID: -651057808, guid: 080cb6d98b00c2645b2c41df5f69bc78, type: 3}
+  AbilityRank: 2
   EAbilityEffectType: 0
   AbilityTriggerTypes: 
   IsDisposable: 0
   ApplyStatType: 0
-  PlayerStat: 5
-  ApplyType: 0
-  RatioType: 0
-  Value: 3
+  PlayerStat: 1
+  ApplyType: 2
+  RatioType: 2
+  Value: 1

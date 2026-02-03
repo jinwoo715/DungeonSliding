@@ -17,7 +17,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         public override void ExcuteAbility()
         {
-            _service.AddEnhance(ENextAttackEnhanceType.ExtraAttack,1);
+            _service.AddEnhance(EnextAttackEnhanceType.ExtraAttack, _data.GainValue);
         }
 
         public override void ProcTrigger(EGameTriggerType triggerType)

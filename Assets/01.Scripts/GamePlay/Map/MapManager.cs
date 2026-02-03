@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace JW.DungeonSliding.Map 
 {
-    public class MapManager : MonoBehaviour, IBoard
+    public class MapManager : MonoBehaviour, IBoard, IMoveContextProvider, ITileCheckService
     {
         [SerializeField] private TileGenerator _tileMap;
         [SerializeField] private EffectObjectGenerator _effectObjectGenerator;
@@ -31,7 +31,6 @@ namespace JW.DungeonSliding.Map
             _tileMap.Init(this);
             _effectObjectGenerator.SetBoard(this);
         }
-
         public void SetMap(int floor)
         {
             _currentMapData = _mapBag.GetItem();
@@ -119,15 +118,23 @@ namespace JW.DungeonSliding.Map
         {
             _effectTileDic.Remove(point);
         }
-
         public void RegisterObstacleTile(Tile point)
         {
             _obstacleTiles.Add(point);
         }
-
         public void UnRegisterObstacleTile(Tile point)
         {
             _obstacleTiles.Remove(point);
+        }
+
+        public bool IsRouteTile(Tile point)
+        {
+            if (!IsInArea(point)) return false;
+            if (_tileMapData[GetTileIndex(point)] == false) return false;
+            if (_obstacleTiles.Contains(point)) return false;
+            if (_enemyTiles.Contains(point)) return false;
+
+            return true;
         }
     }
 }

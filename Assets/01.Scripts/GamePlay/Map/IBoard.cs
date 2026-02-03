@@ -9,9 +9,18 @@ namespace JW.DungeonSliding.Map
         public void UnRegisterEffectObject(Tile point);
         public void RegisterEnemyTile(Tile point);
         public void UnRegisterEnemyTile(Tile point);
-
         public void RegisterObstacleTile(Tile point);
         public void UnRegisterObstacleTile(Tile point);
         public void ClearEnemyBoard();
+    }
+
+    public interface ITileCheckService
+    {
+        public bool IsRouteTile(Tile point);
+    }
+
+    public interface IMoveContextProvider
+    {
+        public MoveContext GetMoveContext(Tile startPoint, EDirectionType direction, ETileEnterType enterType);
     }
 }

@@ -19,7 +19,7 @@ namespace JW.DungeonSliding.Core.Inputs
         {
             if(IsMoveableFlowFunc?.Invoke() == true)
             {
-                _moveable.Move(directionType);
+                _moveable.SlideRoute(directionType);
             }
         }
     }

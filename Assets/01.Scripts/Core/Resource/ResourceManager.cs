@@ -1,5 +1,6 @@
 using JW.DungeonSliding.GamePlay;
 using JW.DungeonSliding.GamePlay.Ability;
+using JW.DungeonSliding.GamePlay.Entities;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,10 +15,13 @@ namespace JW.DungeonSliding.Core.Resource
 
         [SerializeField] private GameConfig _gameConfig;
 
+        [SerializeField] private PlayerData _playerData;
+
         public List<MapData> MapData { get; private set; }
         public Dictionary<string, string> _textDataByName = new Dictionary<string, string>();
         public List<AbilityData> AllAbility => _abilities;
         public GameConfig GameConfig => _gameConfig;
+        public PlayerData PlayerData => _playerData;
 
         internal void Init()
         {

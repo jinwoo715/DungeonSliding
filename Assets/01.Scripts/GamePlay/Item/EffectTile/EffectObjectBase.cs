@@ -14,7 +14,11 @@ namespace JW.DungeonSliding
             _effectObjectData = effectObjectData;
         }
 
-        public abstract MoveContext OnEnterTile(ref MoveContext moveContext);
+        public virtual MoveContext OnEnterTile(ref MoveContext moveContext)
+        {
+            moveContext.EnterEffectTile();
+            return moveContext;
+        }
 
         public void SetPosition(Tile point)
         {

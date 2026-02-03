@@ -28,8 +28,8 @@ namespace JW.DungeonSliding
     public enum EStatusEffectType
     {
         None,
-        Stun,
-        KnockBack
+        KnockBack,
+        Blind
     }
 
     public enum EEffectObjectType
@@ -110,6 +110,7 @@ namespace JW.DungeonSliding
         Rule,
     }
 
+  
     public enum EAbilityApplyStatType
     {
         EntityStat,

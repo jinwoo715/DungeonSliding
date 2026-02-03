@@ -41,11 +41,18 @@ namespace JW.DungeonSliding.GamePlay.Context
             GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.ClearStage, PrepareStage);
         }
 
+        public void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.A))
+            {
+                GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.LevelUp);
+            }
+        }
+
         public void PrepareStage() 
         {
             StartCoroutine(CoWaitStartStage());
         }
-
         public IEnumerator CoWaitStartStage()
         {
             yield return new WaitUntil(() => _gameModeController.Flow == EGameModeType.Play);
@@ -61,8 +68,8 @@ namespace JW.DungeonSliding.GamePlay.Context
             yield return _uiFader.FadeIn();
 
             _gameModeController.ExitGameMode(EGameModeType.PrepareStage);
+            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.EnterRoom);
         }
-
         public void FailGame()
         {
             Debug.Log("Á³´Ù!");

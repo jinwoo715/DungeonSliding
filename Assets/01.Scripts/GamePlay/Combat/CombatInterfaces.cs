@@ -48,11 +48,13 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
     public interface INextAttackEnhancer
     {
-        public void AddEnhance(ENextAttackEnhanceType nextAttackEnhanceType, float value);
+        public void AddEnhance(EnextAttackEnhanceType nextAttackEnhanceType, float value);
+        public void ClearEnhance();
     }
     
-    public enum ENextAttackEnhanceType
+    public enum EnextAttackEnhanceType
     {
+        None,
         Add,
         Multi,
         ExtraAttack

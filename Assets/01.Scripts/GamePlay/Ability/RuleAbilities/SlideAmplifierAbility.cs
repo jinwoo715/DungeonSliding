@@ -16,7 +16,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
         public override void ExcuteAbility()
         {
             int addDamage = _moveable.SlideTileCount();
-            _nextAttackEnhancer.AddEnhance(ENextAttackEnhanceType.Add, addDamage);
+            _nextAttackEnhancer.AddEnhance(EnextAttackEnhanceType.Add, addDamage);
         }
 
         public override void ProcTrigger(EGameTriggerType triggerType)

@@ -12,14 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cdf3099fdb5b3e541869be85b12a2028, type: 3}
   m_Name: ShadowFeed
   m_EditorClassIdentifier: 
+  AbilityUID: 5
   Name: "\uADF8\uB9BC\uC790 \uD3EC\uC2DD"
-  Description: "\uBC31 \uC5B4\uD0DD \uC2DC HP\uD68C\uBCF5"
-  AbilitySprite: {fileID: 0}
+  Description: "\uBC31 \uC5B4\uD0DD \uC2DC HP 3\uD68C\uBCF5"
+  AbilitySprite: {fileID: -651057808, guid: 080cb6d98b00c2645b2c41df5f69bc78, type: 3}
   AbilityRank: 0
-  EffectKind: 0
-  AbilityTrigger: 0
+  EAbilityEffectType: 0
+  AbilityTriggerTypes: 02000000
   IsDisposable: 0
-  PlayerStat: 0
+  ApplyStatType: 0
+  PlayerStat: 1
   ApplyType: 0
   RatioType: 0
-  Value: 0
+  Value: 3

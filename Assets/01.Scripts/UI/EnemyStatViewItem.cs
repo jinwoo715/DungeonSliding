@@ -19,11 +19,12 @@ namespace JW.DungeonSliding
         {
             _transform = target.transform;
             _statModifier = statReadOnly;
+            _statModifier.OnStatChangedEvent += UpdateStat;
         }
 
         private void LateUpdate()
         {
-            transform.forward = Camera.main.transform.forward;
+            if (_transform == null) return;
 
             Vector3 position = Camera.main.WorldToScreenPoint(_transform.position);
             position.z = 0;
@@ -51,7 +52,7 @@ namespace JW.DungeonSliding
 
         public override void OnSpawn()
         {
-            _statModifier.OnStatChangedEvent += UpdateStat;
+            
         }
     }
 }

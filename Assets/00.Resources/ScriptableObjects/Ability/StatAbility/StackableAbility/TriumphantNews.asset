@@ -12,15 +12,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad667a569af33ef4e954427c169b9afc, type: 3}
   m_Name: TriumphantNews
   m_EditorClassIdentifier: 
+  AbilityUID: 4
   Name: "\uC2B9\uC804\uBCF4"
-  Description: "\uC801 3\uB9C8\uB9AC \uCC98\uCE58\uB9C8\uB2E4 HP\uD68C\uBCF5"
+  Description: "\uC801 3\uB9C8\uB9AC \uCC98\uCE58\uB9C8\uB2E4 5 HP\uD68C\uBCF5"
   AbilitySprite: {fileID: -651057808, guid: 080cb6d98b00c2645b2c41df5f69bc78, type: 3}
-  EffectKind: 0
-  AbilityTrigger: 7
+  AbilityRank: 0
+  EAbilityEffectType: 0
+  AbilityTriggerTypes: 05000000
   IsDisposable: 0
-  PlayerStat: 0
+  ApplyStatType: 0
+  PlayerStat: 1
   ApplyType: 0
   RatioType: 0
-  Value: 0
-  IsReleaseStat: 0
-  StackCount: 0
+  Value: 5
+  ExcuteTriggerCount: 3
+  IsResetEnabled: 0
+  ResetOnTriggerTypes: 
+  ResetOnOtherTriggerCount: 0

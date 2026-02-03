@@ -73,9 +73,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
             for (int i = 0; i < datas.Count; i++)
             {
-                int index = i;
-                datas[i].AbilityUID = index;
-                _abilityDataByUID.Add(index, datas[index]);
+                _abilityDataByUID.Add(datas[i].AbilityUID, datas[i]);
             }
 
             GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.LevelUp, RequestAbilitySelect);
@@ -119,9 +117,19 @@ namespace JW.DungeonSliding.GamePlay.Ability
                 if (!_hasAbilitiesByTrigger.ContainsKey(type))
                 {
                     _hasAbilitiesByTrigger.Add(type, new List<IAbility>());
+
+                    GameTriggerEventBus.Instance.SubscribeTriggerEvent(type, () => { ExcuteAbility(type); });
                 }
 
                 _hasAbilitiesByTrigger[type].Add(ability);
+            }
+        }
+
+        public void ExcuteAbility(EGameTriggerType trigger)
+        {
+            foreach (var ability in _hasAbilitiesByTrigger[trigger])
+            {
+                ability.ProcTrigger(trigger);
             }
         }
 

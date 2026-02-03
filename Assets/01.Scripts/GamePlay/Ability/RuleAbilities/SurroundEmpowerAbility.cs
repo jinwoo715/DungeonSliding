@@ -20,7 +20,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
         public override void ExcuteAbility()
         {
             int count = _sensor.GetNearCambatantCount(_combatant);
-            _nextAttackEnhancer.AddEnhance(ENextAttackEnhanceType.Add, count);
+            _nextAttackEnhancer.AddEnhance(EnextAttackEnhanceType.Add, count);
         }
 
         public override void ProcTrigger(EGameTriggerType triggerType)

@@ -91,9 +91,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _selectBtn: {fileID: 7164157748294573317}
+  _cardImage: {fileID: 5193752181983428502}
   _abilityImage: {fileID: 7258813962285688882}
   _abilityName: {fileID: 721506539610904310}
   _abilityDescription: {fileID: 4121076550318763972}
+  _cardSprite:
+  - {fileID: -526782964, guid: d2e0e6b30e2011e44b5987135e92a58e, type: 3}
+  - {fileID: -537042276, guid: 93a7b572f67d8014680d694c07a007c1, type: 3}
+  - {fileID: -1105986591, guid: b71a1dd8073fd87489ef402ca6a192e6, type: 3}
 --- !u!114 &7164157748294573317
 MonoBehaviour:
   m_ObjectHideFlags: 0

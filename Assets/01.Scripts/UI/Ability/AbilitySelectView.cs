@@ -43,7 +43,9 @@ namespace JW.DungeonSliding.UI
             }
 
             if (rerollCount <= 0)
-                _rerollButton.enabled = false;
+                _rerollButton.interactable = false;
+            else
+                _rerollButton.interactable = true;
 
             _rerollButtonText.text = rerollCount.ToString();
         }

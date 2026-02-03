@@ -112,11 +112,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             else return false;
         }
         public abstract void StartAttackAnimation();
-        protected virtual DamageContext CreateDamageContext()
-        {
-            DamageContext damageInfo = new DamageContext(this, Get(EEnemyStatType.Damage), false);
-            return damageInfo;
-        }
+        protected abstract DamageContext CreateDamageContext();
 
         //Take Damage
         public virtual void TakeDamage(DamageContext damageInfo)

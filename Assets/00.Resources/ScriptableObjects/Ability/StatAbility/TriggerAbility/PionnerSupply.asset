@@ -12,14 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cdf3099fdb5b3e541869be85b12a2028, type: 3}
   m_Name: PionnerSupply
   m_EditorClassIdentifier: 
+  AbilityUID: 4
   Name: "\uAC1C\uCC99\uC790\uC758 \uBCF4\uAE09"
-  Description: "\uC0C8\uB85C\uC6B4 \uBC29 \uC9C4\uC785 \uC2DC MoveCount\uD68C\uBCF5"
+  Description: "\uC0C8\uB85C\uC6B4 \uBC29 \uC9C4\uC785 \uC2DC MoveCount 3\uD68C\uBCF5"
   AbilitySprite: {fileID: 485823971, guid: 080cb6d98b00c2645b2c41df5f69bc78, type: 3}
   AbilityRank: 0
-  EffectKind: 0
-  AbilityTrigger: 0
+  EAbilityEffectType: 0
+  AbilityTriggerTypes: 01000000
   IsDisposable: 0
-  PlayerStat: 0
+  ApplyStatType: 0
+  PlayerStat: 4
   ApplyType: 0
   RatioType: 0
-  Value: 0
+  Value: 3

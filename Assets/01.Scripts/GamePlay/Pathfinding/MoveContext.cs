@@ -6,16 +6,19 @@ namespace JW.DungeonSliding
         public ESlideResultType ResultType;
         public Tile DestTile;
         public ETileEnterType EnterType;
-
-        public int Damage;
+        public bool OnEnterEffectTile;
 
         public MoveContext(Tile point, EDirectionType direction, ETileEnterType enterType)
         {
-            Damage = 0;
             DestTile = point;
             Direction = direction;
             ResultType = ESlideResultType.Move;
             EnterType = enterType;
+            OnEnterEffectTile = false;
+        }
+        public void EnterEffectTile()
+        {
+            OnEnterEffectTile = true;
         }
     }
 }

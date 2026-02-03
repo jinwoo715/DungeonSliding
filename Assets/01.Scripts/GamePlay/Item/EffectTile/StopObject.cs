@@ -8,6 +8,8 @@ namespace JW.DungeonSliding
             if (moveContext.EnterType != ETileEnterType.Slide)
                 return moveContext;
 
+            base.OnEnterTile(ref moveContext);
+
             moveContext.ResultType = ESlideResultType.Stop;
 
             return moveContext;

@@ -7,12 +7,12 @@ using JW.DungeonSliding.Core;
 
 namespace JW.DungeonSliding.GamePlay.Entities
 {
-    public abstract class Enemy : Creature, IEnemyStatModifier
+    public abstract class Enemy : Creature, IEnemyStatModifier, IRewardSender
     {
         [SerializeField] private Transform _statUITransform;
 
         private EnemyData _enemyData;
-        private EnemyStat _enemyStat;
+        [SerializeField] private EnemyStat _enemyStat;
 
         public event Action<Enemy> OnDeathEvent;
         public event Action<EEnemyStatType> OnStatChangedEvent;
@@ -25,10 +25,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public override void Init(ICombatEventListener combatEventListener, ECretureType cretureType)
         {
             base.Init(combatEventListener, cretureType);
-
-            int RandomDir = UnityEngine.Random.Range(0, 4);
-            SetCharacterRotation((EDirectionType)RandomDir);
-            
+         
             _backAttackMultiplier = GameManager.Configs.GameConfig.BackAttackDamageMultiplier;
         }
         public void SetData(EnemyData data, int floor)
@@ -36,6 +33,9 @@ namespace JW.DungeonSliding.GamePlay.Entities
             IsActive = true;
 
             _enemyData = data;
+
+            int RandomDir = UnityEngine.Random.Range(0, 4);
+            SetCharacterRotation((EDirectionType)RandomDir);
 
             int hp = CalculateHP(_enemyData.BaseHP, floor);
             int dmg = CalculateDamage(_enemyData.BaseAttack, floor);
@@ -53,6 +53,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
             if(IsBackAttack(damageInfo.Attacker))
             {
+                GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.BackAttack);
                 damage = (int)(damage * _backAttackMultiplier);
                 critical = true;
             }
@@ -117,6 +118,12 @@ namespace JW.DungeonSliding.GamePlay.Entities
             OnDeathEvent?.Invoke(this);
         }
         public override void StartAttackAnimation() { }
+        protected override DamageContext CreateDamageContext()
+        {
+            DamageContext damageInfo = new DamageContext(this, Get(EEnemyStatType.Damage), false);
+            return damageInfo;
+        }
+
 
         #region Calculate Stat
         public int CalculateHP(int baseHP, int floor)
@@ -139,6 +146,10 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
             int scaled = ceil ? Mathf.CeilToInt(v) : Mathf.RoundToInt(v);
             return Mathf.Max(baseValue, scaled);
+        }
+        public RewardData CreateReward()
+        {
+            return new RewardData(_enemyStat.XP);
         }
         #endregion
     }

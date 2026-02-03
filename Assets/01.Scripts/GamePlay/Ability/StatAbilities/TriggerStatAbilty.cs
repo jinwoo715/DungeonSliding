@@ -8,22 +8,45 @@ namespace JW.DungeonSliding.GamePlay.Ability
         public readonly TriggerStatAbiltyData _data;
 
         private IPlayerStatModifier _modifier;
+        private INextAttackEnhancer _nextAttackEnhancer;
         public TriggerStatAbilty(IAbilityHost host, TriggerStatAbiltyData data)
         {
+            if (host.TryGet<IPlayerStatModifier>(out var modifier))
+                _modifier = modifier;
+
+            if (host.TryGet<INextAttackEnhancer>(out var nextAttackEnhancer))
+                _nextAttackEnhancer = nextAttackEnhancer;
+
             _data = data;
-            
-            if(host.TryGet<IPlayerStatModifier>(out var service))
-            {
-                _modifier = service;
-            }
         }
 
         public void ExcuteAbility()
         {
-            PlayerApplyStatContext applyStatContext = new PlayerApplyStatContext(
-                _data.PlayerStat, _data.ApplyType, _data.Value, _data.RatioType);
+            switch (_data.ApplyStatType)
+            {
+                case EAbilityApplyStatType.EntityStat:
 
-            _modifier.ModifyStat(applyStatContext);
+                    PlayerApplyStatContext applyStatContext = new PlayerApplyStatContext(
+               _data.PlayerStat, _data.ApplyType, _data.Value, _data.RatioType);
+
+                    _modifier.ModifyStat(applyStatContext);
+
+                    break;
+                case EAbilityApplyStatType.NextActStat:
+
+                    switch (_data.ApplyType)
+                    {
+                        case EApplyStatType.Add:
+                            _nextAttackEnhancer.AddEnhance(EnextAttackEnhanceType.Add, _data.Value);
+                            break;
+                        case EApplyStatType.Multiple:
+                            _nextAttackEnhancer.AddEnhance(EnextAttackEnhanceType.Multi, _data.Value);
+                            break;
+                    }
+
+                    break;
+            }
+           
         }
 
         public void ProcTrigger(EGameTriggerType triggerType)

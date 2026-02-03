@@ -10,11 +10,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
         [SerializeField] protected Transform _avatar;
         [SerializeField] private GameObject _eyeLight;
 
-        public void ReturnPool()
-        {
-            
-        }
-
         public override void StartAttackAnimation()
         {
             _eyeLight.SetActive(true);

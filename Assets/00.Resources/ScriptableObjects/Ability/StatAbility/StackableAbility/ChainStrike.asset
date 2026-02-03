@@ -9,19 +9,28 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cdf3099fdb5b3e541869be85b12a2028, type: 3}
-  m_Name: EvolvingBlade
+  m_Script: {fileID: 11500000, guid: ad667a569af33ef4e954427c169b9afc, type: 3}
+  m_Name: ChainStrike
   m_EditorClassIdentifier: 
   AbilityUID: 3
-  Name: "\uC9C4\uD654\uC758 \uCE7C\uB0A0"
-  Description: "\uB808\uBCA8\uC5C5 \uC2DC \uACF5\uACA9\uB825 2 \uC99D\uAC00"
+  Name: "\uC5F0\uC1C4\uD0C0\uACA9"
+  Description: "3\uD134 \uC548\uC5D0 \uACF5\uACA9\uC5D0 \uC131\uACF5\uD560 \uB54C
+    \uB9C8\uB2E4 \uCD94\uAC00 \uACF5\uACA9\uB825 1"
   AbilitySprite: {fileID: 695775810, guid: 080cb6d98b00c2645b2c41df5f69bc78, type: 3}
   AbilityRank: 0
   EAbilityEffectType: 0
-  AbilityTriggerTypes: 09000000
+  AbilityTriggerTypes: 03000000
   IsDisposable: 0
   ApplyStatType: 0
   PlayerStat: 3
   ApplyType: 0
   RatioType: 0
-  Value: 2
+  Value: 1
+  nextAttackEnhanceType: 0
+  AddNextAttackDamage: 0
+  MultiNextAttackDamage: 0
+  ExtraAttackCount: 0
+  ExcuteTriggerCount: 3
+  IsResetEnabled: 1
+  ResetOnTriggerTypes: 07000000
+  ResetOnOtherTriggerCount: 3
