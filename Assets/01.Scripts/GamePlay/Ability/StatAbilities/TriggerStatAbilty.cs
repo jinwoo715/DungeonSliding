@@ -37,10 +37,10 @@ namespace JW.DungeonSliding.GamePlay.Ability
                     switch (_data.ApplyType)
                     {
                         case EApplyStatType.Add:
-                            _nextAttackEnhancer.AddEnhance(EnextAttackEnhanceType.Add, _data.Value);
+                            _nextAttackEnhancer.AddEnhance(ENextAttackType.Add, _data.Value);
                             break;
                         case EApplyStatType.Multiple:
-                            _nextAttackEnhancer.AddEnhance(EnextAttackEnhanceType.Multi, _data.Value);
+                            _nextAttackEnhancer.AddEnhance(ENextAttackType.Multiple, _data.Value);
                             break;
                     }
 

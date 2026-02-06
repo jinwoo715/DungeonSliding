@@ -7,7 +7,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
     {
         INextAttackEnhancer _service;
 
-        public ExtraAttackChance(RuleAbilityData data, IAbilityHost host) : base(data, host) 
+        public ExtraAttackChance(RuleAbilitySOData data, IAbilityHost host) : base(data, host) 
         {
             if (Host.TryGet<INextAttackEnhancer>(out var service))
             {
@@ -17,12 +17,12 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         public override void ExcuteAbility()
         {
-            _service.AddEnhance(EnextAttackEnhanceType.ExtraAttack, _data.GainValue);
+            _service.AddEnhance(ENextAttackType.ExtraAttack, _data.GainValue);
         }
 
         public override void ProcTrigger(EGameTriggerType triggerType)
         {
-            if (triggerType == EGameTriggerType.SlideEnd)
+            if (triggerType == EGameTriggerType.OnSlideEnd)
             {
                 int chanceValue = Random.Range(0, 101);
 

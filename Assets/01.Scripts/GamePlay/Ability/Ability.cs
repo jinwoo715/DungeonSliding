@@ -15,12 +15,12 @@ namespace JW.DungeonSliding
 
     public struct PlayerApplyStatContext
     {
-        public readonly EPlayerStat PlayerStat;
+        public readonly EPlayerStatType PlayerStat;
         public readonly EApplyStatType ApplyType;
-        public readonly EPlayerStat RatioStatType;
+        public readonly EPlayerStatType RatioStatType;
         public float Value;
 
-        public PlayerApplyStatContext(EPlayerStat playerStat, EApplyStatType applyType, float value, EPlayerStat ratio)
+        public PlayerApplyStatContext(EPlayerStatType playerStat, EApplyStatType applyType, float value, EPlayerStatType ratio)
         {
             PlayerStat = playerStat;
             ApplyType = applyType;
@@ -30,7 +30,7 @@ namespace JW.DungeonSliding
 
         public void AddValue(float value)
         {
-            Value = value;
+            Value += value;
         }
     }
     public struct EnemyApplyStatContext

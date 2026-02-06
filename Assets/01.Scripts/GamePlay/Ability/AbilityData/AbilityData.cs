@@ -16,8 +16,6 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         public List<EGameTriggerType> AbilityTriggerTypes;
 
-        public bool IsDisposable;
-
         public virtual List<EGameTriggerType> GetEnrollTriggers => AbilityTriggerTypes;
     }
 }

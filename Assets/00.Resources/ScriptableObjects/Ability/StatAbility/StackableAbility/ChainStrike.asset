@@ -20,7 +20,6 @@ MonoBehaviour:
   AbilityRank: 0
   EAbilityEffectType: 0
   AbilityTriggerTypes: 03000000
-  IsDisposable: 0
   ApplyStatType: 0
   PlayerStat: 3
   ApplyType: 0

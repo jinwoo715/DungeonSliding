@@ -59,9 +59,11 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
 
             _mapManager.Init(_player);
             
-            _battleManager.Init(_fieldCombatantManager, _modeController);
+            _battleManager.Init(_fieldCombatantManager);
 
             _rewardManager.Init(_combatEventBus);
+
+            _modeController.Init();
         }
 
         private void BindEvent()

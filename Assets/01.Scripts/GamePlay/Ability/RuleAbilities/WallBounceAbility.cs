@@ -6,7 +6,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
     {
         public IMoveable _moveable;
 
-        public WallBounceAbility(RuleAbilityData data, IAbilityHost host) : base(data, host)
+        public WallBounceAbility(RuleAbilitySOData data, IAbilityHost host) : base(data, host)
         {
             BindService<IMoveable>(ref _moveable);
         }

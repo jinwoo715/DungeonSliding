@@ -1,6 +1,7 @@
 using JW.DungeonSliding.GamePlay;
 using JW.DungeonSliding.GamePlay.Ability;
 using JW.DungeonSliding.GamePlay.Entities;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,11 +18,16 @@ namespace JW.DungeonSliding.Core.Resource
 
         [SerializeField] private PlayerData _playerData;
 
+        [Header("Ability")]
+        [SerializeField] private TextAsset _ruleAbilityJson;
+
         public List<MapData> MapData { get; private set; }
         public Dictionary<string, string> _textDataByName = new Dictionary<string, string>();
         public List<AbilityData> AllAbility => _abilities;
         public GameConfig GameConfig => _gameConfig;
         public PlayerData PlayerData => _playerData;
+
+        public List<RuleAbilityData> abilityData;
 
         internal void Init()
         {
@@ -31,6 +37,8 @@ namespace JW.DungeonSliding.Core.Resource
                 string textName = _textDatas[i].name;
                 _textDataByName[textName] = _textDatas[i].text;
             }
+
+            abilityData = JsonConvert.DeserializeObject<List<RuleAbilityData>>(_ruleAbilityJson.text);
         }
         public string GetTextData(string textName)
         {

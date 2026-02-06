@@ -46,20 +46,20 @@ namespace JW.DungeonSliding.GamePlay.Ability
         }
         public IAbility CreateRuleAbility(AbilityData data, IAbilityHost host)
         {
-            RuleAbilityData ruleData = (RuleAbilityData)data;
+            RuleAbilitySOData ruleData = (RuleAbilitySOData)data;
             IAbility createdAbility = null;
             switch (ruleData.RuleAbilityType)
             {
                 case ERuleAbilityType.Revive:
                     createdAbility = new ReviveAbility(ruleData, host);
                     break;
-                case ERuleAbilityType.RoomBarrier:
+                case ERuleAbilityType.Barrier:
                     createdAbility = new BarrierAbility(ruleData, host);
                     break;
-                case ERuleAbilityType.WallBound:
+                case ERuleAbilityType.WallBounce:
                     createdAbility = new WallBounceAbility(ruleData, host);
                     break;
-                case ERuleAbilityType.SurroundEnemyBonus:
+                case ERuleAbilityType.SurroundEnemy:
                     createdAbility = new SurroundEmpowerAbility(ruleData, host);
 
                     break;

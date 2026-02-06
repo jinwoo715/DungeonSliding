@@ -1402,6 +1402,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _animatorController: {fileID: 726333317}
+  _level: 1
+  _currentXp: 0
+  _levelUpXp: 0
 --- !u!114 &726333317
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3416,8 +3419,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: bf78b1da859830e459e9f67c31e9f69c, type: 2}
   - {fileID: 11400000, guid: cb1cb5ac17e4a0c4f9e4c9b7a5437beb, type: 2}
   - {fileID: 11400000, guid: 5dafd12f428078b44a2b89db6f959b04, type: 2}
+  - {fileID: 11400000, guid: 1da7e69f8ab38254e8760c1e5e03523e, type: 2}
   _gameConfig: {fileID: 11400000, guid: af371193289e7284aa7e3bc27acbdb07, type: 2}
   _playerData: {fileID: 11400000, guid: ad06b226f7d30a34f9ab64dfe9ab3fd0, type: 2}
+  _ruleAbilityJson: {fileID: 4900000, guid: d4737b7175c471b4d9b2856b7bb27623, type: 3}
 --- !u!1 &1793553404
 GameObject:
   m_ObjectHideFlags: 0

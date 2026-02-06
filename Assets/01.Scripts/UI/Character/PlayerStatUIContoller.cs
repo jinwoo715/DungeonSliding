@@ -29,29 +29,29 @@ namespace JW.DungeonSliding.UI
             }
         }
 
-        public void ChangePlayerStat(EPlayerStat changedStat)
+        public void ChangePlayerStat(EPlayerStatType changedStat)
         {
             switch (changedStat)
             {
-                case EPlayerStat.HP:
+                case EPlayerStatType.HP:
 
-                    _viewer.UpdateHP(_statReadOnly.Get(EPlayerStat.HP), _statReadOnly.Get(EPlayerStat.MaxHp));
-
-                    break;
-                case EPlayerStat.MaxHp:
-                    _viewer.UpdateHP(_statReadOnly.Get(EPlayerStat.HP), _statReadOnly.Get(EPlayerStat.MaxHp));
+                    _viewer.UpdateHP(_statReadOnly.Get(EPlayerStatType.HP), _statReadOnly.Get(EPlayerStatType.MaxHp));
 
                     break;
-                case EPlayerStat.Damage:
-                    _viewer.UpdateDamage(_statReadOnly.Get(EPlayerStat.Damage));
+                case EPlayerStatType.MaxHp:
+                    _viewer.UpdateHP(_statReadOnly.Get(EPlayerStatType.HP), _statReadOnly.Get(EPlayerStatType.MaxHp));
 
                     break;
-                case EPlayerStat.MoveCount:
-                    _viewer.UpdateMoveCount(_statReadOnly.Get(EPlayerStat.MoveCount), _statReadOnly.Get(EPlayerStat.MaxMoveCount));
+                case EPlayerStatType.Damage:
+                    _viewer.UpdateDamage(_statReadOnly.Get(EPlayerStatType.Damage));
 
                     break;
-                case EPlayerStat.MaxMoveCount:
-                    _viewer.UpdateMoveCount(_statReadOnly.Get(EPlayerStat.MoveCount), _statReadOnly.Get(EPlayerStat.MaxMoveCount));
+                case EPlayerStatType.MoveCount:
+                    _viewer.UpdateMoveCount(_statReadOnly.Get(EPlayerStatType.MoveCount), _statReadOnly.Get(EPlayerStatType.MaxMoveCount));
+
+                    break;
+                case EPlayerStatType.MaxMoveCount:
+                    _viewer.UpdateMoveCount(_statReadOnly.Get(EPlayerStatType.MoveCount), _statReadOnly.Get(EPlayerStatType.MaxMoveCount));
 
                     break;
             }

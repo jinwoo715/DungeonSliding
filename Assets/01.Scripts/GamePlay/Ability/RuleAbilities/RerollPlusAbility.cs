@@ -6,7 +6,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
     {
         IRerollService _rerollService;
 
-        public RerollPlusAbility(RuleAbilityData data, IAbilityHost host) : base(data, host)
+        public RerollPlusAbility(RuleAbilitySOData data, IAbilityHost host) : base(data, host)
         {
             BindService<IRerollService>(ref _rerollService);
         }

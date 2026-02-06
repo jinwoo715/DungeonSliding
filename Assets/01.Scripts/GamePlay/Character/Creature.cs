@@ -38,11 +38,11 @@ namespace JW.DungeonSliding.GamePlay.Entities
         }
         private void OnEnable()
         {
-            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.BattleEnd, EndBattle);
+            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.OnBattleEnd, EndBattle);
         }
         private void OnDisable()
         {
-            GameTriggerEventBus.Instance?.UnSubscribeTriggerEvent(EGameTriggerType.BattleEnd, EndBattle);
+            GameTriggerEventBus.Instance?.UnSubscribeTriggerEvent(EGameTriggerType.OnBattleEnd, EndBattle);
         }
         private void OnDestroy()
         {
@@ -129,6 +129,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             ReduceHP(info.Damage);
 
             _combatEventListener.RaiseDamageEvent(new DamageEvent(LastAttacker, this, info.Damage));
+
         }
         protected abstract DamageContext CalculateRealAppliedDamage(DamageContext damageInfo);
         protected abstract void ReduceHP(int damage);
@@ -149,6 +150,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         {
             if (!IsActive || AttackTarget == null || !AttackTarget.IsActive) return;
 
+            
             AttackTarget.TakeDamage(CreateDamageContext());
         }
         public virtual void EndHittedAnimation()

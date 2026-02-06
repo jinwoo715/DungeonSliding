@@ -19,12 +19,11 @@ MonoBehaviour:
   AbilityRank: 0
   EAbilityEffectType: 0
   AbilityTriggerTypes: 03000000
-  IsDisposable: 0
   ApplyStatType: 1
   PlayerStat: 3
   ApplyType: 0
   RatioType: 0
-  Value: 3
+  Value: 0
   nextAttackEnhanceType: 3
   AddNextAttackDamage: 0
   MultiNextAttackDamage: 0

@@ -110,7 +110,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
             if (_activeEnemyByTile.Count == 0)
             {
-                GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.ClearStage);
+                GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnClearStage);
             }
         }
 

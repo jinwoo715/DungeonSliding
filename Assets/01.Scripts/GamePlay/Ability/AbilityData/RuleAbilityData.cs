@@ -1,11 +1,25 @@
+using JW.DungeonSliding.GamePlay.Combat;
 using UnityEngine;
+
 namespace JW.DungeonSliding.GamePlay.Ability
 {
-    [CreateAssetMenu(fileName = "RuleAbility", menuName = "Create Ability/RuleAbility", order = 0)]
-    public class RuleAbilityData : AbilityData
+    [System.Serializable]
+    public class AbilityDataBase
     {
-        public ERuleAbilityType RuleAbilityType;
-        public float CostValue;
-        public float GainValue;
+        public string UID;
+        public string Name;
+        public string Description;
+        public string IconName;
+        public EAbilityRank Rank;
+    }
+
+    [System.Serializable]
+    public class RuleAbilityData : AbilityDataBase
+    {
+        public EGameTriggerType TriggerType;
+        public ERuleAbilityType RuleType;
+        public float P1;
+        public float P2;
+        public string Notes;
     }
 }

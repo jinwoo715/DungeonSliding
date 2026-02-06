@@ -13,7 +13,6 @@ namespace JW.DungeonSliding.GamePlay.Ability
         private int _currentTriggerCount = 0;
         private int _currentResetTriggerThreshold = 0;
 
-        private float _value;
         PlayerApplyStatContext _applyStatContext = new PlayerApplyStatContext();
 
         public StackableAbility(IAbilityHost host, StackableStatAbilityData data)
@@ -52,25 +51,25 @@ namespace JW.DungeonSliding.GamePlay.Ability
                         switch (_data.ApplyType)
                         {
                             case EApplyStatType.Add:
-                                service.AddEnhance(EnextAttackEnhanceType.Add, _data.Value);
+                                service.AddEnhance(ENextAttackType.Add, _data.Value);
                                 break;
                             case EApplyStatType.Multiple:
-                                service.AddEnhance(EnextAttackEnhanceType.Multi, _data.Value);
+                                service.AddEnhance(ENextAttackType.Multiple, _data.Value);
                                 break;
                         }
 
                         switch (_data.nextAttackEnhanceType)
                         {
-                            case EnextAttackEnhanceType.Add:
-                                service.AddEnhance(EnextAttackEnhanceType.Add, _data.AddNextAttackDamage);
+                            case ENextAttackType.Add:
+                                service.AddEnhance(ENextAttackType.Add, _data.AddNextAttackDamage);
 
                                 break;
-                            case EnextAttackEnhanceType.Multi:
-                                service.AddEnhance(EnextAttackEnhanceType.Add, _data.MultiNextAttackDamage);
+                            case ENextAttackType.Multiple:
+                                service.AddEnhance(ENextAttackType.Multiple, _data.MultiNextAttackDamage);
 
                                 break;
-                            case EnextAttackEnhanceType.ExtraAttack:
-                                service.AddEnhance(EnextAttackEnhanceType.Add, _data.ExtraAttackCount);
+                            case ENextAttackType.ExtraAttack:
+                                service.AddEnhance(ENextAttackType.ExtraAttack, _data.ExtraAttackCount);
 
                                 break;
                         }
@@ -85,7 +84,8 @@ namespace JW.DungeonSliding.GamePlay.Ability
         {
             if(_data.AbilityTriggerTypes.Contains(triggerType))
             {
-                Debug.Log("Stack");
+                _currentResetTriggerThreshold = 0;
+
                 _currentTriggerCount++;
 
                 if (_currentTriggerCount >= _data.ExcuteTriggerCount)

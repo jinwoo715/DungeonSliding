@@ -9,7 +9,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
         private ICombatant _combatant;
         private INextAttackEnhancer _nextAttackEnhancer;
         private IMoveable _moveable;
-        public SurroundEmpowerAbility(RuleAbilityData data, IAbilityHost host) : base(data, host) 
+        public SurroundEmpowerAbility(RuleAbilitySOData data, IAbilityHost host) : base(data, host) 
         {
             BindService<ICombatantSensor>(ref _sensor);
             BindService<ICombatant>(ref _combatant);
@@ -20,7 +20,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
         public override void ExcuteAbility()
         {
             int count = _sensor.GetNearCambatantCount(_combatant);
-            _nextAttackEnhancer.AddEnhance(EnextAttackEnhanceType.Add, count);
+            _nextAttackEnhancer.AddEnhance(ENextAttackType.Add, count);
         }
 
         public override void ProcTrigger(EGameTriggerType triggerType)

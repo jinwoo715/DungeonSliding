@@ -3,22 +3,25 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Ability
 {
-    public class StatAbiltyData : AbilityData
+    [System.Serializable]
+    public class StatAbilityData
     {
-        [Header("Default Stat Ability Data")]
-
-        [Header("Stat")]
-        public EAbilityApplyStatType ApplyStatType;
-
-        public EPlayerStat PlayerStat;
+        public int UID;
+        public string Name;
+        public string Description;
+        public string IconName;
+        public EAbilityRank Rank;
+        public EGameTriggerType TriggerType;
+        public EAbilityApplyStatType StatType;
+        public EPlayerStatType PlayerStatType;
         public EApplyStatType ApplyType;
-        public EPlayerStat RatioType;
-        public float Value;
-
-        [Header("NextAttack")]
-        public EnextAttackEnhanceType nextAttackEnhanceType; 
-        public int AddNextAttackDamage;
-        public float MultiNextAttackDamage;
-        public int ExtraAttackCount;
+        public EPlayerStatType RatioType;
+        public float StatValue;
+        public ENextAttackType NextAttackType;
+        public float NextAttackValue;
+        public int NeedStackCount;
+        public bool IsResetEnabled;
+        public EGameTriggerType ResetOnTrigger;
+        public int ResetThreshold;
     }
 }

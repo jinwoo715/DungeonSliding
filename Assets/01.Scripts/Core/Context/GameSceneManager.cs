@@ -38,14 +38,14 @@ namespace JW.DungeonSliding.GamePlay.Context
             _uiFader = uiFader;
             _obstacleRequest = obstacleRequest;
 
-            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.ClearStage, PrepareStage);
+            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.OnClearStage, PrepareStage);
         }
 
         public void Update()
         {
             if (Input.GetKeyDown(KeyCode.A))
             {
-                GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.LevelUp);
+                GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnLevelUp);
             }
         }
 
@@ -68,7 +68,7 @@ namespace JW.DungeonSliding.GamePlay.Context
             yield return _uiFader.FadeIn();
 
             _gameModeController.ExitGameMode(EGameModeType.PrepareStage);
-            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.EnterRoom);
+            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnEnterRoom);
         }
         public void FailGame()
         {

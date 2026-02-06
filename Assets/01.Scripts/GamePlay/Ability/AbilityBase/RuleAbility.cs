@@ -2,10 +2,10 @@ namespace JW.DungeonSliding.GamePlay.Ability
 {
     public abstract class RuleAbility : IAbility
     {
-        public readonly RuleAbilityData _data;
+        public readonly RuleAbilitySOData _data;
         public IAbilityHost Host { get; private set; }
 
-        public RuleAbility(RuleAbilityData data, IAbilityHost host)
+        public RuleAbility(RuleAbilitySOData data, IAbilityHost host)
         {
             _data = data;
             Host = host;

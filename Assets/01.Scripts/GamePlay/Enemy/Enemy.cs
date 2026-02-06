@@ -53,7 +53,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
             if(IsBackAttack(damageInfo.Attacker))
             {
-                GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.BackAttack);
+                GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnBackAttack);
                 damage = (int)(damage * _backAttackMultiplier);
                 critical = true;
             }
@@ -115,6 +115,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public override void OnDeath()
         {
             base.OnDeath();
+            GameTriggerEventBus.Instance?.ExcuteAbilityEvent(EGameTriggerType.OnKillEnemy);
             OnDeathEvent?.Invoke(this);
         }
         public override void StartAttackAnimation() { }

@@ -10,28 +10,25 @@ namespace JW.DungeonSliding.GamePlay.Combat
     {
         private ICombatantSensor _combatSensor;
 
-        private IGameModeChanger _gameModeChanger;
-
         private Queue<ActPair> _actPairs = new Queue<ActPair>();
         private Queue<ActPair> _counterActPairs = new Queue<ActPair>();
         private HashSet<(ICombatant, ICombatant)> _counterActs = new ();
 
-        public void Init(ICombatantSensor combatantSensor, IGameModeChanger gameModeChanger)
+        public void Init(ICombatantSensor combatantSensor)
         {
             _combatSensor = combatantSensor;
-            _gameModeChanger = gameModeChanger;
 
-            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.SlideEnd, StartBattleSequence);
+            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.OnMoveEnd, StartBattleSequence);
         }
 
         private void OnDestroy()
         {
-            GameTriggerEventBus.Instance.UnSubscribeTriggerEvent(EGameTriggerType.SlideEnd, StartBattleSequence);
+            GameTriggerEventBus.Instance.UnSubscribeTriggerEvent(EGameTriggerType.OnMoveEnd, StartBattleSequence);
         }
 
         public void StartBattleSequence()
         {
-            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.BattleStart);
+            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnBattleStart);
 
             _combatSensor.PlayerCombatant.TrySubmitAttackRequest(_combatSensor, this);
 
@@ -101,9 +98,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
                 act.Target.OnHitDoneEvent -= OnHitEnd;
             }
 
-            _gameModeChanger.ExitGameMode(EGameModeType.Battle);
-
-            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.BattleEnd);
+            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnBattleEnd);
 
             _actPairs.Clear();
             _counterActPairs.Clear();

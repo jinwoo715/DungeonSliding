@@ -7,7 +7,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
     {
         INextAttackEnhancer _nextAttackEnhancer;
         IMoveable _moveable;
-        public SlideAmplifierAbility(RuleAbilityData data, IAbilityHost host) : base(data, host) 
+        public SlideAmplifierAbility(RuleAbilitySOData data, IAbilityHost host) : base(data, host) 
         {
             BindService<INextAttackEnhancer>(ref _nextAttackEnhancer);
             BindService<IMoveable>(ref _moveable);
@@ -16,7 +16,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
         public override void ExcuteAbility()
         {
             int addDamage = _moveable.SlideTileCount();
-            _nextAttackEnhancer.AddEnhance(EnextAttackEnhanceType.Add, addDamage);
+            _nextAttackEnhancer.AddEnhance(ENextAttackType.Add, addDamage);
         }
 
         public override void ProcTrigger(EGameTriggerType triggerType)

@@ -48,13 +48,13 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         public AbilityFactory _abilityFactory = new AbilityFactory();
 
-        private IGameModeChanger _gameModeChanger;
+        private IGameModeReader _gameModeChanger;
         private IAbilitySelectService _selectServeice;
         private int _maxRerollCount = 1;
         
         AbilityHost _abilityHost;
 
-        public AbilitySystem(IAbilitySelectService abilitySelectService, IGameModeChanger gameModeChanger, IAbilityHost host)
+        public AbilitySystem(IAbilitySelectService abilitySelectService, IGameModeReader gameModeChanger, IAbilityHost host)
         {
             _selectServeice = abilitySelectService;
             _gameModeChanger = gameModeChanger;
@@ -76,11 +76,11 @@ namespace JW.DungeonSliding.GamePlay.Ability
                 _abilityDataByUID.Add(datas[i].AbilityUID, datas[i]);
             }
 
-            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.LevelUp, RequestAbilitySelect);
+            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.OnLevelUp, RequestAbilitySelect);
         }
         public void RequestAbilitySelect()
         {
-            _gameModeChanger.EnterGameMode(EGameModeType.AbilityUI);
+            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnShowAbility);
             var session = new AbilitySession(GetAbilityDataSet(), GrantAbility, GetAbilityDataSet, _maxRerollCount);
             _selectServeice.SetAbilitySession(session);
         }
@@ -103,7 +103,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
             EnrollAbility(data.GetEnrollTriggers, ability);
 
-            _gameModeChanger.ExitGameMode(EGameModeType.AbilityUI);
+            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnHideAbility);
         }
 
         private void EnrollAbility(List<EGameTriggerType> types, IAbility ability)

@@ -5,8 +5,8 @@ namespace JW.DungeonSliding.GamePlay.Stats
 {
     public interface IPlayerStatProvider
     {
-        public int Get(EPlayerStat stat);
-        public event Action<EPlayerStat> OnStatChanged;
+        public int Get(EPlayerStatType stat);
+        public event Action<EPlayerStatType> OnStatChanged;
     }
     public interface IEnemyStatModifier
     {
