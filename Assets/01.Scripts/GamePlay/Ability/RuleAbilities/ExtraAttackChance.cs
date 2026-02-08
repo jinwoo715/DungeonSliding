@@ -1,36 +1,44 @@
 using JW.DungeonSliding.GamePlay.Combat;
+using JW.DungeonSliding.Map;
 using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Ability
 {
-    public class ExtraAttackChance : RuleAbility
+    public class ExtraAttackChance : RuleAbilityBase
     {
         INextAttackEnhancer _service;
-
-        public ExtraAttackChance(RuleAbilitySOData data, IAbilityHost host) : base(data, host) 
+        IMoveable _moveable;
+        public ExtraAttackChance(RuleAbilityData data, AbilityHost host) : base(data, host) 
         {
-            if (Host.TryGet<INextAttackEnhancer>(out var service))
-            {
-                _service = service;
-            }
+            
         }
 
         public override void ExcuteAbility()
         {
-            _service.AddEnhance(ENextAttackType.ExtraAttack, _data.GainValue);
+            Debug.Log("Extra Attack");
+            _service.AddEnhance(ENextAttackType.ExtraAttack, _data.P2);
         }
 
         public override void ProcTrigger(EGameTriggerType triggerType)
         {
-            if (triggerType == EGameTriggerType.OnSlideEnd)
+            if(triggerType == EGameTriggerType.OnMoveEnd && _moveable.SlideResultType == ESlideResultType.EnemyStop)
             {
                 int chanceValue = Random.Range(0, 101);
 
-                if (chanceValue <= _data.CostValue)
+                Debug.Log(chanceValue);
+
+                if (chanceValue <= _data.P1)
                 {
                     ExcuteAbility();
                 }
             }
+        }
+
+        protected override void BindService()
+        {
+            BindService<INextAttackEnhancer>(ref _service);
+            BindService(ref _moveable);
+
         }
     }
 }

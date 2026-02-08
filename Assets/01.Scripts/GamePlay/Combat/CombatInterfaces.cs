@@ -19,11 +19,13 @@ namespace JW.DungeonSliding.GamePlay.Combat
         ICombatant LastAttacker { get;}
 
         void AddDamageTakenMultiplier(float value);
-        void TakeDamage(DamageContext damageInfo);
+        bool TakeDamage(DamageContext damageInfo);
         void OnDeath();
     }
     public interface IAttackable
     {
+        Action<ActPair> OnCounterEvent { get; set; }
+
         event Action OnAttackDoneEvent;
         ICombatant AttackTarget { get;}
 
@@ -36,12 +38,12 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
     public interface ICounterAttackable
     {
-        public event Action<ICombatant, ICombatant> OnCounterRequestedEvent;
         public void RequestCounterAttack(ICombatant target);
     }
 
     public interface IBarrierable
     {
+        public bool IsBarrierActive { get; }
         public void GainBarrier();
         public void ReleaseBarrier();
     }
@@ -67,11 +69,14 @@ namespace JW.DungeonSliding.GamePlay.Combat
         bool HasStatus(ECreatureStatus status);
         void ApplyStatus(ECreatureStatus status, int durationTurnCount);
         void RemoveStatus(ECreatureStatus status);
+        void ClearStatus();
     }
 
     public interface IPlayerStatModifier
     {
         public void ModifyStat(PlayerApplyStatContext context);
+        public void SetCurrentHP(PlayerApplyStatContext context);
+        public void SetCurrentMoveCount(PlayerApplyStatContext context);
     }
 
     public interface ICombatant : ITilePosition, IAttackable, IDamageable, IStatusEffectable
@@ -90,7 +95,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
         public ICombatant PlayerCombatant { get; }
         public List<ICombatant> AllEnemyCombatants { get; }
         public bool GetCombatant(Tile tile, ECretureType targetType, out ICombatant combatant);
-        public int GetNearCambatantCount(ICombatant except);
+        public int GetNearEnemyCount(Tile pivot);
     }
 
 }

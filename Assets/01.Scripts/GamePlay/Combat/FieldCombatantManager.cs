@@ -39,9 +39,25 @@ namespace JW.DungeonSliding.GamePlay.Combat
             combatant = default;
             return false;
         }
-        public int GetNearCambatantCount(ICombatant except)
+        public int GetNearEnemyCount(Tile pivot)
         {
-            return 0;
+            int[,] positions = new int[8,2] 
+            { 
+                {-1, 1 }, { 0, 1 } ,{ 1, 1 },
+                {-1, 0 },           { 1, 0 },
+                {-1,-1 }, { 0,-1 } ,{ 1,-1 }
+            };
+
+            int count = 0;
+
+            for (int i = 0; i < 8; i++)
+            {
+                Tile search = new Tile(pivot.XPos + positions[i, 0], pivot.ZPos + positions[i, 1]);
+
+                if (_enemyCombatProvider.TryGetCombatant(search, out ICombatant combat)) count++;
+            }
+
+            return count;
         }
     }
 }

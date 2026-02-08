@@ -45,7 +45,7 @@ namespace JW.DungeonSliding.UI
 
                 obj.Init(damageEvent.Damage, 0.5f);
 
-                yield return new WaitForSeconds(0.2f);
+                yield return new WaitForSeconds(0.3f);
             }
 
             _showUICoroutine = null;

@@ -2,29 +2,35 @@ using JW.DungeonSliding.GamePlay.Combat;
 
 namespace JW.DungeonSliding.GamePlay.Ability
 {
-    public class ReviveAbility : RuleAbility
+    public class ReviveAbility : RuleAbilityBase
     {
         private IPlayerStatModifier _statModifier;
-        private bool isCunsumed = false;
-        public ReviveAbility(RuleAbilitySOData data, IAbilityHost host) : base(data, host) 
+        private int isReviveCount = 0;
+        public ReviveAbility(RuleAbilityData data, AbilityHost host) : base(data, host) 
         {
-            BindService<IPlayerStatModifier>(ref _statModifier);
+            
         }
 
         public override void ExcuteAbility()
         {
-            PlayerApplyStatContext hp = new PlayerApplyStatContext(EPlayerStatType.HP, EApplyStatType.Ratio, 0.5f, EPlayerStatType.MaxHp);
-            PlayerApplyStatContext move = new PlayerApplyStatContext(EPlayerStatType.MoveCount, EApplyStatType.Ratio, 0.5f, EPlayerStatType.MaxMoveCount);
-            _statModifier.ModifyStat(hp);
-            _statModifier.ModifyStat(move);
+            float reviveStatValue = _data.P2 * 0.01f;
+            PlayerApplyStatContext hp = new PlayerApplyStatContext(EPlayerStatType.CurrentHP, EApplyStatType.Ratio, EPlayerStatType.MaxHp, reviveStatValue);
+            PlayerApplyStatContext move = new PlayerApplyStatContext(EPlayerStatType.CurrentMoveCount, EApplyStatType.Ratio, EPlayerStatType.MaxMoveCount, reviveStatValue);
+            _statModifier.SetCurrentHP(hp);
+            _statModifier.SetCurrentMoveCount(move);
 
-            isCunsumed = true;
+            isReviveCount++;
         }
         public override void ProcTrigger(EGameTriggerType triggerType)
         {
-            if (isCunsumed == true) return;
+            if (isReviveCount >= _data.P1) return;
                 
             ExcuteAbility();
+        }
+
+        protected override void BindService()
+        {
+            BindService<IPlayerStatModifier>(ref _statModifier);
         }
     }
 }

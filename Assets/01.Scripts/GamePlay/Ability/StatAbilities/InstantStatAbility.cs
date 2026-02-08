@@ -9,6 +9,8 @@ namespace JW.DungeonSliding.GamePlay.Ability
         public readonly InstantStatAbiltyData _data;
         public IAbilityHost Host { get; private set; }
 
+        public EGameTriggerType ProgTriggers => throw new System.NotImplementedException();
+
         public InstantStatAbility(IAbilityHost host, InstantStatAbiltyData data)
         {
             Host = host;
@@ -24,7 +26,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
             {
                 Debug.Log("Excute!");
                 PlayerApplyStatContext applyStatContext = new PlayerApplyStatContext(
-                _data.PlayerStat, _data.ApplyType, _data.Value, _data.RatioType);
+                _data.PlayerStat, _data.ApplyType, _data.RatioType, _data.Value);
                 service.ModifyStat(applyStatContext);
             }
         }

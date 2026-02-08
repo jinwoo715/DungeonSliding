@@ -5,13 +5,13 @@ namespace JW.DungeonSliding.GamePlay.Ability
     using JW.DungeonSliding.GamePlay.Combat;
     using JW.DungeonSliding.GamePlay.Entities;
 
-    public class BindEnemyAbility : RuleAbility
+    public class BindEnemyAbility : RuleAbilityBase
     {
         HashSet<ICombatant> _bindEenmies = new HashSet<ICombatant>();
         ICombatant _combatant;
-        public BindEnemyAbility(RuleAbilitySOData data, IAbilityHost host) : base(data, host) 
+        public BindEnemyAbility(RuleAbilityData data, AbilityHost host) : base(data, host) 
         {
-            BindService<ICombatant>(ref _combatant);
+            
         }
 
         public override void ExcuteAbility()
@@ -34,6 +34,11 @@ namespace JW.DungeonSliding.GamePlay.Ability
             {
                 _bindEenmies.Clear();
             }
+        }
+
+        protected override void BindService()
+        {
+            BindService<ICombatant>(ref _combatant);
         }
     }
 }

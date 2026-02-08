@@ -1,4 +1,6 @@
 using JW.DungeonSliding.GamePlay;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace JW.DungeonSliding.Core.Flow
@@ -8,8 +10,9 @@ namespace JW.DungeonSliding.Core.Flow
         private EGameModeType _gameFlowType = EGameModeType.Play;
         public EGameModeType Flow => _gameFlowType;
         public bool IsCanMove => Flow == 0;
-
         public EGameModeType GameMode => _gameFlowType;
+
+        public Dictionary<EGameModeType, Action> GameModeEvent = new();
 
         public void Init()
         {
@@ -23,6 +26,17 @@ namespace JW.DungeonSliding.Core.Flow
             GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.OnShowAbility, EnterAbilityUI);
             GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.OnHideAbility, ExitAbilityUI);
         }
+
+        public void SubscribeModeEvent(EGameModeType mode, Action action)
+        {
+            if (GameModeEvent.ContainsKey(mode))
+            {
+                GameModeEvent.Add(mode, delegate { });
+            }
+
+            GameModeEvent[mode] += action;
+        }
+
         private void EnterSlideMode() => EnterGameMode(EGameModeType.Sliding);
         private void ExitSlideMode() => ExitGameMode(EGameModeType.Sliding);
         private void EnterStartBattle() => EnterGameMode(EGameModeType.Battle);

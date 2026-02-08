@@ -1,5 +1,6 @@
 using JW.DungeonSliding.Core;
 using JW.DungeonSliding.Core.Flow;
+using JW.DungeonSliding.GamePlay.Combat;
 using JW.Utility;
 using System;
 using System.Collections.Generic;
@@ -40,40 +41,40 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
     public class AbilitySystem : IRerollService
     {
-        private ShuffleBag<AbilityData> _abilityBag;
-        private Dictionary<int, AbilityData> _abilityDataByUID = new();
+        private ShuffleBag<AbilityDataBase> _abilityBag;
+        private Dictionary<string, AbilityDataBase> _abilityDataByUID = new();
         
         private Dictionary<EGameTriggerType, List<IAbility>> _hasAbilitiesByTrigger = new Dictionary<EGameTriggerType, List<IAbility>>();
         private Dictionary<IAbility, List<EGameTriggerType>> _hasTriggersByAbility = new Dictionary<IAbility, List<EGameTriggerType>>();
 
         public AbilityFactory _abilityFactory = new AbilityFactory();
 
-        private IGameModeReader _gameModeChanger;
         private IAbilitySelectService _selectServeice;
+        
         private int _maxRerollCount = 1;
         
         AbilityHost _abilityHost;
 
-        public AbilitySystem(IAbilitySelectService abilitySelectService, IGameModeReader gameModeChanger, IAbilityHost host)
+        public AbilitySystem(IAbilitySelectService abilitySelectService, ICombatantSensor combatantSensor, IAbilityHost host)
         {
             _selectServeice = abilitySelectService;
-            _gameModeChanger = gameModeChanger;
 
             _abilityHost = new AbilityHost(host);
             _abilityHost.Register<IRerollService>(this);
+            _abilityHost.Register<ICombatantSensor>(combatantSensor);
 
             Init();
         }
 
         public void Init()
         {
-            List<AbilityData> datas = GameManager.Instance.Resource.AllAbility;
+            List<AbilityDataBase> datas = GameManager.Instance.Resource.AllAbilityDatas;
 
-            _abilityBag = new ShuffleBag<AbilityData>(datas);
+            _abilityBag = new ShuffleBag<AbilityDataBase>(datas);
 
             for (int i = 0; i < datas.Count; i++)
             {
-                _abilityDataByUID.Add(datas[i].AbilityUID, datas[i]);
+                _abilityDataByUID.Add(datas[i].UID, datas[i]);
             }
 
             GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.OnLevelUp, RequestAbilitySelect);
@@ -85,9 +86,9 @@ namespace JW.DungeonSliding.GamePlay.Ability
             _selectServeice.SetAbilitySession(session);
         }
 
-        public AbilityData[] GetAbilityDataSet()
+        public AbilityDataBase[] GetAbilityDataSet()
         {
-            AbilityData[] abilityDatas = new AbilityData[3];
+            AbilityDataBase[] abilityDatas = new AbilityDataBase[3];
             for (int i = 0; i < 3; i++)
             {
                 abilityDatas[i] = _abilityBag.GetItem();
@@ -96,32 +97,31 @@ namespace JW.DungeonSliding.GamePlay.Ability
             return abilityDatas;
         }
 
-        public void GrantAbility(int _abilityUID)
+        public void GrantAbility(string _abilityUID)
         {
-            AbilityData data = _abilityDataByUID[_abilityUID];
+            AbilityDataBase data = _abilityDataByUID[_abilityUID];
             IAbility ability = _abilityFactory.CreateAbility(data, _abilityHost);
 
-            EnrollAbility(data.GetEnrollTriggers, ability);
+            EnrollAbility(ability.ProgTriggers, ability);
 
             GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnHideAbility);
         }
 
-        private void EnrollAbility(List<EGameTriggerType> types, IAbility ability)
+        private void EnrollAbility(EGameTriggerType types, IAbility ability)
         {
-            _hasTriggersByAbility.Add(ability, types);
+            var triggers = SplitTriggers(types);
 
-            for (int i = 0; i < types.Count; i++)
+            foreach (var trigger in triggers)
             {
-                EGameTriggerType type = types[i];
-
-                if (!_hasAbilitiesByTrigger.ContainsKey(type))
+                if (!_hasAbilitiesByTrigger.ContainsKey(trigger))
                 {
-                    _hasAbilitiesByTrigger.Add(type, new List<IAbility>());
+                    _hasAbilitiesByTrigger.Add(trigger, new List<IAbility>());
 
-                    GameTriggerEventBus.Instance.SubscribeTriggerEvent(type, () => { ExcuteAbility(type); });
+                    GameTriggerEventBus.Instance.SubscribeTriggerEvent(trigger, () => { ExcuteAbility(trigger); });
                 }
 
-                _hasAbilitiesByTrigger[type].Add(ability);
+                Debug.Log($"{trigger}, {triggers}");
+                _hasAbilitiesByTrigger[trigger].Add(ability);
             }
         }
 
@@ -135,7 +135,20 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         public void AddReroll(int amount = 1)
         {
+            Debug.Log("AddReroll");
             _maxRerollCount += amount;
+        }
+
+        public static IEnumerable<EGameTriggerType> SplitTriggers(EGameTriggerType triggers)
+        {
+            foreach (EGameTriggerType value in Enum.GetValues(typeof(EGameTriggerType)))
+            {
+                if (value == EGameTriggerType.None)
+                    continue;
+
+                if (triggers.HasFlag(value))
+                    yield return value;
+            }
         }
     }
 }

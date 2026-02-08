@@ -45,7 +45,7 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
         private void ChildInit()
         {
             _routeBuilder = new RouteBuilder(_mapManager);
-            _abilitySystem = new AbilitySystem(_gameSceneUIManager, _modeController, _player);
+            _abilitySystem = new AbilitySystem(_gameSceneUIManager, _fieldCombatantManager, _player);
             
             _gameSceneUIManager.Init(_player, _combatEventBus);
 

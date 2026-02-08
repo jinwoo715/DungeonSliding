@@ -17,28 +17,28 @@
     "Description": "공격 시 {P1}퍼센트 확률로 추가 {P2}회 타격",
     "IconName": "Fire",
     "Rank": "Rare",
-    "TriggerType": "OnAttack",
+    "TriggerType": "OnMoveEnd",
     "RuleType": "DoubleAttack",
-    "P1": 50,
+    "P1": 80,
     "P2": 1,
     "Notes": ""
   },
   {
     "UID": "RA_ATK_DIST_01",
     "Name": "가속 붙은 일격",
-    "Description": "전투 이전 이동 타일당 {P1}만큼 추가 데미지",
+    "Description": "슬라이딩 후 전투시 직전 이동 타일당 {P1}만큼 추가 데미지",
     "IconName": "Fire",
     "Rank": "Nomal",
     "TriggerType": "OnSlideEnd",
     "RuleType": "DistanceDamageBonus",
-    "P1": 2,
+    "P1": 1,
     "P2": 0,
     "Notes": ""
   },
   {
     "UID": "RA_ATK_SURR_01",
     "Name": "일당백",
-    "Description": "공격 시 주위 적 숫자 한마리당 {P1}만큼 추가 데미지",
+    "Description": "주위 적 숫자 한마리당 {P1}만큼 데미지 상승",
     "IconName": "Fire",
     "Rank": "Rare",
     "TriggerType": "OnMoveEnd",
@@ -62,13 +62,13 @@
   {
     "UID": "RA_DEF_REVI_01",
     "Name": "불사조의 심장",
-    "Description": "죽으면 1회 체력, 이동 횟수 {P1}%로 부활",
+    "Description": "죽으면 {P1}회 체력, 이동 횟수 {P2}%로 부활",
     "IconName": "Rivive",
     "Rank": "Epic",
     "TriggerType": "OnDeath",
     "RuleType": "Revive",
     "P1": 1,
-    "P2": 0,
+    "P2": 50,
     "Notes": ""
   },
   {
@@ -86,13 +86,13 @@
   {
     "UID": "RA_HAZ_BERS_01",
     "Name": "피의 계약",
-    "Description": "피해 {P1}%, 데미지 {P2}%",
+    "Description": "피해 {P1}%, 데미지 {P2}% 증가",
     "IconName": "Blood",
     "Rank": "Epic",
     "TriggerType": "Instant",
     "RuleType": "Berserker",
-    "P1": 200,
-    "P2": 200,
+    "P1": 100,
+    "P2": 100,
     "Notes": ""
   },
   {
@@ -114,7 +114,7 @@
     "IconName": "Healing",
     "Rank": "Epic",
     "TriggerType": "OnDeathByHP",
-    "RuleType": "LastResortMove",
+    "RuleType": "ConvertMoveCountToHp",
     "P1": 5,
     "P2": 3,
     "Notes": ""
@@ -126,7 +126,7 @@
     "IconName": "Speed",
     "Rank": "Epic",
     "TriggerType": "OnDeathByMoveCount",
-    "RuleType": "LastResortHP",
+    "RuleType": "ConvertHpToMoveCount",
     "P1": 5,
     "P2": 3,
     "Notes": ""

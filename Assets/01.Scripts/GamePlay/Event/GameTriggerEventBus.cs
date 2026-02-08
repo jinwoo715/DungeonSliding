@@ -42,6 +42,7 @@ namespace JW.DungeonSliding.GamePlay
         }
         public void ExcuteAbilityEvent(EGameTriggerType triggerType)
         {
+            Debug.Log(triggerType);
             if(_triggerEventsByTriggerType.TryGetValue(triggerType, out Action action))
             {
                 action?.Invoke();

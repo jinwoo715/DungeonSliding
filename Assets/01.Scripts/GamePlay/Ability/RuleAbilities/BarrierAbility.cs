@@ -2,12 +2,11 @@ using JW.DungeonSliding.GamePlay.Combat;
 
 namespace JW.DungeonSliding.GamePlay.Ability
 {
-    public class BarrierAbility : RuleAbility
+    public class BarrierAbility : RuleAbilityBase
     {
         IBarrierable _barrierable;
-        public BarrierAbility(RuleAbilitySOData data, IAbilityHost host) : base(data, host) 
+        public BarrierAbility(RuleAbilityData data, AbilityHost host) : base(data, host) 
         {
-            BindService<IBarrierable>(ref _barrierable);
         }
 
         public override void ExcuteAbility()
@@ -17,10 +16,15 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         public override void ProcTrigger(EGameTriggerType triggerType)
         {
-            if (triggerType == EGameTriggerType.OnEnterRoom)
+            if (triggerType == _data.TriggerType)
             {
                 ExcuteAbility();
             }
+        }
+
+        protected override void BindService()
+        {
+            BindService<IBarrierable>(ref _barrierable);
         }
     }
 }

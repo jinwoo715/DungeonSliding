@@ -16,15 +16,15 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public ICombatant LastAttacker { get; private set; }
         public ICombatant AttackTarget { get; protected set; }
         public ECreatureStatus StatusFlags { get; private set; }
-        private Dictionary<ECreatureStatus, int> _statusDurations = new();
+        protected Dictionary<ECreatureStatus, int> _statusDurations = new();
         private readonly List<ECreatureStatus> _statusKeys = new();
 
         public float DamageDealtMultiplier { get; private set; } = 1;
         public float DamageTakenMultiplier { get; private set; } = 1;
         
-
         public event Action OnAttackDoneEvent;
         public event Action OnHitDoneEvent;
+        public Action<ActPair> OnCounterEvent { get; set; }
 
         private ECretureType _cretureType;
         private ICombatEventListener _combatEventListener;
@@ -100,6 +100,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
         //Attack
         public bool TrySubmitAttackRequest(ICombatantSensor sensor, IAttackRequestListener attackRequestListener)
         {
+            if (_statusDurations.ContainsKey(ECreatureStatus.Stun)) return false;
+
             ECretureType searchType = _cretureType == ECretureType.Player ? ECretureType.Enemy : ECretureType.Player;
          
             if (sensor.GetCombatant(TilePosition.GetNextTile(Direction), searchType, out var target))
@@ -115,21 +117,22 @@ namespace JW.DungeonSliding.GamePlay.Entities
         protected abstract DamageContext CreateDamageContext();
 
         //Take Damage
-        public virtual void TakeDamage(DamageContext damageInfo)
+        public virtual bool TakeDamage(DamageContext damageInfo)
         {
             LastAttacker = damageInfo.Attacker;
-            ApplyDamage(damageInfo);
+            return ApplyDamage(damageInfo);
         }
-        protected void ApplyDamage(DamageContext damageInfo)
+        private bool ApplyDamage(DamageContext damageInfo)
         {
             DamageContext info = CalculateRealAppliedDamage(damageInfo);
 
-            if (info.Damage <= 0) return;
+            if (info.Damage <= 0) return false;
 
             ReduceHP(info.Damage);
 
             _combatEventListener.RaiseDamageEvent(new DamageEvent(LastAttacker, this, info.Damage));
 
+            return true;
         }
         protected abstract DamageContext CalculateRealAppliedDamage(DamageContext damageInfo);
         protected abstract void ReduceHP(int damage);
@@ -139,7 +142,9 @@ namespace JW.DungeonSliding.GamePlay.Entities
             _animatorController.SetAnimationTrigger(ConstString.STOP_ALL_TRIGGER_ANIMATION);
             
             _combatEventListener.RaiseDeathEvent(new DeathEvent(LastAttacker, this));
-            
+
+            ClearStatus();
+
             OnHitDoneEvent?.Invoke();
             OnAttackDoneEvent?.Invoke();
         }
@@ -149,7 +154,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
         protected virtual void ApplyAttack()
         {
             if (!IsActive || AttackTarget == null || !AttackTarget.IsActive) return;
-
             
             AttackTarget.TakeDamage(CreateDamageContext());
         }
@@ -181,7 +185,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         }
 
         #region Stat
-        public void AddDamageDealtMultiplier(float value)
+        public virtual void AddDamageDealtMultiplier(float value)
         {
             DamageDealtMultiplier += value;
         }
@@ -227,6 +231,12 @@ namespace JW.DungeonSliding.GamePlay.Entities
                     StatusFlags &= ~key;
                 }
             }
+        }
+
+        public void ClearStatus()
+        {
+            _statusDurations.Clear();
+            StatusFlags = ECreatureStatus.None;
         }
         #endregion
     }

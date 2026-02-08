@@ -25,12 +25,12 @@ namespace JW.DungeonSliding.GamePlay.Entities
             StopAllCoroutines();
         }
 
-        public override void TakeDamage(DamageContext damageInfo)
+        public override bool TakeDamage(DamageContext damageInfo)
         {
             base.TakeDamage(damageInfo);
 
             if (IsActive == false)
-                return;
+                return false;
 
             Vector3 punchScale = new Vector3(0.02f, 0f, 0.02f);
             _avatar.transform.DOPunchPosition(punchScale, 0.3f, 20);
@@ -43,7 +43,11 @@ namespace JW.DungeonSliding.GamePlay.Entities
             float targetRotation = GetEulerYByDirection(toDir);
             particle.transform.rotation = Quaternion.Euler(-20, targetRotation, 0);
 
-            StartCoroutine(CoRotationToPlayer(toDir));
+            if(!HasStatus(ECreatureStatus.Bind) && !HasStatus(ECreatureStatus.Stun))
+                StartCoroutine(CoRotationToPlayer(toDir));
+            else EndHittedAnimation();
+
+            return true;
         }
         public IEnumerator CoRotationToPlayer(EDirectionType rotationDir)
         {

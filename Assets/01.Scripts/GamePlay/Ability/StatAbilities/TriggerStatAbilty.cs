@@ -20,19 +20,21 @@ namespace JW.DungeonSliding.GamePlay.Ability
             _data = data;
         }
 
+        public EGameTriggerType ProgTriggers => throw new System.NotImplementedException();
+
         public void ExcuteAbility()
         {
             switch (_data.ApplyStatType)
             {
-                case EAbilityApplyStatType.EntityStat:
+                case EAbilityApplyStatType.PlayerStat:
 
-                    PlayerApplyStatContext applyStatContext = new PlayerApplyStatContext(
-               _data.PlayerStat, _data.ApplyType, _data.Value, _data.RatioType);
+               //     PlayerApplyStatContext applyStatContext = new PlayerApplyStatContext(
+               //_data.PlayerStat, _data.ApplyType, _data.Value, _data.RatioType);
 
-                    _modifier.ModifyStat(applyStatContext);
+               //     _modifier.ModifyStat(applyStatContext);
 
                     break;
-                case EAbilityApplyStatType.NextActStat:
+                case EAbilityApplyStatType.NextAttack:
 
                     switch (_data.ApplyType)
                     {

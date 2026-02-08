@@ -20,17 +20,21 @@ namespace JW.DungeonSliding
         public readonly EPlayerStatType RatioStatType;
         public float Value;
 
-        public PlayerApplyStatContext(EPlayerStatType playerStat, EApplyStatType applyType, float value, EPlayerStatType ratio)
+        public PlayerApplyStatContext(EPlayerStatType playerStat, EApplyStatType applyType, EPlayerStatType ratio, float value)
         {
             PlayerStat = playerStat;
             ApplyType = applyType;
-            Value = value;
             RatioStatType = ratio;
+            Value = value;
         }
 
         public void AddValue(float value)
         {
             Value += value;
+        }
+        public void Reset()
+        {
+            Value = 0;
         }
     }
     public struct EnemyApplyStatContext

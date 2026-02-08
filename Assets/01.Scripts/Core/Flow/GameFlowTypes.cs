@@ -10,5 +10,6 @@ namespace JW.DungeonSliding.Core.Flow
         Sliding = 1 << 2,
         Battle = 1 << 3,
         AbilityUI = 1 << 4,
+        GameOver = 1 << 5,
     }
 }

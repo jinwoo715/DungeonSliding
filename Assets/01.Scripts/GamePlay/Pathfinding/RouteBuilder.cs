@@ -7,7 +7,7 @@ namespace JW.DungeonSliding
 {
     public interface IRouteService
     {
-        public Queue<MoveContext> BuildRoute(Tile startTile, EDirectionType direction);
+        public Queue<MoveContext> BuildRoute(Tile startTile, EDirectionType direction, int maxCount);
         public int LastMoveTileCount { get; }
     }
 
@@ -16,14 +16,14 @@ namespace JW.DungeonSliding
         IMoveContextProvider _moveContextProvider;
 
         private Queue<MoveContext> _lastMoveRoute = new Queue<MoveContext>();
-        public int LastMoveTileCount => _lastMoveRoute.Count;
+        public int LastMoveTileCount => _lastMoveRoute.Count-1;
 
         public RouteBuilder(IMoveContextProvider moveContextProvider)
         {
             _moveContextProvider = moveContextProvider;
         }
 
-        public Queue<MoveContext> BuildRoute(Tile startPoint, EDirectionType moveDir)
+        public Queue<MoveContext> BuildRoute(Tile startPoint, EDirectionType moveDir, int maxCount)
         {
             _lastMoveRoute.Clear();
 
@@ -31,8 +31,11 @@ namespace JW.DungeonSliding
 
             ETileEnterType enterType = ETileEnterType.None;
 
-            while (true)
+            int moveCount = 0;
+            while (moveCount < maxCount)
             {
+                moveCount++;
+
                 MoveContext moveContext = _moveContextProvider.GetMoveContext(startPoint, moveDir, enterType);
                 moveQueue.Enqueue(moveContext);
                 _lastMoveRoute.Enqueue(moveContext);

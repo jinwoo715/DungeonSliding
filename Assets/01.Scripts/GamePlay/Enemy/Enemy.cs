@@ -67,6 +67,12 @@ namespace JW.DungeonSliding.GamePlay.Entities
             var behindTile = TilePosition.GetNextTile(ReverseDirection(Direction));
             return behindTile != null && attacker.TilePosition == behindTile;
         }
+
+        public override void AddDamageDealtMultiplier(float value)
+        {
+            base.AddDamageDealtMultiplier(value);
+            OnStatChangedEvent?.Invoke(EEnemyStatType.Damage);
+        }
         public void ModifyStat(EnemyApplyStatContext context)
         {
             switch (context.EnemyStat)

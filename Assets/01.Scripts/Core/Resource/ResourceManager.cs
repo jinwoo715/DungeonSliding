@@ -12,7 +12,7 @@ namespace JW.DungeonSliding.Core.Resource
     {
         [SerializeField] private List<MapData> _mapDatas;
         [SerializeField] private List<TextAsset> _textDatas;
-        [SerializeField] private List<AbilityData> _abilities;
+        [SerializeField] private List<AbilityDataBase> _abilities;
 
         [SerializeField] private GameConfig _gameConfig;
 
@@ -20,14 +20,17 @@ namespace JW.DungeonSliding.Core.Resource
 
         [Header("Ability")]
         [SerializeField] private TextAsset _ruleAbilityJson;
+        [SerializeField] private TextAsset _statAbilityJson;
 
         public List<MapData> MapData { get; private set; }
         public Dictionary<string, string> _textDataByName = new Dictionary<string, string>();
-        public List<AbilityData> AllAbility => _abilities;
+        public List<AbilityDataBase> AllAbilityDatas => _abilities;
+
         public GameConfig GameConfig => _gameConfig;
         public PlayerData PlayerData => _playerData;
 
-        public List<RuleAbilityData> abilityData;
+        public List<RuleAbilityData> ruleAbilityDatas;
+        public List<StatAbilityData> statAbilityDatas;
 
         internal void Init()
         {
@@ -38,7 +41,18 @@ namespace JW.DungeonSliding.Core.Resource
                 _textDataByName[textName] = _textDatas[i].text;
             }
 
-            abilityData = JsonConvert.DeserializeObject<List<RuleAbilityData>>(_ruleAbilityJson.text);
+            var settings = new JsonSerializerSettings
+            {
+                ContractResolver = new EmptyStringValueTypeResolver()
+            };
+
+            ruleAbilityDatas = JsonConvert.DeserializeObject<List<RuleAbilityData>>(_ruleAbilityJson.text, settings);
+            statAbilityDatas = JsonConvert.DeserializeObject<List<StatAbilityData>>(_statAbilityJson.text, settings);
+
+            _abilities = new List<AbilityDataBase>();
+            //_abilities.AddRange(statAbilityDatas);
+            _abilities.AddRange(ruleAbilityDatas);
+
         }
         public string GetTextData(string textName)
         {
@@ -51,5 +65,20 @@ namespace JW.DungeonSliding.Core.Resource
                 return null;
             }
         }
+    }
+    public class ForceDefaultConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t != typeof(string); // string 빼고 다 건드림
+        public override object ReadJson(JsonReader r, Type t, object ev, JsonSerializer s)
+        {
+            // 빈 문자열("")이나 null이 들어오면? "씨발 무시하고 기본값 써!"
+            if (r.TokenType == JsonToken.String && string.IsNullOrWhiteSpace(r.Value?.ToString()))
+            {
+                return t.IsValueType ? Activator.CreateInstance(t) : null;
+            }
+            try { return s.Deserialize(r, t); }
+            catch { return t.IsValueType ? Activator.CreateInstance(t) : null; }
+        }
+        public override void WriteJson(JsonWriter w, object v, JsonSerializer s) => s.Serialize(w, v);
     }
 }

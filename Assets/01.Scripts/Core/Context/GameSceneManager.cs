@@ -8,20 +8,22 @@ using JW.DungeonSliding.Core.Inputs;
 using JW.DungeonSliding.Core.Flow;
 using System.Collections;
 using JW.DungeonSliding.UI;
+using UnityEngine.SceneManagement;
 
 namespace JW.DungeonSliding.GamePlay.Context
 {
     public class GameSceneManager : MonoBehaviour
     {
-        public RewardManager PlayerReward { get; private set; }
-        public MapManager _mapManager;
-        public Player _player;
-        public EnemyManager _enemyManager;
-        public BattleManager _battleManager;
-        public InputSystem _inputSystem;
-        public GameModeController _gameModeController;
-        public IUIFader _uiFader;
-        public IObstacleRequest _obstacleRequest;
+        private RewardManager PlayerReward { get; set; }
+        private MapManager _mapManager;
+        private Player _player;
+        private EnemyManager _enemyManager;
+        private BattleManager _battleManager;
+        private InputSystem _inputSystem;
+        private GameModeController _gameModeController;
+        private IUIFader _uiFader;
+        private IObstacleRequest _obstacleRequest;
+        
         public int Floor { get; private set; }
         public void Init(RewardManager reward, MapManager map, 
             Player player, EnemyManager enemyManager, BattleManager battleManager, 
@@ -39,6 +41,7 @@ namespace JW.DungeonSliding.GamePlay.Context
             _obstacleRequest = obstacleRequest;
 
             GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.OnClearStage, PrepareStage);
+            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.OnTurnEnd, CheckGameOver);
         }
 
         public void Update()
@@ -70,9 +73,21 @@ namespace JW.DungeonSliding.GamePlay.Context
             _gameModeController.ExitGameMode(EGameModeType.PrepareStage);
             GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnEnterRoom);
         }
-        public void FailGame()
+
+        public void CheckGameOver()
         {
+            if (!_player.IsActive)
+                StartCoroutine(FailGame());
+        }
+        public IEnumerator FailGame()
+        {
+            //TODO UI 팝업이 먼저 나와야하나?
+
             Debug.Log("졌다!");
+
+            yield return _uiFader.FadeOut();
+
+            SceneManager.LoadScene("LobbyScene");
         }
         public void VictoryGame() { }
     }

@@ -8,6 +8,9 @@ namespace JW.DungeonSliding.GamePlay.Ability
         public readonly StackableStatAbilityData _data;
         
         public IAbilityHost Host { get; private set; }
+
+        public EGameTriggerType ProgTriggers => throw new System.NotImplementedException();
+
         private IPlayerStatModifier _modifier;
 
         private int _currentTriggerCount = 0;
@@ -17,34 +20,34 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         public StackableAbility(IAbilityHost host, StackableStatAbilityData data)
         {
-            Host = host;
-            _data = data;
+            //Host = host;
+            //_data = data;
 
-            _applyStatContext = new PlayerApplyStatContext(
-                        _data.PlayerStat, _data.ApplyType, 0, _data.RatioType);
+            //_applyStatContext = new PlayerApplyStatContext(
+            //            _data.PlayerStat, _data.ApplyType, 0, _data.RatioType);
 
-            if (Host.TryGet<IPlayerStatModifier>(out var modifier))
-                _modifier = modifier;
+            //if (Host.TryGet<IPlayerStatModifier>(out var modifier))
+            //    _modifier = modifier;
         }
 
         public void ExcuteAbility()
         {
             switch (_data.ApplyStatType)
             {
-                case EAbilityApplyStatType.EntityStat:
+                case EAbilityApplyStatType.PlayerStat:
 
                     if(Host.TryGet<IPlayerStatModifier>(out var modifier))
                     {
-                        PlayerApplyStatContext applyStatContext = new PlayerApplyStatContext(
-                        _data.PlayerStat, _data.ApplyType, _data.Value, _data.RatioType);
+                        //PlayerApplyStatContext applyStatContext = new PlayerApplyStatContext(
+                        //_data.PlayerStat, _data.ApplyType, _data.Value, _data.RatioType);
 
-                        _applyStatContext.AddValue(-_data.Value);
+                        //_applyStatContext.AddValue(-_data.Value);
 
-                        modifier.ModifyStat(applyStatContext);
+                        //modifier.ModifyStat(applyStatContext);
                     }
 
                     break;
-                case EAbilityApplyStatType.NextActStat:
+                case EAbilityApplyStatType.NextAttack:
 
                     if (Host.TryGet<INextAttackEnhancer>(out var service))
                     {

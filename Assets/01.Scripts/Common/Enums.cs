@@ -12,6 +12,7 @@ namespace JW.DungeonSliding
 
     public enum ESlideResultType
     {
+        None,
         Move,
         Stop,       //일반적인 멈춤
         EnemyStop,  //앞에 적이 있어서 멈춤
@@ -76,39 +77,41 @@ namespace JW.DungeonSliding
     }
     public enum EGameTriggerType
     {
-        None,
+        None                = 0,
 
-        Instant,
+        Instant             = 1 << 0,
 
-        OnEnterRoom,
+        OnEnterRoom         = 1 << 1,
 
-        OnBackAttack,
-        OnAttack,
-        OnDamaged, 
-        OnKillEnemy,
+        OnBackAttack        = 1 << 2,
+        OnAttack            = 1 << 3,
+        OnDamaged           = 1 << 4, 
+        OnKillEnemy         = 1 << 5,
 
-        OnSlideStart,
-        OnSlideEnd,
+        OnSlideStart        = 1 << 6,
+        OnSlideEnd          = 1 << 7,
 
-        OnSlideBlocked,
+        OnSlideBlocked      = 1 << 8,
 
-        OnShowAbility,
-        OnHideAbility,
+        OnShowAbility       = 1 << 9,
+        OnHideAbility       = 1 << 10,
 
-        OnMoveEnd,
+        OnMoveEnd           = 1 << 11,
 
-        OnLevelUp,
+        OnLevelUp           = 1 << 12,
 
-        OnBattleStart,
-        OnBattleEnd,
+        OnBattleStart       = 1 << 13,
+        OnBattleEnd         = 1 << 14,
 
-        OnStepEffectTile,
+        OnStepEffectTile    = 1 << 15,
 
-        OnDeathByHP,
-        OnDeathByMoveCount,
-        OnDeath,
+        OnDeathByHP         = 1 << 16,
+        OnDeathByMoveCount  = 1 << 17,
+        OnDeath             = 1 << 18,
 
-        OnClearStage,
+        OnClearStage        = 1 << 19,
+
+        OnTurnEnd           = 1 << 20,
     }
 
     public enum EAbilityEffectKind
@@ -121,8 +124,8 @@ namespace JW.DungeonSliding
     public enum EAbilityApplyStatType
     {
         None,
-        EntityStat,
-        NextActStat
+        PlayerStat,
+        NextAttack
     }
 
     public enum ERuleAbilityType
@@ -145,8 +148,8 @@ namespace JW.DungeonSliding
         Berserker,           // 피해 2배 / 피격 2배
 
         // --- 자원 역전 (부활과 구분 필요) ---
-        LastResortMove,      // Move 0일 때 HP 소모 Move회복
-        LastResortHP,         // HP 0일 때 Move 소모 HP 회복
+        ConvertHPToMoveCount,      // Move 0일 때 HP 소모 Move회복
+        ConvertMoveCountToHp,         // HP 0일 때 Move 소모 HP 회복
 
         RerollPlus          //리롤 횟수 1회
     }
@@ -154,15 +157,16 @@ namespace JW.DungeonSliding
     public enum EPlayerStatType
     {
         None,
-        HP,
+        CurrentHP,
         MaxHp,
         Damage,
-        MoveCount,
+        CurrentMoveCount,
         MaxMoveCount,
     }
 
     public enum EApplyStatType
     {
+        None,
         Add,
         Multiple,
         Ratio

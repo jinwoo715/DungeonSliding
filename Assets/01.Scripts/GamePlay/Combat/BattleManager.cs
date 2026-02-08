@@ -21,7 +21,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
             GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.OnMoveEnd, StartBattleSequence);
         }
 
-        private void OnDestroy()
+        private void OnDisable()
         {
             GameTriggerEventBus.Instance.UnSubscribeTriggerEvent(EGameTriggerType.OnMoveEnd, StartBattleSequence);
         }
@@ -70,6 +70,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
                 act.Attacker.OnAttackDoneEvent += OnAttackEnd;
                 act.Target.OnHitDoneEvent += OnHitEnd;
+                act.Target.OnCounterEvent += EnqueueCounterActPair;
 
                 act.Attacker.StartAttackAnimation();
 
@@ -103,6 +104,8 @@ namespace JW.DungeonSliding.GamePlay.Combat
             _actPairs.Clear();
             _counterActPairs.Clear();
             _counterActs.Clear();
+
+            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnTurnEnd);
         }
 
         public void EnqueueActPair(ActPair pair)

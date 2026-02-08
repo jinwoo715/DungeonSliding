@@ -33,25 +33,25 @@ namespace JW.DungeonSliding.UI
         {
             switch (changedStat)
             {
-                case EPlayerStatType.HP:
+                case EPlayerStatType.CurrentHP:
 
-                    _viewer.UpdateHP(_statReadOnly.Get(EPlayerStatType.HP), _statReadOnly.Get(EPlayerStatType.MaxHp));
+                    _viewer.UpdateHP(_statReadOnly.Get(EPlayerStatType.CurrentHP), _statReadOnly.Get(EPlayerStatType.MaxHp));
 
                     break;
                 case EPlayerStatType.MaxHp:
-                    _viewer.UpdateHP(_statReadOnly.Get(EPlayerStatType.HP), _statReadOnly.Get(EPlayerStatType.MaxHp));
+                    _viewer.UpdateHP(_statReadOnly.Get(EPlayerStatType.CurrentHP), _statReadOnly.Get(EPlayerStatType.MaxHp));
 
                     break;
                 case EPlayerStatType.Damage:
                     _viewer.UpdateDamage(_statReadOnly.Get(EPlayerStatType.Damage));
 
                     break;
-                case EPlayerStatType.MoveCount:
-                    _viewer.UpdateMoveCount(_statReadOnly.Get(EPlayerStatType.MoveCount), _statReadOnly.Get(EPlayerStatType.MaxMoveCount));
+                case EPlayerStatType.CurrentMoveCount:
+                    _viewer.UpdateMoveCount(_statReadOnly.Get(EPlayerStatType.CurrentMoveCount), _statReadOnly.Get(EPlayerStatType.MaxMoveCount));
 
                     break;
                 case EPlayerStatType.MaxMoveCount:
-                    _viewer.UpdateMoveCount(_statReadOnly.Get(EPlayerStatType.MoveCount), _statReadOnly.Get(EPlayerStatType.MaxMoveCount));
+                    _viewer.UpdateMoveCount(_statReadOnly.Get(EPlayerStatType.CurrentMoveCount), _statReadOnly.Get(EPlayerStatType.MaxMoveCount));
 
                     break;
             }

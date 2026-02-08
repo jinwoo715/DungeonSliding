@@ -26,13 +26,14 @@ namespace JW.DungeonSliding.UI
 
         public void Reroll()
         {
+            Debug.Log("ReRoll");
             if (_currentSession.TryRerollAbilities())
             {
                 _abilitySelectView.SetAilityDatas(_currentSession.Abilities, _currentSession.RerollCount);
             }
         }
 
-        public void SelectAbility(int abilityUid)
+        public void SelectAbility(string abilityUid)
         {
             _currentSession.SelectAbiltyUIDEvent(abilityUid);
             _abilitySelectView.gameObject.SetActive(false);

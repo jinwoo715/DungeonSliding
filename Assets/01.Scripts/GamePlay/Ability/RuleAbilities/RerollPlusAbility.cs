@@ -2,13 +2,13 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Ability
 {
-    public class RerollPlusAbility : RuleAbility
+    public class RerollPlusAbility : RuleAbilityBase
     {
         IRerollService _rerollService;
 
-        public RerollPlusAbility(RuleAbilitySOData data, IAbilityHost host) : base(data, host)
+        public RerollPlusAbility(RuleAbilityData data, AbilityHost host) : base(data, host)
         {
-            BindService<IRerollService>(ref _rerollService);
+            
         }
 
         public override void ExcuteAbility()
@@ -18,7 +18,11 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         public override void ProcTrigger(EGameTriggerType triggerType)
         {
-            ExcuteAbility();
+        }
+
+        protected override void BindService()
+        {
+            BindService<IRerollService>(ref _rerollService);
         }
     }
 }

@@ -4,18 +4,26 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Ability
 {
-    public class DoubleEdgedAbility : RuleAbility
+    public class DoubleEdgedAbility : RuleAbilityBase
     {
-        ICombatant _combatant;
-        public DoubleEdgedAbility(RuleAbilitySOData data, IAbilityHost host) : base(data, host)
+        IAttackable _attackable;
+        IDamageable _damageable;
+        public DoubleEdgedAbility(RuleAbilityData data, AbilityHost host) : base(data, host)
         {
-            BindService<ICombatant>(ref _combatant);
-
-            _combatant.AddDamageDealtMultiplier(_data.GainValue);
-            _combatant.AddDamageTakenMultiplier(_data.GainValue);
+            
         }
 
-        public override void ExcuteAbility() { }
+        public override void ExcuteAbility() 
+        {
+            _attackable.AddDamageDealtMultiplier(_data.P1 * 0.01f);
+            _damageable.AddDamageTakenMultiplier(_data.P2 * 0.01f);
+        }
         public override void ProcTrigger(EGameTriggerType triggerType) { }
+
+        protected override void BindService()
+        {
+            BindService<IAttackable>(ref _attackable);
+            BindService<IDamageable>(ref _damageable);
+        }
     }
 }

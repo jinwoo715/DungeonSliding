@@ -4,101 +4,52 @@ namespace JW.DungeonSliding.GamePlay.Ability
 {
     public class AbilityFactory
     {
-        public IAbility CreateAbility(AbilityData data, AbilityHost host)
+        public IAbility CreateAbility(AbilityDataBase data, AbilityHost host)
         {
-            IAbility createdAbility = null;
+            string abilityType = data.UID.Substring(0, 2);
 
-            switch (data.EAbilityEffectType)
+            if (abilityType == "SA")
             {
-                case EAbilityEffectKind.Stat:
-
-                    createdAbility = CreateStatAbility(data, host);
-
-                    break;
-                case EAbilityEffectKind.Rule:
-
-                    CreateRuleAbility(data, host);
-
-                    break;
+                return CreateStatAbility(data as StatAbilityData, host);
             }
-
-            return createdAbility;
+            else if(abilityType == "RA")
+            {
+                return CreateRuleAbility(data as RuleAbilityData, host);
+            }
+            else
+            {
+                Debug.LogError("Abiilty Type Error");
+                return null;
+            }
         }
 
-        public IAbility CreateStatAbility(AbilityData data, IAbilityHost entity)
+        public IAbility CreateStatAbility(StatAbilityData data, AbilityHost host)
         {
-            IAbility createdAbility = null;
-
-            if (data is InstantStatAbiltyData)
-            {
-                createdAbility = new InstantStatAbility(entity, (InstantStatAbiltyData)data);
-            }
-            else if (data is TriggerStatAbiltyData)
-            {
-                createdAbility = new TriggerStatAbilty(entity, (TriggerStatAbiltyData)data);
-            }
-            else if (data is StackableStatAbilityData)
-            {
-                createdAbility = new StackableAbility(entity, (StackableStatAbilityData)data);
-            }
-
-            return createdAbility;
+            return new StatAbility(data, host);
         }
-        public IAbility CreateRuleAbility(AbilityData data, IAbilityHost host)
+
+        //TODO Rule Ability 姥薄
+        public IAbility CreateRuleAbility(RuleAbilityData data, AbilityHost host)
         {
-            RuleAbilitySOData ruleData = (RuleAbilitySOData)data;
-            IAbility createdAbility = null;
-            switch (ruleData.RuleAbilityType)
+            switch (data.RuleType)
             {
-                case ERuleAbilityType.Revive:
-                    createdAbility = new ReviveAbility(ruleData, host);
-                    break;
-                case ERuleAbilityType.Barrier:
-                    createdAbility = new BarrierAbility(ruleData, host);
-                    break;
-                case ERuleAbilityType.WallBounce:
-                    createdAbility = new WallBounceAbility(ruleData, host);
-                    break;
-                case ERuleAbilityType.SurroundEnemy:
-                    createdAbility = new SurroundEmpowerAbility(ruleData, host);
-
-                    break;
-                case ERuleAbilityType.DoubleAttack:
-                    createdAbility = new ExtraAttackChance(ruleData, host);
-
-                    break;
-                case ERuleAbilityType.CounterAttack:
-                    createdAbility = new CounterAttack(ruleData, host);
-
-                    break;
-                case ERuleAbilityType.DistanceDamageBonus:
-                    createdAbility = new SlideAmplifierAbility(ruleData, host);
-
-                    break;
-                case ERuleAbilityType.EnemyBind:
-                    createdAbility = new BindEnemyAbility(ruleData, host);
-
-                    break;
-                case ERuleAbilityType.Berserker:
-                    createdAbility = new DoubleEdgedAbility(ruleData, host);
-
-                    break;
-                case ERuleAbilityType.LastResortMove:
-                    createdAbility = new ConvertHpToMoveCount(ruleData, host);
-
-                    break;
-                case ERuleAbilityType.LastResortHP:
-                    createdAbility = new ConvertMoveCountToHp(ruleData, host);
-
-                    break;
-
-                case ERuleAbilityType.RerollPlus:
-                    createdAbility = new RerollPlusAbility(ruleData, host);
-
-                    break;
+                case ERuleAbilityType.Revive:               return new ReviveAbility(data, host);               //し
+                case ERuleAbilityType.Barrier:              return new BarrierAbility(data, host);              //し
+                case ERuleAbilityType.WallBounce:           return new WallBounceAbility(data, host);           //し
+                case ERuleAbilityType.SurroundEnemy:        return new SurroundEmpowerAbility(data, host);      //し
+                case ERuleAbilityType.DoubleAttack:         return new ExtraAttackChance(data, host);           //し
+                case ERuleAbilityType.CounterAttack:        return new CounterAttackAbility(data, host);        //し
+                case ERuleAbilityType.DistanceDamageBonus:  return new SlideTileDamageBounsAbility(data, host); //し
+                case ERuleAbilityType.EnemyBind:            return new BindEnemyAbility(data, host);            //し        
+                case ERuleAbilityType.Berserker:            return new DoubleEdgedAbility(data, host);          //し
+                case ERuleAbilityType.ConvertHPToMoveCount: return new ConvertHpToMoveCount(data, host);        //し
+                case ERuleAbilityType.ConvertMoveCountToHp: return new ConvertMoveCountToHp(data, host);        //し
+                case ERuleAbilityType.RerollPlus:           return new RerollPlusAbility(data, host);           //し
+                default:
+                    Debug.LogError($"Rule Ability Type Error {data.RuleType}");
+                    return null;
             }
-
-            return createdAbility;
         }
+        
     }
 }
