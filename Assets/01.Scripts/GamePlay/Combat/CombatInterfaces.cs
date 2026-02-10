@@ -79,10 +79,11 @@ namespace JW.DungeonSliding.GamePlay.Combat
         public void SetCurrentMoveCount(PlayerApplyStatContext context);
     }
 
-    public interface ICombatant : ITilePosition, IAttackable, IDamageable, IStatusEffectable
+    public interface ICombatant : ITilePosition, IAttackable, IDamageable, IStatusEffectable, ICreatureRotator
     {
         public bool IsActive { get; }
         public EDirectionType Direction { get; }
+        bool TryGet<T>(out T service) where T : class;
     }
 
     public interface ICombatProvider

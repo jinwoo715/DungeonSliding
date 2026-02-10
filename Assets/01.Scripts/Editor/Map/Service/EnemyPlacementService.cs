@@ -6,7 +6,7 @@ namespace JW.DungeonSliding
 {
     public class EnemyPlacementService
     {
-        public void ProcessEnemyPoint(MapEditState mapEditState, Tile point, int templeteNum, int enemyUid)
+        public void ProcessEnemyPoint(MapEditState mapEditState, Tile point, int templeteNum, string enemyUid)
         {
             if (!mapEditState.IsRoute(point)) return;
 

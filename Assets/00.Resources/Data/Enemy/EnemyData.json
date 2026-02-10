@@ -1,0 +1,92 @@
+[
+  {
+    "UID": "ENEMY_BOSS_MEDUSA",
+    "Name": "메두사",
+    "Description": "",
+    "BaseDamage": 1,
+    "BaseHP": 5,
+    "BaseXP": 1,
+    "AbilityList": "AutoRotate|MoveBanToDirection",
+    "EnemyAbilityType": "AutoRotate, MoveBanToDirection"
+  },
+  {
+    "UID": "ENEMY_BOSS_GRAVITON",
+    "Name": "그라비톤",
+    "Description": "",
+    "BaseDamage": 1,
+    "BaseHP": 5,
+    "BaseXP": 1,
+    "AbilityList": "HeavyGravity",
+    "EnemyAbilityType": "HeavyGravity"
+  },
+  {
+    "UID": "ENEMY_BOSS_DOPPELGANGER",
+    "Name": "도플갱어",
+    "Description": "",
+    "BaseDamage": 1,
+    "BaseHP": 5,
+    "BaseXP": 1,
+    "AbilityList": "CopyPlayerStat",
+    "EnemyAbilityType": "CopyPlayerStat"
+  },
+  {
+    "UID": "ENEMY_BOSS_EREBOS",
+    "Name": "에레보스",
+    "Description": "",
+    "BaseDamage": 1,
+    "BaseHP": 5,
+    "BaseXP": 1,
+    "AbilityList": "Blind",
+    "EnemyAbilityType": "Blind"
+  },
+  {
+    "UID": "ENEMY_BOSS_REAPER",
+    "Name": "리퍼",
+    "Description": "",
+    "BaseDamage": 1,
+    "BaseHP": 5,
+    "BaseXP": 1,
+    "AbilityList": "EnhanceOnEnemyDeath",
+    "EnemyAbilityType": "EnhanceOnEnemyDeath"
+  },
+  {
+    "UID": "ENEMY_BOSS_MELTDOWN",
+    "Name": "멜트다운",
+    "Description": "",
+    "BaseDamage": 1,
+    "BaseHP": 5,
+    "BaseXP": 1,
+    "AbilityList": "EnhanceOnHitted",
+    "EnemyAbilityType": "EnhanceOnHitted"
+  },
+  {
+    "UID": "ENEMY_BOSS_INFINITY",
+    "Name": "인피니티",
+    "Description": "",
+    "BaseDamage": 1,
+    "BaseHP": 5,
+    "BaseXP": 1,
+    "AbilityList": "GrowthOnBattleEnd",
+    "EnemyAbilityType": "GrowthOnBattleEnd"
+  },
+  {
+    "UID": "ENEMY_BOSS_BALOR",
+    "Name": "바롤",
+    "Description": "",
+    "BaseDamage": 1,
+    "BaseHP": 5,
+    "BaseXP": 1,
+    "AbilityList": "Exaltation",
+    "EnemyAbilityType": "Exaltation"
+  },
+  {
+    "UID": "ENEMY_BOSS_ORDO",
+    "Name": "오르도",
+    "Description": "",
+    "BaseDamage": 1,
+    "BaseHP": 5,
+    "BaseXP": 1,
+    "AbilityList": "CommandRotate",
+    "EnemyAbilityType": "CommandRotate"
+  }
+]

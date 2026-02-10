@@ -22,6 +22,10 @@ namespace JW.DungeonSliding.Core.Resource
         [SerializeField] private TextAsset _ruleAbilityJson;
         [SerializeField] private TextAsset _statAbilityJson;
 
+        [Header("Enemy")]
+        [SerializeField] private TextAsset _enemyData;
+        [SerializeField] private TextAsset _enemyAbilityData;
+
         public List<MapData> MapData { get; private set; }
         public Dictionary<string, string> _textDataByName = new Dictionary<string, string>();
         public List<AbilityDataBase> AllAbilityDatas => _abilities;
@@ -31,6 +35,10 @@ namespace JW.DungeonSliding.Core.Resource
 
         public List<RuleAbilityData> ruleAbilityDatas;
         public List<StatAbilityData> statAbilityDatas;
+
+
+        public List<EnemyData> EnemyData;
+        public List<EnemyAbilityData> EnemyAbilityData;
 
         internal void Init()
         {
@@ -52,6 +60,10 @@ namespace JW.DungeonSliding.Core.Resource
             _abilities = new List<AbilityDataBase>();
             //_abilities.AddRange(statAbilityDatas);
             _abilities.AddRange(ruleAbilityDatas);
+
+
+            EnemyData = JsonConvert.DeserializeObject<List<EnemyData>>(_enemyData.text, settings);
+            EnemyAbilityData = JsonConvert.DeserializeObject<List<EnemyAbilityData>>(_enemyAbilityData.text, settings);
 
         }
         public string GetTextData(string textName)

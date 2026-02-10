@@ -26,7 +26,7 @@ namespace JW.DungeonSliding
         private int xCountField;
         private int zCountField;
 
-        private int[] _enemyUids;
+        private string[] _enemyUids;
         private string[] _enemyNames;
         private string[] _effectTileNames;
         private string[] _tileNames;
@@ -77,7 +77,7 @@ namespace JW.DungeonSliding
 
             var enemyDatas = JsonConvert.DeserializeObject<List<EnemyDataSheet>>(data);
             _enemyNames = new string[enemyDatas.Count];
-            _enemyUids = new int[enemyDatas.Count];
+            _enemyUids = new string[enemyDatas.Count];
 
             for (int i = 0; i < enemyDatas.Count; i++)
             {
@@ -298,7 +298,7 @@ namespace JW.DungeonSliding
 
                 case EEditModeType.Enemy:
                     int enemyTemplete = _sessionState.EnemyTemplateIndex;
-                    int enemyUid = _enemyUids[_sessionState.SelectedEnemyIndex];
+                    string enemyUid = _enemyUids[_sessionState.SelectedEnemyIndex];
                     _enemyService.ProcessEnemyPoint(_mapEditState, point, enemyTemplete, enemyUid);
                     break;
 

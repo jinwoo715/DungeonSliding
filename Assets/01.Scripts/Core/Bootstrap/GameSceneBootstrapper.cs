@@ -22,6 +22,13 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
         private AbilitySystem _abilitySystem;
         private FieldCombatantManager _fieldCombatantManager;
         private RouteBuilder _routeBuilder;
+        private BossAbilityManager _bossAbilityManager;
+        private MoveRule _moveRule = new MoveRule();
+        private GameVisualController _visualContoller;
+
+        [SerializeField] private Camera cam;
+        [SerializeField] private GameObject dirLight;
+        [SerializeField] private GameObject playerLight;
 
         [SerializeField] private GameSceneManager _gameSceneManager;
         [SerializeField] private GameSceneUIManager _gameSceneUIManager;
@@ -50,11 +57,13 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
             _gameSceneUIManager.Init(_player, _combatEventBus);
 
             _player.Init(_combatEventBus, ECretureType.Player);
-            _player.SetData(GameManager.Instance.Resource.PlayerData, _routeBuilder, _mapManager);
+            _player.SetData(GameManager.Instance.Resource.PlayerData, _routeBuilder, _mapManager, _moveRule);
 
             _inputCoordinator.Init(_player);
-            
-            _enemyManager.WireInterfaces(_mapManager, _obstacleController, _gameSceneUIManager.EnemyStatUIService, _combatEventBus);
+
+            _bossAbilityManager = new BossAbilityManager(_fieldCombatantManager, _moveRule, _player, _visualContoller);
+
+            _enemyManager.WireInterfaces(_mapManager, _obstacleController, _gameSceneUIManager.EnemyStatUIService, _combatEventBus, _bossAbilityManager);
             _enemyManager.LoadData();
 
             _mapManager.Init(_player);
@@ -64,6 +73,8 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
             _rewardManager.Init(_combatEventBus);
 
             _modeController.Init();
+
+            _visualContoller = new GameVisualController(cam, playerLight, dirLight, _gameSceneUIManager.EnemyStatUIService);
         }
 
         private void BindEvent()

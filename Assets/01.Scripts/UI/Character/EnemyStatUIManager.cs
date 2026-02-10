@@ -36,5 +36,20 @@ namespace JW.DungeonSliding
                 _activeEnemyStatItemByEnemy.Remove(enemyStatReadOnly);
             }
         }
+
+        public void HideAll()
+        {
+            foreach (var ui in _activeEnemyStatItemByEnemy)
+            {
+                ui.Value.gameObject.SetActive(false);
+            }
+        }
+        public void ShowAll()
+        {
+            foreach (var ui in _activeEnemyStatItemByEnemy)
+            {
+                ui.Value.gameObject.SetActive(true);
+            }
+        }
     }
 }

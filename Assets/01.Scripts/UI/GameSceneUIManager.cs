@@ -24,7 +24,7 @@ namespace JW.DungeonSliding.UI
 
         public IEnemyStatUIService EnemyStatUIService => _enemyStatUIManager;
 
-        public void Init(GamePlay.Stats.IPlayerStatProvider statReadOnly, ICombatEventPresenter combatEventPresenter)
+        public void Init(GamePlay.Stats.IPlayerStatReader statReadOnly, ICombatEventPresenter combatEventPresenter)
         {
             _abilityUIController.Init();
             _playerStatUI.Init(statReadOnly);

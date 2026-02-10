@@ -1,6 +1,7 @@
 using JW.DungeonSliding.GamePlay.Combat;
 using JW.DungeonSliding.GamePlay.Stats;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -55,23 +56,14 @@ namespace JW.DungeonSliding.GamePlay.Entities
             TilePosition = point;
             this.transform.position = point.GetPosition;
         }
-        protected void SetCharacterRotation(EDirectionType directionType)
-        {
-            if (directionType == EDirectionType.None)
-                return;
 
-            Direction = directionType;
-
-            float rotation = GetEulerYByDirection(directionType);
-            this.transform.rotation = Quaternion.Euler(0, rotation, 0);
-        }
         public float GetEulerYByDirection(EDirectionType direction)
         {
             float rotation = (int)direction * 90;
 
             return rotation;
         }
-        public EDirectionType ToTargetDirection(Tile tile)
+        public EDirectionType DirectionToTile(Tile tile)
         {
             float xDistance = tile.XPos - this.TilePosition.XPos;
             float zDistance = tile.ZPos - this.TilePosition.ZPos;
@@ -93,6 +85,41 @@ namespace JW.DungeonSliding.GamePlay.Entities
             reverse = reverse % 4;
 
             return (EDirectionType)reverse;
+        }
+        public IEnumerator CoRotateCharacter(EDirectionType directionType)
+        {
+            if (directionType != Direction)
+            {
+                float timer = 0;
+                const float rotationDuration = 1f; // 1초 동안 회전
+
+                float startRotationY = this.transform.rotation.eulerAngles.y;
+                float targetRotationY = GetEulerYByDirection(directionType);
+
+                while (timer < 1f)
+                {
+                    timer += Time.deltaTime / rotationDuration; // duration으로 나눠야 정확히 1초 걸림
+
+                    // LerpAngle을 써야 270도에서 0(360)도로 갈 때 최단 거리로 회전함
+                    float rotationValue = Mathf.LerpAngle(startRotationY, targetRotationY, timer);
+                    this.transform.rotation = Quaternion.Euler(0, rotationValue, 0);
+
+                    yield return null;
+                }
+
+                SetRotation(directionType);
+            }
+        }
+
+        public void SetRotation(EDirectionType directionType)
+        {
+            if (directionType == EDirectionType.None)
+                return;
+
+            Direction = directionType;
+
+            float rotation = GetEulerYByDirection(directionType);
+            this.transform.rotation = Quaternion.Euler(0, rotation, 0);
         }
         #endregion
 
@@ -178,7 +205,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
             _animatorController.OnHitTimeingEvent -= ApplyAttack;
         }
         #endregion
-
         public virtual void EndBattle()
         {
             UpdateStatusDuration();
@@ -238,6 +264,20 @@ namespace JW.DungeonSliding.GamePlay.Entities
             _statusDurations.Clear();
             StatusFlags = ECreatureStatus.None;
         }
+
+        public bool TryGet<T>(out T service) where T : class
+        {
+            // object로 캐스팅하면 컴파일러가 "T가 뭔지 모르겠지만 일단 해봐"라고 허락해줍니다.
+            service = (object)this as T;
+            return service != null;
+        }
+
+        public IEnumerator CoRotateToTarget(ITilePosition combatant)
+        {
+            EDirectionType dir = DirectionToTile(combatant.TilePosition);
+            yield return CoRotateCharacter(dir);
+        }
+
         #endregion
     }
 }

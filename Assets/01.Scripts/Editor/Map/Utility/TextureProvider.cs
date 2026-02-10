@@ -12,7 +12,7 @@ namespace JW.DungeonSliding
     {
         private Dictionary<ETileType, Texture2D> _tileTextureDic = new Dictionary<ETileType, Texture2D>();
         private Texture2D _playerIconTexture;
-        private Dictionary<int, Texture2D> _enemyTextureDic = new Dictionary<int, Texture2D>();
+        private Dictionary<string, Texture2D> _enemyTextureDic = new Dictionary<string, Texture2D>();
         private Dictionary<EEffectObjectType, Texture2D> _effectObjectTextureDic = new Dictionary<EEffectObjectType, Texture2D>();
         
         public void Init()
@@ -57,7 +57,7 @@ namespace JW.DungeonSliding
         {
             return _effectObjectTextureDic[type];
         }
-        public Texture2D GetEnemyIcon(int enemyUid)
+        public Texture2D GetEnemyIcon(string enemyUid)
         {
             return _enemyTextureDic[enemyUid];
         }
@@ -84,7 +84,7 @@ namespace JW.DungeonSliding
     {
         Texture2D GetTileTexture(ETileType type);
         Texture2D GetPlayerIcon();
-        Texture2D GetEnemyIcon(int enemyUid);
+        Texture2D GetEnemyIcon(string enemyUid);
         Texture2D GetEffectIcon(EEffectObjectType type);
     }
 }

@@ -7,7 +7,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
 {
     public class ConvertHpToMoveCount : RuleAbilityBase
     {
-        IPlayerStatProvider _statReadOnly;
+        IPlayerStatReader _statReadOnly;
         IPlayerStatModifier _statModifier;
         IMoveable _moveable;
         public ConvertHpToMoveCount(RuleAbilityData data, AbilityHost host) : base(data, host)

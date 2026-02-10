@@ -28,7 +28,6 @@ namespace JW.DungeonSliding.GamePlay.Ability
             return new StatAbility(data, host);
         }
 
-        //TODO Rule Ability ±¸Çö
         public IAbility CreateRuleAbility(RuleAbilityData data, AbilityHost host)
         {
             switch (data.RuleType)

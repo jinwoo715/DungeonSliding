@@ -35,7 +35,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             Vector3 punchScale = new Vector3(0.02f, 0f, 0.02f);
             _avatar.transform.DOPunchPosition(punchScale, 0.3f, 20);
 
-            EDirectionType toDir = ToTargetDirection(damageInfo.Attacker.TilePosition);
+            EDirectionType toDir = DirectionToTile(damageInfo.Attacker.TilePosition);
 
             var particle = ParticlePool.Instance.GetParticle("HitDust");
             particle.SetParticle(this.transform.position + Vector3.up * 0.65f + GetHitParticlePosition(toDir), 1.0f);
@@ -53,28 +53,10 @@ namespace JW.DungeonSliding.GamePlay.Entities
         {
             yield return new WaitForSeconds(0.3f);
 
-            if (rotationDir != Direction)
-            {
-                float timer = 0;
-                const float roationTime = 1f;
+            var particle = ParticlePool.Instance.GetParticle("RotationDust");
+            particle.SetParticle(this.transform.position + Vector3.up * 0.15f, 2.0f);
 
-                float startRotationY = this.transform.rotation.eulerAngles.y;
-                float targetRotation = GetEulerYByDirection(rotationDir);
-
-                var particle = ParticlePool.Instance.GetParticle("RotationDust");
-                particle.SetParticle(this.transform.position + Vector3.up * 0.15f, 2.0f);
-
-                while (timer <= 1)
-                {
-                    float rotationValue = Mathf.Lerp(startRotationY, targetRotation, timer);
-                    this.transform.rotation = Quaternion.Euler(new Vector3(0, rotationValue, 0));
-
-                    timer += Time.deltaTime * roationTime;
-                    yield return null;
-                }
-
-                SetCharacterRotation(rotationDir);
-            }
+            yield return CoRotateCharacter(rotationDir);
 
             EndHittedAnimation();
         }

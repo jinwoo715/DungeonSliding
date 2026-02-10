@@ -7,13 +7,13 @@ namespace JW.DungeonSliding.UI
     {
         [SerializeField] private PlayerStatViewer _viewer;
 
-        private IPlayerStatProvider _statReadOnly;
+        private IPlayerStatReader _statReadOnly;
         
-        public void Init(IPlayerStatProvider statReadOnly)
+        public void Init(IPlayerStatReader statReadOnly)
         {
             Bind(statReadOnly);
         }
-        private void Bind(IPlayerStatProvider statReadOnly)
+        private void Bind(IPlayerStatReader statReadOnly)
         {
             UnBind();
 

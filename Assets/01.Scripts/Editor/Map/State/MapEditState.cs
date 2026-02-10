@@ -144,7 +144,7 @@ namespace JW.DungeonSliding
             else
                 return null;
         }
-        public void SetEnemy(int templeteNum, Tile point, int enemyUid)
+        public void SetEnemy(int templeteNum, Tile point, string enemyUid)
         {
             if(_enemyTempleteSheet[templeteNum].EnemyData.TryGetValue(point, out EnemySettingData data))
             {

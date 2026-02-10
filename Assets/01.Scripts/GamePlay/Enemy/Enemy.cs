@@ -10,18 +10,15 @@ namespace JW.DungeonSliding.GamePlay.Entities
     public abstract class Enemy : Creature, IEnemyStatModifier, IRewardSender
     {
         [SerializeField] private Transform _statUITransform;
-
         private EnemyData _enemyData;
         [SerializeField] private EnemyStat _enemyStat;
-
         public event Action<Enemy> OnDeathEvent;
         public event Action<EEnemyStatType> OnStatChangedEvent;
-        
         private float _backAttackMultiplier;
-
-        public int EnemyUID => _enemyData.EnemyUID;
+        public string EnemyUID => _enemyData.UID;
         public Transform StatUITransform => _statUITransform;
 
+        //TODO Enemy Skill ±¸Çö
         public override void Init(ICombatEventListener combatEventListener, ECretureType cretureType)
         {
             base.Init(combatEventListener, cretureType);
@@ -35,11 +32,11 @@ namespace JW.DungeonSliding.GamePlay.Entities
             _enemyData = data;
 
             int RandomDir = UnityEngine.Random.Range(0, 4);
-            SetCharacterRotation((EDirectionType)RandomDir);
+            SetRotation((EDirectionType)RandomDir);
 
             int hp = CalculateHP(_enemyData.BaseHP, floor);
-            int dmg = CalculateDamage(_enemyData.BaseAttack, floor);
-            int xp = CalculateXp(_enemyData.Xp, floor);
+            int dmg = CalculateDamage(_enemyData.BaseDamage, floor);
+            int xp = CalculateXp(_enemyData.BaseXP, floor);
 
             _enemyStat = new EnemyStat(hp, dmg, xp);
 
@@ -67,13 +64,25 @@ namespace JW.DungeonSliding.GamePlay.Entities
             var behindTile = TilePosition.GetNextTile(ReverseDirection(Direction));
             return behindTile != null && attacker.TilePosition == behindTile;
         }
-
         public override void AddDamageDealtMultiplier(float value)
         {
             base.AddDamageDealtMultiplier(value);
             OnStatChangedEvent?.Invoke(EEnemyStatType.Damage);
         }
-        public void ModifyStat(EnemyApplyStatContext context)
+        public void SetEnemyStat(EEnemyStatType stat, int value)
+        {
+            switch (stat)
+            {
+                case EEnemyStatType.HP:
+                    _enemyStat.HP = value;
+                    break;
+                case EEnemyStatType.Damage:
+                    _enemyStat.Damage = value;
+                    break;
+            }
+            OnStatChangedEvent?.Invoke(stat);
+        }
+        public void ModifyEnemyStat(EnemyApplyStatContext context)
         {
             switch (context.EnemyStat)
             {
@@ -116,7 +125,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         }
         protected override void ReduceHP(int damage)
         {
-            ModifyStat(new EnemyApplyStatContext(EEnemyStatType.HP, EApplyStatType.Add, -damage, EEnemyStatType.None));
+            ModifyEnemyStat(new EnemyApplyStatContext(EEnemyStatType.HP, EApplyStatType.Add, -damage, EEnemyStatType.None));
         }
         public override void OnDeath()
         {
@@ -130,7 +139,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
             DamageContext damageInfo = new DamageContext(this, Get(EEnemyStatType.Damage), false);
             return damageInfo;
         }
-
 
         #region Calculate Stat
         public int CalculateHP(int baseHP, int floor)
@@ -158,6 +166,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
         {
             return new RewardData(_enemyStat.XP);
         }
+
+
         #endregion
     }
 }

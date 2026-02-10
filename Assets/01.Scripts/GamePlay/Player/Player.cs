@@ -38,7 +38,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             RatioValueByStat[stat] += value;
         }
 
-        public int Final(IPlayerStatProvider StatReadOnly) 
+        public int Final(IPlayerStatReader StatReadOnly) 
         {
             float addRatioValue = 0;
             foreach (var item in RatioValueByStat)
@@ -56,7 +56,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             RatioValueByStat.Clear();
         }
     }
-    public class Player : Creature, IMoveable, IAbilityHost, INextAttackEnhancer, IPlayerStatProvider, IPlayerStatModifier, IRewardReceiver, IBarrierable, ICounterAttackable
+    public class Player : Creature, IMoveable, IAbilityHost, INextAttackEnhancer, IPlayerStatReader, IPlayerStatModifier, IRewardReceiver, IBarrierable, ICounterAttackable
     {
         private ECharacterStateType _characterState = ECharacterStateType.Idle;
         public ESlideResultType SlideResultType { get; private set; }
@@ -67,6 +67,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
         private ITileCheckService _tileCheckService;
         private IRouteService _routeService;
+        private IMoveRule _moveRule;
 
         private bool _isPushed = false;
 
@@ -100,7 +101,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             _levelUpXp = MathUtil.GetFib(_level + ConstData.LEVELUP_XP_OFFSET);
             _nextAttackBuff.Reset();
         }
-        public void SetData(PlayerData playerData, IRouteService routeService, ITileCheckService tileCheckService)
+        public void SetData(PlayerData playerData, IRouteService routeService, ITileCheckService tileCheckService, IMoveRule moveRule)
         {
             MaxHp = new StatValue(playerData.HP);
             MaxMoveCount = new StatValue(playerData.MoveCount);
@@ -115,6 +116,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
             _tileCheckService = tileCheckService;
             _routeService = routeService;
+            _moveRule = moveRule;
         }
         public void AddReward(RewardData rewardData)
         {
@@ -139,6 +141,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
         #region Move
         public void SlideRoute(EDirectionType inputDirection)
         {
+            if (!_moveRule.IsCanMove(inputDirection)) return;
+
             if (_isPushed) return;
 
             if (_characterState != ECharacterStateType.Idle) return;
@@ -149,7 +153,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
             if(moveQueue.Count == 1)
             {
-                SetCharacterRotation(inputDirection);
+                SetRotation(inputDirection);
 
                 MoveContext cur = moveQueue.Dequeue();
                 SlideResultType = cur.ResultType;
@@ -175,7 +179,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
                 switch (moveContext.ResultType)
                 {
                     case ESlideResultType.Move:
-                        if(lookDir) SetCharacterRotation(moveContext.Direction);
+                        if(lookDir) SetRotation(moveContext.Direction);
                         yield return StartCoroutine(CoMove(moveContext));
                         break;
                     case ESlideResultType.Stop:
@@ -213,7 +217,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         }
         public void FinishMove()
         {
-            ModifyStat(new PlayerApplyStatContext(EPlayerStatType.CurrentMoveCount, EApplyStatType.Add, EPlayerStatType.None, -1));
+            ModifyStat(new PlayerApplyStatContext(EPlayerStatType.CurrentMoveCount, EApplyStatType.Add, EPlayerStatType.None, -_moveRule.MoveCost));
             GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnMoveEnd);
             SlideResultType = ESlideResultType.None;
         }
@@ -293,11 +297,11 @@ namespace JW.DungeonSliding.GamePlay.Entities
                 GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnDamaged);
             }
 
-            SetCharacterRotation(ToTargetDirection(damageInfo.Attacker.TilePosition));
+            SetRotation(DirectionToTile(damageInfo.Attacker.TilePosition));
 
             if(damageInfo.StatusEffect == EStatusEffectType.KnockBack)
             {
-                EDirectionType toAttackDir = ToTargetDirection(damageInfo.Attacker.TilePosition);
+                EDirectionType toAttackDir = DirectionToTile(damageInfo.Attacker.TilePosition);
                 EDirectionType backDirection = ReverseDirection(toAttackDir);
                 Tile backTile = TilePosition.GetNextTile(backDirection);
 

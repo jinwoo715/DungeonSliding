@@ -30,20 +30,31 @@ namespace JW.DungeonSliding
     [System.Serializable]
     public class EnemyData
     {
-        public int EnemyUID;
-        public string EnemyName;
+        public string UID;
+        public string Name;
+        public string Description;
         public int BaseHP;
-        public int BaseAttack;
-        public int Xp;
+        public int BaseDamage;
+        public int BaseXP;
+        public string AbilityList;
     }
+
+    [System.Serializable]
+    public class EnemyBossData : EnemyData
+    {
+        public EEnemyAbilityType AbilityType;
+        public float P1;
+        public float P2;
+    }
+
 
     [System.Serializable]
     public class EnemySettingData
     {
-        public int EnemyUID;
+        public string EnemyUID;
         public Tile Point;
 
-        public EnemySettingData(int enemyUID, Tile point)
+        public EnemySettingData(string enemyUID, Tile point)
         {
             EnemyUID = enemyUID;
             Point = point;
@@ -66,7 +77,7 @@ namespace JW.DungeonSliding
     [System.Serializable]
     public class EnemyDataSheet
     {
-        public int EnemyUID;
+        public string EnemyUID;
         public string EnemyName;
         public int BaseHP;
         public int BaseAttack;
