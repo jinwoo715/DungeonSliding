@@ -3,16 +3,123 @@ using UnityEngine;
 
 namespace JW.DungeonSliding
 {
-    [CreateAssetMenu(fileName = "MapData", menuName = "Data/Map", order = 1)]
-    public class MapData : ScriptableObject
+    [System.Serializable]
+    public class MapDataBundle
     {
-        public int Width;
-        public int Height;
-        public int[] MapTiles;
+        public string BundleName;
+        public List<MapData> MapDatas;
+    }
 
-        public Tile PlayerPosition;
-        public EnemyTemplete[] EnemyTemplete;
-        public List<EffectObjectData> effectTileDatas;
+    
+
+ 
+
+    public class MapProvider
+    {
+        [SerializeField] private List<MapDataBundle> Bundles;
+
+        public MapProvider(List<MapDataBundle> bundles)
+        {
+            Bundles = bundles;
+        }
+
+        public MapDataBundle GetActMapBundle(int actNum)
+        {
+            if (Bundles.Count < actNum) return null;
+
+            return Bundles[actNum];
+        }
+
+    }
+
+    [System.Serializable]
+    public class CreatureTemplete
+    {
+        public List<Tile> NomalEnemyPos = new List<Tile>();
+        public List<Tile> BossEnemyPos = new List<Tile>();
+        public Tile PlayerPos = Tile.Invalid;
+    }
+
+    public class CretureTempleteEditor
+    {
+        public void SetCreturePos(CreatureTemplete cretureTemplete, EEditorCretureType creatureType, Tile tile)
+        {
+            if(TryRemovePos(cretureTemplete, tile, out var removeType))
+            {
+                if(creatureType != removeType)
+                {
+                    SetCreaturePos(cretureTemplete, creatureType, tile);
+                }
+            }
+            else
+            {
+                SetCreaturePos(cretureTemplete, creatureType, tile);
+            }
+        }
+
+        private void SetCreaturePos(CreatureTemplete cretureTemplete, EEditorCretureType creatureType, Tile tile)
+        {
+            switch (creatureType)
+            {
+                case EEditorCretureType.Player:
+                    SetPlayerPos(cretureTemplete, tile);
+                    break;
+                case EEditorCretureType.NomalEnemy:
+                    SetEnemyPos(cretureTemplete, tile);
+                    break;
+                case EEditorCretureType.BossEnemy:
+                    SetBossPos(cretureTemplete, tile);
+                    break;
+            }
+        }
+
+        public void SetPlayerPos(CreatureTemplete cretureTemplete, Tile tile) 
+        {
+            cretureTemplete.PlayerPos = tile;
+        }
+        public void SetEnemyPos(CreatureTemplete cretureTemplete, Tile tile) 
+        {
+            cretureTemplete.NomalEnemyPos.Add(tile);
+        }
+        public void SetBossPos(CreatureTemplete cretureTemplete, Tile tile) 
+        {
+            cretureTemplete.BossEnemyPos.Add(tile);
+        }
+        public bool TryRemovePos(CreatureTemplete cretureTemplete, Tile tile, out EEditorCretureType removeType)
+        {
+            if (cretureTemplete.PlayerPos == tile)
+            {
+                cretureTemplete.PlayerPos = Tile.Invalid;
+                removeType = EEditorCretureType.Player;
+                return true;
+            }
+
+            if (cretureTemplete.NomalEnemyPos.Contains(tile))
+            {
+                cretureTemplete.NomalEnemyPos.Remove(tile);
+                removeType = EEditorCretureType.NomalEnemy;
+                return true;
+            }
+
+            if (cretureTemplete.BossEnemyPos.Contains(tile))
+            {
+                cretureTemplete.BossEnemyPos.Remove(tile);
+                removeType = EEditorCretureType.BossEnemy;
+                return true;
+            }
+
+            removeType = default;
+            return false;
+        }
+    }
+
+
+
+    [System.Serializable]
+    public class EnemyTemplete2
+    {
+        public List<Tile> NomalEnemyPos = new List<Tile>();
+        public List<Tile> BossEnemyPos = new List<Tile>();
     }
 
     [System.Serializable]
@@ -40,23 +147,12 @@ namespace JW.DungeonSliding
     }
 
     [System.Serializable]
-    public class EnemyBossData : EnemyData
-    {
-        public EEnemyAbilityType AbilityType;
-        public float P1;
-        public float P2;
-    }
-
-
-    [System.Serializable]
     public class EnemySettingData
     {
-        public string EnemyUID;
         public Tile Point;
 
-        public EnemySettingData(string enemyUID, Tile point)
+        public EnemySettingData(Tile point)
         {
-            EnemyUID = enemyUID;
             Point = point;
         }
     }

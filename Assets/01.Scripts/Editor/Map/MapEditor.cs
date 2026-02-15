@@ -18,7 +18,7 @@ namespace JW.DungeonSliding
         private MapGridView _mapGridView;
 
         private PlayerPlacementService _playerService;
-        private EnemyPlacementService _enemyService;
+        private EnemyPlacementService _cretureService;
         private EffectObjectPlacementService _effectObjService;
 
         private MapDataSerializer _mapDataSerializer;
@@ -26,8 +26,6 @@ namespace JW.DungeonSliding
         private int xCountField;
         private int zCountField;
 
-        private string[] _enemyUids;
-        private string[] _enemyNames;
         private string[] _effectTileNames;
         private string[] _tileNames;
         private string[] _editModeNames;
@@ -56,7 +54,7 @@ namespace JW.DungeonSliding
             _mapGridView = new MapGridView(_mapEditState, _textureProvider);
 
             _playerService = new PlayerPlacementService();
-            _enemyService = new EnemyPlacementService();
+            _cretureService = new EnemyPlacementService();
             _effectObjService = new EffectObjectPlacementService();
 
             _mapDataSerializer = new MapDataSerializer();
@@ -71,19 +69,7 @@ namespace JW.DungeonSliding
             _tileNames = Enum.GetNames(typeof(ETileType));
             _editModeNames = Enum.GetNames(typeof(EEditModeType));
 
-            string jsonName = "EnemyData.json";
-            string jsonPath = Path.Combine("00.Resources/Data/", jsonName);
-            string data = LoadLocalAsset.GetJsonData(jsonPath);
-
-            var enemyDatas = JsonConvert.DeserializeObject<List<EnemyDataSheet>>(data);
-            _enemyNames = new string[enemyDatas.Count];
-            _enemyUids = new string[enemyDatas.Count];
-
-            for (int i = 0; i < enemyDatas.Count; i++)
-            {
-                _enemyNames[i] = enemyDatas[i].EnemyName;
-                _enemyUids[i] = enemyDatas[i].EnemyUID;
-            }
+            
         }
         private void OnGUI()
         {
@@ -95,9 +81,7 @@ namespace JW.DungeonSliding
                 case EEditModeType.Tile:
                     DrawTileEditUI();
                     break;
-                case EEditModeType.Player:
-                    break;
-                case EEditModeType.Enemy:
+                case EEditModeType.Creture:
                     DrawEnemyEdit();
                     break;
                 case EEditModeType.Effect:
@@ -105,7 +89,7 @@ namespace JW.DungeonSliding
                     break;
             }
 
-            _mapGridView.DrawGridWithOverlays(_sessionState.EnemyTemplateIndex);
+            _mapGridView.DrawGridWithOverlays(_sessionState.CretureTemplateIndex);
         }
         private void UpdateAreaSize()
         {
@@ -127,6 +111,9 @@ namespace JW.DungeonSliding
             DrawLoadMapField();
 
             EditorGUILayout.Space(10);
+
+            //CreateRandomMap();
+            //EditorGUILayout.Space(10);
 
             DrawEditModeToolbar();
 
@@ -160,6 +147,27 @@ namespace JW.DungeonSliding
             );
         }
 
+        int seed;
+        int wallAmount;
+        float fillAmount;
+        private void CreateRandomMap()
+        {
+            seed = EditorGUILayout.IntField(seed);
+
+            wallAmount = EditorGUILayout.IntField(wallAmount);
+            
+            fillAmount = EditorGUILayout.FloatField(fillAmount);
+
+            if (GUILayout.Button("랜덤 생성"))
+            {
+                MapData newdata = MapCreater.CreateMap(xCountField, zCountField, wallAmount, new MapCreater.Tile(0,2), new MapCreater.Tile(0,0));
+
+                _mapEditState.LoadFromMapData(newdata);
+
+                Repaint();
+            }
+        }
+
         private void DrawLoadMapField()
         {
             EditorGUILayout.LabelField("Load Map Asset");
@@ -168,7 +176,7 @@ namespace JW.DungeonSliding
                 typeof(MapData),
                 false
             );
-
+            
             if (GUILayout.Button("로드"))
             {
                 if (_loadedMapAsset != null)
@@ -206,13 +214,6 @@ namespace JW.DungeonSliding
 
             EditorGUILayout.Space(10);
 
-            EditorGUILayout.LabelField("타일 종류");
-            _sessionState.SelectedTileType = (ETileType)GUILayout.Toolbar(
-                (int)_sessionState.SelectedTileType,
-                _tileNames,
-                GUILayout.Height(30)
-            );
-
             EditorGUIUtility.labelWidth = prev;
 
             EditorGUILayout.Space(20);
@@ -223,16 +224,14 @@ namespace JW.DungeonSliding
         {
             BeginFixedWidthBox();
 
-            EditorGUILayout.LabelField("Enemy Data");
+            EditorGUILayout.LabelField("Creture Type");
+            
+            string[] cretureTypes = { "Player", "Enemy", "Boss" };
+
+            _sessionState.EditorCretureType = (EEditorCretureType)GUILayout.Toolbar(
+               (int)_sessionState.EditorCretureType, cretureTypes, GUILayout.Height(30) );
 
             EditorGUILayout.Space(10);
-
-            _sessionState.SelectedEnemyIndex = GUILayout.Toolbar(
-               _sessionState.SelectedEnemyIndex,
-               _enemyNames,
-               GUILayout.Height(30)
-           );
-
             string[] templeteNums = new string[_mapEditState.GetEnemyTempleteCount()];
             for (int i = 0; i < templeteNums.Length; i++)
             {
@@ -240,8 +239,8 @@ namespace JW.DungeonSliding
             }
 
             _enemyTempleteScroll = EditorGUILayout.BeginScrollView(_enemyTempleteScroll); 
-            _sessionState.EnemyTemplateIndex = GUILayout.SelectionGrid(
-            _sessionState.EnemyTemplateIndex,
+            _sessionState.CretureTemplateIndex = GUILayout.SelectionGrid(
+            _sessionState.CretureTemplateIndex,
             templeteNums,
             1, // columns = 1 => 세로로 쌓임
             GUILayout.Height(30 * templeteNums.Length)
@@ -250,11 +249,11 @@ namespace JW.DungeonSliding
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("+"))
             {
-                _sessionState.EnemyTemplateIndex = _mapEditState.AddEnemyTemplete();
+                _sessionState.CretureTemplateIndex = _mapEditState.AddEnemyTemplete();
             }
             if (GUILayout.Button("-"))
             {
-                _sessionState.EnemyTemplateIndex = _mapEditState.RemoveEnemyTemplete(_sessionState.EnemyTemplateIndex);
+                _sessionState.CretureTemplateIndex = _mapEditState.RemoveEnemyTemplete(_sessionState.CretureTemplateIndex);
             }
 
             GUILayout.EndHorizontal();
@@ -289,21 +288,17 @@ namespace JW.DungeonSliding
             switch (_sessionState.EditMode)
             {
                 case EEditModeType.Tile:
-                    _mapEditState.SetTileType(point, _sessionState.SelectedTileType);
-                    break;
-
-                case EEditModeType.Player:
-                    _playerService.ProcessPlayerPoint(_mapEditState, point);
-                    break;
-
-                case EEditModeType.Enemy:
-                    int enemyTemplete = _sessionState.EnemyTemplateIndex;
-                    string enemyUid = _enemyUids[_sessionState.SelectedEnemyIndex];
-                    _enemyService.ProcessEnemyPoint(_mapEditState, point, enemyTemplete, enemyUid);
+                    _mapEditState.SetTileType(point);
                     break;
 
                 case EEditModeType.Effect:
                     _effectObjService.ProcessEffectObject(_mapEditState, point, _sessionState.SelectedEffectType);
+                    break;
+
+                case EEditModeType.Creture:
+                    int templeteNum = _sessionState.CretureTemplateIndex;
+                    EEditorCretureType cretureType = _sessionState.EditorCretureType;
+                    _cretureService.ProcessCreturePoint(_mapEditState, point, templeteNum, cretureType);
                     break;
             }
         }

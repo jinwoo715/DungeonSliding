@@ -5,7 +5,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
     using JW.DungeonSliding.GamePlay.Combat;
     using JW.DungeonSliding.GamePlay.Entities;
 
-    public class BindEnemyAbility : RuleAbilityBase
+    public class BindEnemyAbility : AbilityBase
     {
         HashSet<ICombatant> _bindEenmies = new HashSet<ICombatant>();
         ICombatant _combatant;

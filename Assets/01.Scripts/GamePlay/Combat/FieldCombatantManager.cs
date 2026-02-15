@@ -52,7 +52,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
             for (int i = 0; i < 8; i++)
             {
-                Tile search = new Tile(pivot.XPos + positions[i, 0], pivot.ZPos + positions[i, 1]);
+                Tile search = new Tile(pivot.X + positions[i, 0], pivot.Z + positions[i, 1]);
 
                 if (_enemyCombatProvider.TryGetCombatant(search, out ICombatant combat)) count++;
             }

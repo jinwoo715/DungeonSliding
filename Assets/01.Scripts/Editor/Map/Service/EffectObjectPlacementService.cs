@@ -12,10 +12,7 @@ namespace JW.DungeonSliding
             if (!mapEditState.IsRoute(point))
                 return;
 
-            if (mapEditState.PlayerPoint == point)
-                return;
-
-            if (mapEditState.IsExistEnemy(point))
+            if (mapEditState.IsSettedCreatureTile(point))
                 return;
 
             if (mapEditState.TryGetEffectObject(point, out EffectObjectData exist))

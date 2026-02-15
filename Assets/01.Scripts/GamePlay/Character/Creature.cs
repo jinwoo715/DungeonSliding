@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Entities
 {
-    public abstract class Creature : MonoBehaviour, ICombatant
+    public abstract class Creature : MonoBehaviour, ICombatant, ICounterAttackable, IBarrierable
     {
         [SerializeField] protected AnimatorController _animatorController;
 
@@ -16,6 +16,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public Tile TilePosition { get; private set; }
         public ICombatant LastAttacker { get; private set; }
         public ICombatant AttackTarget { get; protected set; }
+        public bool IsCombat { get; private set; }
         public ECreatureStatus StatusFlags { get; private set; }
         protected Dictionary<ECreatureStatus, int> _statusDurations = new();
         private readonly List<ECreatureStatus> _statusKeys = new();
@@ -25,8 +26,14 @@ namespace JW.DungeonSliding.GamePlay.Entities
         
         public event Action OnAttackDoneEvent;
         public event Action OnHitDoneEvent;
+
+        public bool _isAttacked = false;
+        public bool _isHitted = false;
         public Action<ActPair> OnCounterEvent { get; set; }
 
+        public bool IsBarrierActive { get; private set; }
+
+        protected DamageContext damageContext = new DamageContext();
         private ECretureType _cretureType;
         private ICombatEventListener _combatEventListener;
 
@@ -39,11 +46,15 @@ namespace JW.DungeonSliding.GamePlay.Entities
         }
         private void OnEnable()
         {
-            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.OnBattleEnd, EndBattle);
+            GameTriggerEventBus.Instance?.SubscribeTriggerEvent(EGameTriggerType.OnBattleEnd, OnBattleEnd);
+            GameTriggerEventBus.Instance?.SubscribeTriggerEvent(EGameTriggerType.OnTurnEnd, OnTurnEnd);
+            GameTriggerEventBus.Instance?.SubscribeTriggerEvent(EGameTriggerType.OnTurnStart, OnTurnStart);
         }
         private void OnDisable()
         {
-            GameTriggerEventBus.Instance?.UnSubscribeTriggerEvent(EGameTriggerType.OnBattleEnd, EndBattle);
+            GameTriggerEventBus.Instance?.UnSubscribeTriggerEvent(EGameTriggerType.OnBattleEnd, OnBattleEnd);
+            GameTriggerEventBus.Instance?.SubscribeTriggerEvent(EGameTriggerType.OnTurnEnd, OnTurnEnd);
+            GameTriggerEventBus.Instance?.SubscribeTriggerEvent(EGameTriggerType.OnTurnStart, OnTurnStart);
         }
         private void OnDestroy()
         {
@@ -65,8 +76,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
         }
         public EDirectionType DirectionToTile(Tile tile)
         {
-            float xDistance = tile.XPos - this.TilePosition.XPos;
-            float zDistance = tile.ZPos - this.TilePosition.ZPos;
+            float xDistance = tile.X - this.TilePosition.X;
+            float zDistance = tile.Z - this.TilePosition.Z;
 
             if(Mathf.Abs(xDistance) >= Mathf.Abs(zDistance))
             {
@@ -135,10 +146,14 @@ namespace JW.DungeonSliding.GamePlay.Entities
             {
                 AttackTarget = target;
                 attackRequestListener.EnqueueActPair(new ActPair(this, target));
+                _isAttacked = true;
                 return true;
             }
-
-            else return false;
+            else
+            {
+                AttackTarget = null;
+                return false;
+            }
         }
         public abstract void StartAttackAnimation();
         protected abstract DamageContext CreateDamageContext();
@@ -146,6 +161,15 @@ namespace JW.DungeonSliding.GamePlay.Entities
         //Take Damage
         public virtual bool TakeDamage(DamageContext damageInfo)
         {
+            _isHitted = true;
+
+            if (IsBarrierActive)
+            {
+                ReleaseBarrier();
+                EndHittedAnimation();
+                return false;
+            }
+
             LastAttacker = damageInfo.Attacker;
             return ApplyDamage(damageInfo);
         }
@@ -183,6 +207,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
             if (!IsActive || AttackTarget == null || !AttackTarget.IsActive) return;
             
             AttackTarget.TakeDamage(CreateDamageContext());
+
+            damageContext.Reset();
         }
         public virtual void EndHittedAnimation()
         {
@@ -205,9 +231,19 @@ namespace JW.DungeonSliding.GamePlay.Entities
             _animatorController.OnHitTimeingEvent -= ApplyAttack;
         }
         #endregion
-        public virtual void EndBattle()
+        public virtual void OnBattleEnd()
+        {
+            IsCombat = _isAttacked || _isHitted;
+        }
+
+        public void OnTurnEnd()
         {
             UpdateStatusDuration();
+        }
+        public void OnTurnStart()
+        {
+            _isAttacked = false;
+            _isHitted = false;
         }
 
         #region Stat
@@ -272,10 +308,32 @@ namespace JW.DungeonSliding.GamePlay.Entities
             return service != null;
         }
 
-        public IEnumerator CoRotateToTarget(ITilePosition combatant)
+        public IEnumerator CoRotateToTarget(ITilePosition combatant, Action DoneCallback = null)
         {
             EDirectionType dir = DirectionToTile(combatant.TilePosition);
-            yield return CoRotateCharacter(dir);
+            yield return StartCoroutine(CoRotateCharacter(dir));
+            DoneCallback?.Invoke();
+        }
+
+        public void RequestCounterAttack(ICombatant target)
+        {
+            OnCounterEvent?.Invoke(new ActPair(this, target));
+        }
+
+        public virtual void GainBarrier()
+        {
+            IsBarrierActive = true;
+        }
+
+        public virtual void ReleaseBarrier()
+        {
+            IsBarrierActive = false;
+        }
+
+        public void AddDamageContextStatue(EStatusEffectType effectType, int amount)
+        {
+            damageContext.StatusEffect = effectType;
+            damageContext.StatusAmount = amount;
         }
 
         #endregion

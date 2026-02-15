@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Ability
 {
-    public class ConvertHpToMoveCount : RuleAbilityBase
+    public class ConvertHpToMoveCount : AbilityBase
     {
         IPlayerStatReader _statReadOnly;
         IPlayerStatModifier _statModifier;

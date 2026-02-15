@@ -11,37 +11,53 @@ namespace JW.DungeonSliding.Map
         [SerializeField] private TileGenerator _tileMap;
         [SerializeField] private EffectObjectGenerator _effectObjectGenerator;
 
-        private ShuffleBag<MapData> _mapBag;
 
         public Action<EnemyTemplete[], int> SetEnemyEvent;
+        public Action<List<Tile>,List<Tile>> RequestSpawnEnemyEvent;
         
         private bool[] _tileMapData;
         private HashSet<Tile> _enemyTiles = new HashSet<Tile>();
         private HashSet<Tile> _obstacleTiles = new HashSet<Tile>();
         private Dictionary<Tile, IEffectTile> _effectTileDic = new Dictionary<Tile, IEffectTile>();
+        
+
+        private MapBundle MapData;
+        private ShuffleBag<MapData> _mapBag;
         private MapData _currentMapData;
+        private ShuffleBag<CreatureTemplete> _creatureShuffleBag;
 
         private int[,] _dir = { { 0,1 }, {1,0 }, {0,-1 }, { -1, 0 } };
         private ITilePosition _player;
 
+        int _currentAct = 0;
+
         public void Init(ITilePosition player)
         {
             _player = player;
-            _mapBag = new ShuffleBag<MapData>(GameManager.Instance.Resource.MapData);
+            MapData = GameManager.Resource.MapBundle;
+
+            _mapBag = new ShuffleBag<MapData>(MapData.GetActMapBundle(_currentAct).MapDatas);
+
             _tileMap.Init(this);
             _effectObjectGenerator.SetBoard(this);
         }
         public void SetMap(int floor)
         {
             _currentMapData = _mapBag.GetItem();
+            _creatureShuffleBag = new ShuffleBag<CreatureTemplete>(_currentMapData.CretureTempletes);
 
             _tileMapData = new bool[_currentMapData.Height * _currentMapData.Width];
 
             _tileMap.SetMap(_currentMapData.MapTiles, _currentMapData.Height, _currentMapData.Width);
             _effectObjectGenerator.SetMap(_currentMapData.effectTileDatas);
 
-            SetEnemyEvent?.Invoke(_currentMapData.EnemyTemplete, floor);
-            _player.SetPosition(_currentMapData.PlayerPosition);
+            var templete = _creatureShuffleBag.GetItem();
+
+            //SetEnemyEvent?.Invoke(_currentMapData.EnemyTemplete, floor);
+            RequestSpawnEnemyEvent?.Invoke(templete.NomalEnemyPos, templete.BossEnemyPos);
+
+
+            _player.SetPosition(templete.PlayerPos);
         }
         public MoveContext GetMoveContext(Tile startPoint, EDirectionType direction, ETileEnterType enterType)
         {
@@ -61,8 +77,8 @@ namespace JW.DungeonSliding.Map
 
             Tile destination = startPoint;
 
-            destination.XPos += _dir[(int)moveContext.Direction, 0];
-            destination.ZPos += _dir[(int)moveContext.Direction, 1];
+            destination.X += _dir[(int)moveContext.Direction, 0];
+            destination.Z += _dir[(int)moveContext.Direction, 1];
 
             if (!IsInArea(destination) || _tileMapData[GetTileIndex(destination)] == false || _obstacleTiles.Contains(destination))
             {
@@ -83,7 +99,7 @@ namespace JW.DungeonSliding.Map
         }
         private bool IsInArea(Tile data)
         {
-            if (data.XPos < 0 || data.XPos >= _currentMapData.Width || data.ZPos < 0 || data.ZPos >= _currentMapData.Height)
+            if (data.X < 0 || data.X >= _currentMapData.Width || data.Z < 0 || data.Z >= _currentMapData.Height)
             {
                 return false;
             }
@@ -94,10 +110,10 @@ namespace JW.DungeonSliding.Map
         //interface
         public void RegisterTileBoard(Tile point, bool isWalkable)
         {
-            _tileMapData[GetTileIndex(point.XPos, point.ZPos)] = isWalkable;
+            _tileMapData[GetTileIndex(point.X, point.Z)] = isWalkable;
         }
         private int GetTileIndex(int x, int z) => _currentMapData.Width * z + x;
-        private int GetTileIndex(Tile point) => _currentMapData.Width * point.ZPos + point.XPos;
+        private int GetTileIndex(Tile point) => _currentMapData.Width * point.Z + point.X;
         public void RegisterEnemyTile(Tile point)
         {
             _enemyTiles.Add(point);

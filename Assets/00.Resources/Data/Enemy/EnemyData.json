@@ -6,8 +6,8 @@
     "BaseDamage": 1,
     "BaseHP": 5,
     "BaseXP": 1,
-    "AbilityList": "AutoRotate|MoveBanToDirection",
-    "EnemyAbilityType": "AutoRotate, MoveBanToDirection"
+    "AbilityList": "자동회전|이동 막기",
+    "EnemyAbilityType": "자동회전, 이동 막기"
   },
   {
     "UID": "ENEMY_BOSS_GRAVITON",
@@ -16,8 +16,8 @@
     "BaseDamage": 1,
     "BaseHP": 5,
     "BaseXP": 1,
-    "AbilityList": "HeavyGravity",
-    "EnemyAbilityType": "HeavyGravity"
+    "AbilityList": "강중력",
+    "EnemyAbilityType": "강중력"
   },
   {
     "UID": "ENEMY_BOSS_DOPPELGANGER",
@@ -26,8 +26,8 @@
     "BaseDamage": 1,
     "BaseHP": 5,
     "BaseXP": 1,
-    "AbilityList": "CopyPlayerStat",
-    "EnemyAbilityType": "CopyPlayerStat"
+    "AbilityList": "도플갱어",
+    "EnemyAbilityType": "도플갱어"
   },
   {
     "UID": "ENEMY_BOSS_EREBOS",
@@ -36,8 +36,8 @@
     "BaseDamage": 1,
     "BaseHP": 5,
     "BaseXP": 1,
-    "AbilityList": "Blind",
-    "EnemyAbilityType": "Blind"
+    "AbilityList": "실명",
+    "EnemyAbilityType": "실명"
   },
   {
     "UID": "ENEMY_BOSS_REAPER",
@@ -46,8 +46,8 @@
     "BaseDamage": 1,
     "BaseHP": 5,
     "BaseXP": 1,
-    "AbilityList": "EnhanceOnEnemyDeath",
-    "EnemyAbilityType": "EnhanceOnEnemyDeath"
+    "AbilityList": "동족의 분노",
+    "EnemyAbilityType": "동족의 분노"
   },
   {
     "UID": "ENEMY_BOSS_MELTDOWN",
@@ -56,8 +56,8 @@
     "BaseDamage": 1,
     "BaseHP": 5,
     "BaseXP": 1,
-    "AbilityList": "EnhanceOnHitted",
-    "EnemyAbilityType": "EnhanceOnHitted"
+    "AbilityList": "버서커",
+    "EnemyAbilityType": "버서커"
   },
   {
     "UID": "ENEMY_BOSS_INFINITY",
@@ -66,8 +66,8 @@
     "BaseDamage": 1,
     "BaseHP": 5,
     "BaseXP": 1,
-    "AbilityList": "GrowthOnBattleEnd",
-    "EnemyAbilityType": "GrowthOnBattleEnd"
+    "AbilityList": "성장",
+    "EnemyAbilityType": "성장"
   },
   {
     "UID": "ENEMY_BOSS_BALOR",
@@ -76,8 +76,8 @@
     "BaseDamage": 1,
     "BaseHP": 5,
     "BaseXP": 1,
-    "AbilityList": "Exaltation",
-    "EnemyAbilityType": "Exaltation"
+    "AbilityList": "아군 선동",
+    "EnemyAbilityType": "아군 선동"
   },
   {
     "UID": "ENEMY_BOSS_ORDO",
@@ -86,7 +86,7 @@
     "BaseDamage": 1,
     "BaseHP": 5,
     "BaseXP": 1,
-    "AbilityList": "CommandRotate",
-    "EnemyAbilityType": "CommandRotate"
+    "AbilityList": "자동 타겟",
+    "EnemyAbilityType": "자동 타겟"
   }
 ]

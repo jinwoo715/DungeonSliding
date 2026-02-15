@@ -1,12 +1,12 @@
 namespace JW.DungeonSliding.GamePlay.Ability
 {
-    public abstract class RuleAbilityBase : IAbility
+    public abstract class AbilityBase : IAbility
     {
         public readonly RuleAbilityData _data;
         private AbilityHost _host;
         public EGameTriggerType ProgTriggers => _data.TriggerType;
 
-        public RuleAbilityBase(RuleAbilityData data, AbilityHost host)
+        public AbilityBase(RuleAbilityData data, AbilityHost host)
         {
             _data = data;
             _host = host;

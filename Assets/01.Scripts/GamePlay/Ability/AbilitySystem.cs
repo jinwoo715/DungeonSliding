@@ -68,7 +68,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         public void Init()
         {
-            List<AbilityDataBase> datas = GameManager.Instance.Resource.AllAbilityDatas;
+            List<AbilityDataBase> datas = GameManager.Data.Abilities;
 
             _abilityBag = new ShuffleBag<AbilityDataBase>(datas);
 

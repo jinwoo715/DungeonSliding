@@ -48,9 +48,7 @@ public class MapGridView
 
         DrawTileGrid();
 
-        DrawPlayerIcon();
-
-        DrawEnemyIcons(currentTemplete);
+        DrawCretureIcons(currentTemplete);
 
         DrawEffectObjects();
 
@@ -86,33 +84,28 @@ public class MapGridView
             }
         }
     }
-    private void DrawPlayerIcon()
+
+    private void DrawCretureIcons(int currentTemplete)
     {
-        Tile playerPoint = _mapState.PlayerPoint;
+        CreatureTemplete templete = _mapState.GetCretureTemplete(currentTemplete);
 
-        if (playerPoint.XPos == -1 || playerPoint.ZPos == -1)
-            return;
-
-        GUI.DrawTexture(GetIconRect(playerPoint), _textureProvider.GetPlayerIcon());
-    }
-
-    private void DrawEnemyIcons(int currentTemplete)
-    {
-        EnemyTempleteSheet enemyTemplete = _mapState.GetEnemyTemplete(currentTemplete);
-
-        if (enemyTemplete == null)
-            return;
-
-        foreach (var enemy in enemyTemplete.EnemyData)
+        if (templete.PlayerPos.IsValid)
         {
-            GUI.DrawTexture(GetIconRect(enemy.Value.Point), _textureProvider.GetEnemyIcon(enemy.Value.EnemyUID));
+            GUI.DrawTexture(GetIconRect(templete.PlayerPos), _textureProvider.GetCreatureIcon(EEditorCretureType.Player));
+        }
+
+        for (int i = 0; i < templete.NomalEnemyPos.Count; i++)
+        {
+            GUI.DrawTexture(GetIconRect(templete.NomalEnemyPos[i]), _textureProvider.GetCreatureIcon(EEditorCretureType.NomalEnemy));
+        }
+
+        for (int i = 0; i < templete.BossEnemyPos.Count; i++)
+        {
+            GUI.DrawTexture(GetIconRect(templete.BossEnemyPos[i]), _textureProvider.GetCreatureIcon(EEditorCretureType.BossEnemy));
         }
     }
     private void DrawEffectObjects()
     {
-        if (_mapState.EffectObjects == null) 
-            return;
-
         foreach (var obj in _mapState.EffectObjects)
         {
             GUI.DrawTexture(GetIconRect(obj.Value.Point), _textureProvider.GetEffectIcon(obj.Value.EffectObjectType));
@@ -125,8 +118,8 @@ public class MapGridView
         float iconRatio = 0.5f;
         float iconSize = _iconImageSize * iconRatio;
 
-        float x = point.XPos * _iconImageSize + iconSize * 0.5f;
-        float y = zStartPoint - (point.ZPos * _iconImageSize) + (iconSize * 0.5f);
+        float x = point.X * _iconImageSize + iconSize * 0.5f;
+        float y = zStartPoint - (point.Z * _iconImageSize) + (iconSize * 0.5f);
 
         return new Rect(x, y, iconSize, iconSize);
     }

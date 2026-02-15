@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Ability
 {
-    public class SurroundEmpowerAbility : RuleAbilityBase
+    public class SurroundEmpowerAbility : AbilityBase
     {
         private ICombatantSensor _sensor;
         private ICombatant _combatant;

@@ -75,51 +75,15 @@ namespace JW.DungeonSliding
         public string UID;
         public string Name;
         public string Description;
-        public EEnemyAbilityType AbilityType;
+        public EEnemyAbilityType EnemyAbilityType;
         public EGameTriggerType GameTriggerType;
-        public ECretureTrigger CretureTriggerType;
+        public ECreatureTrigger CretureTriggerType;
         public bool IsReleaseOnDeath;
-        public float P1;
+        public float BaseP1;
         public float GrowthP1Ratio;
-        public float P2;
+        public float BaseP2;
         public float GrowthP2Ratio;
     }
-
-    public class EnemyAbilityFactory
-    {
-        public IEnemyAbilityGetter getter;
-        public List<IEnemyAbility> GetAbility(string enemyAbilities, ICombatant host, int section)
-        {
-            string[] abilities = enemyAbilities.Split('|');
-            List<IEnemyAbility> abilityList = new List<IEnemyAbility>();
-
-            for (int i = 0; i < abilities.Length; i++)
-            {
-                EEnemyAbilityType type = (EEnemyAbilityType)Enum.Parse(typeof(EEnemyAbilityType), abilities[i]);
-                EnemyAbilityData data = new EnemyAbilityData();
-
-                abilityList.Add(CreateAbility(type, data, host, section));
-            }
-
-            return abilityList;
-        }
-        private IEnemyAbility CreateAbility(EEnemyAbilityType abilityType, EnemyAbilityData data, ICombatant host, int section)
-        {
-            switch (abilityType)
-            {
-                case EEnemyAbilityType.HeavyGravity:          return new HeavyGravityAbility(data, getter, host, section);   
-                case EEnemyAbilityType.AutoRotate:            return new AutoRotateAbility(data, getter, host, section);
-                case EEnemyAbilityType.MoveBanToDirection:    return new FacingMoveBanAbility(data, getter, host, section);
-                case EEnemyAbilityType.CopyPlayerStat:        return new CopyAbility(data, getter, host, section);
-                case EEnemyAbilityType.Blind:                 return new BlindAbility(data, getter, host, section);
-                case EEnemyAbilityType.EnhanceAbility:        return new EnemyEnhanceAbility(data, getter, host, section);
-                case EEnemyAbilityType.Exaltation:            return new ExaltationAbility(data, getter, host, section);
-                case EEnemyAbilityType.CommandRotate:         return new CommandRotateAbility(data, getter, host, section);
-                default: return null;
-            }
-        }
-    }
-
 
     public enum EEnemyAbilityType
     {
@@ -129,23 +93,60 @@ namespace JW.DungeonSliding
         CopyPlayerStat,
         Blind,
         EnhanceAbility,
-        GrowthOnBattleEnd,
+        CounterAbility,
         Exaltation,
-        CommandRotate
+        CommandRotate,
+        DefenceFrontAttack,
+        KnockBackAttackAbility,
+        AutoRotateToPlayer,
     }
-
-    public enum ECretureTrigger
+    //Environment       //change
+    //Direction light   //off
+    //player spot light //on
+    //enemy ui          //off
+    public interface IVisualController
+    {
+        void EnterBlind();
+        void ExitBlind();
+    }
+    public interface IEnemyAbilityGetter
+    {
+        ICombatantSensor CombatantSensor { get; }
+        IMoveRule MoveRule { get; }
+        IPlayerStatReader PlayerStatReader { get; }
+        IVisualController VisualController { get; }
+    }
+    public interface ICreatureRotator
+    {
+        public IEnumerator CoRotateCharacter(EDirectionType directionType);
+        public void SetRotation(EDirectionType directionType);
+        public IEnumerator CoRotateToTarget(ITilePosition combatant, Action DoneCallback = null);
+    }
+    public interface IEnemyAbility
+    {
+        public EGameTriggerType GameTrigger { get; }
+        public ECreatureTrigger CreatureTrigger { get; }
+        public IEnumerator Excute();
+        public void ReleaseAbility();
+    }
+    public enum ECreatureTrigger
     {
         None,
         OnRotate,
         OnAttack,
+        OnReceivedAttack,
         OnHitted,
         OnDeath
     }
+
     public abstract class EnemyAbilityBase : IEnemyAbility
     {
         public EnemyAbilityData _data;
         protected ICombatant _owner;
+
+        public EGameTriggerType GameTrigger => _data.GameTriggerType;
+        public ECreatureTrigger CreatureTrigger => _data.CretureTriggerType;
+
         public EnemyAbilityBase(EnemyAbilityData data, IEnemyAbilityGetter bossAbilityGetter, ICombatant boss, int section)
         {
             _owner = boss;
@@ -157,8 +158,8 @@ namespace JW.DungeonSliding
         public abstract void Bind(IEnemyAbilityGetter bossAbilityGetter);
         private void CalculateParam(int section)
         {
-            _data.P1 = _data.P1 + _data.GrowthP1Ratio * section;
-            _data.P2 = _data.P2 + _data.GrowthP2Ratio * section;
+            _data.BaseP1 = _data.BaseP1 + _data.GrowthP1Ratio * section;
+            _data.BaseP2 = _data.BaseP2 + _data.GrowthP2Ratio * section;
         }
         public virtual void ReleaseAbility() { }
     }
@@ -180,10 +181,13 @@ namespace JW.DungeonSliding
 
         public override IEnumerator Excute()
         {
-            _moveRule.SetIsMoveable(false);
-            EDirectionType nextDirection = (EDirectionType)(((int)_owner.Direction + 1) % 4);
-            yield return _creatureRotator.CoRotateCharacter(nextDirection);
-            _moveRule.SetIsMoveable(true);
+            if (!_owner.IsCombat)
+            {
+                _moveRule.SetIsMoveable(false);
+                EDirectionType nextDirection = (EDirectionType)(((int)_owner.Direction + 1) % 4);
+                yield return _creatureRotator.CoRotateCharacter(nextDirection);
+                _moveRule.SetIsMoveable(true);
+            }
         }
     }
     public class FacingMoveBanAbility : EnemyAbilityBase
@@ -216,7 +220,7 @@ namespace JW.DungeonSliding
         {
             yield return null;
 
-            _addMoveCost += (int)_data.P1;
+            _addMoveCost += (int)_data.BaseP1;
 
             _moveRule.AddMoveCost(_addMoveCost);
         }
@@ -248,22 +252,11 @@ namespace JW.DungeonSliding
             yield return null;
         }
     }
-
-    //Environment       //change
-    //Direction light   //off
-    //player spot light //on
-    //enemy ui          //off
-
-    public interface IVisualController
-    {
-        void EnterBlind();
-        void ExitBlind();
-    }
-
     public class BlindAbility : EnemyAbilityBase
     {
         IVisualController _visualController;
-        private bool isEnabled = true;
+        private bool isBlined = false;
+        private int blindTurn = 0;
 
         public BlindAbility(EnemyAbilityData data, IEnemyAbilityGetter getter, ICombatant owner, int section) : base(data, getter, owner, section) { }
 
@@ -274,15 +267,25 @@ namespace JW.DungeonSliding
 
         public override IEnumerator Excute()
         {
-            isEnabled = !isEnabled;
-
-            if (isEnabled) _visualController.EnterBlind();
-            else _visualController.ExitBlind();
-
+            Debug.Log("Excute");
+            if(isBlined == true)
+            {
+                isBlined = false;
+                _visualController.ExitBlind();
+            }
+            else
+            {
+                blindTurn++;
+                if(blindTurn >= _data.BaseP1)
+                {
+                    blindTurn = 0;
+                    isBlined = true;
+                    _visualController.EnterBlind();
+                }
+            }
             yield return null;
         }
     }
-
     public class EnemyEnhanceAbility : EnemyAbilityBase
     {
         IEnemyStatModifier _statModifier;
@@ -299,8 +302,8 @@ namespace JW.DungeonSliding
 
         public override IEnumerator Excute()
         {
-            _statModifier.ModifyEnemyStat(new EnemyApplyStatContext(EEnemyStatType.HP, EApplyStatType.Add, _data.P1, EEnemyStatType.None));
-            _statModifier.ModifyEnemyStat(new EnemyApplyStatContext(EEnemyStatType.Damage, EApplyStatType.Add, _data.P2, EEnemyStatType.None));
+            _statModifier.ModifyEnemyStat(new EnemyApplyStatContext(EEnemyStatType.HP, EApplyStatType.Add, _data.BaseP1, EEnemyStatType.None));
+            _statModifier.ModifyEnemyStat(new EnemyApplyStatContext(EEnemyStatType.Damage, EApplyStatType.Add, _data.BaseP2, EEnemyStatType.None));
             yield return null;
         }
     }
@@ -321,8 +324,8 @@ namespace JW.DungeonSliding
             {
                 if (enemy.TryGet<IEnemyStatModifier>(out var service))
                 {
-                    service.ModifyEnemyStat(new EnemyApplyStatContext(EEnemyStatType.HP, EApplyStatType.Add, _data.P1, EEnemyStatType.None));
-                    service.ModifyEnemyStat(new EnemyApplyStatContext(EEnemyStatType.Damage, EApplyStatType.Add, _data.P2, EEnemyStatType.None));
+                    service.ModifyEnemyStat(new EnemyApplyStatContext(EEnemyStatType.HP, EApplyStatType.Add, _data.BaseP1, EEnemyStatType.None));
+                    service.ModifyEnemyStat(new EnemyApplyStatContext(EEnemyStatType.Damage, EApplyStatType.Add, _data.BaseP2, EEnemyStatType.None));
                 }
             }
 
@@ -337,8 +340,8 @@ namespace JW.DungeonSliding
             {
                 if (enemy.TryGet<IEnemyStatModifier>(out var service))
                 {
-                    int setHp = Mathf.Max(1, service.Get(EEnemyStatType.HP) - (int)_data.P1);
-                    int setDamage = Mathf.Max(1, service.Get(EEnemyStatType.Damage) - (int)_data.P2);
+                    int setHp = Mathf.Max(1, service.Get(EEnemyStatType.HP) - (int)_data.BaseP1);
+                    int setDamage = Mathf.Max(1, service.Get(EEnemyStatType.Damage) - (int)_data.BaseP2);
 
                     service.SetEnemyStat(EEnemyStatType.HP, setHp);
                     service.SetEnemyStat(EEnemyStatType.Damage, setDamage);
@@ -349,45 +352,129 @@ namespace JW.DungeonSliding
     public class CommandRotateAbility : EnemyAbilityBase
     {
         ICombatantSensor _sensor;
-
+        IMoveRule _moveRule;
         public CommandRotateAbility(EnemyAbilityData data, IEnemyAbilityGetter getter, ICombatant owner, int section) : base(data, getter, owner, section) { }
 
         public override void Bind(IEnemyAbilityGetter getter)
         {
             _sensor = getter.CombatantSensor;
+            _moveRule = getter.MoveRule;
         }
 
         public override IEnumerator Excute()
         {
+            _moveRule.SetIsMoveable(false);
             var enemies = _sensor.AllEnemyCombatants;
             var playerTile = _sensor.PlayerCombatant;
 
+            int remain = 0;
+
             foreach (var enemy in enemies)
             {
-                enemy.CoRotateToTarget(playerTile);
+                remain++;
+                enemy.CoRotateToTarget(playerTile, () => remain--);
+            }
+
+            while (remain > 0)
+            {
+                yield return null;
+            }
+
+            _moveRule.SetIsMoveable(true);
+        }
+    }
+    public class CounterAbility : EnemyAbilityBase
+    {
+        IDamageable _damageable;
+        ICounterAttackable _counterAttackable;
+
+        public CounterAbility(EnemyAbilityData data, IEnemyAbilityGetter getter, ICombatant owner, int section) : base(data, getter, owner, section) { }
+        public override void Bind(IEnemyAbilityGetter bossAbilityGetter)
+        {
+            if(_owner.TryGet<IDamageable>(out var damageable))
+            {
+                _damageable = damageable;
+            }
+
+            if (_owner.TryGet<ICounterAttackable>(out var counter))
+            {
+                _counterAttackable = counter;
+            }
+        }
+
+        public override IEnumerator Excute()
+        {
+            if (_counterAttackable != null)
+            {
+                int chanceValue = UnityEngine.Random.Range(0, 101);
+
+                if (chanceValue <= _data.BaseP1)
+                {
+                    _counterAttackable.RequestCounterAttack(_damageable.LastAttacker);
+                }
             }
 
             yield return null;
         }
     }
+    public class DefenceFrontAttackAbility : EnemyAbilityBase
+    {
+        private IBarrierable _barrierable;
+        public DefenceFrontAttackAbility(EnemyAbilityData data, IEnemyAbilityGetter getter, ICombatant owner, int section) : base(data, getter, owner, section) { }
+        public override void Bind(IEnemyAbilityGetter bossAbilityGetter)
+        {
+            if(_owner.TryGet<IBarrierable>(out var barrierable))
+            {
+                _barrierable = barrierable;
+            }
+        }
 
+        public override IEnumerator Excute()
+        {
+            _barrierable.GainBarrier();
+            yield return null;
+        }
+    }
+    public class KnockBackAttackAbility : EnemyAbilityBase
+    {
+        IAttackable _attackable;
+        public KnockBackAttackAbility(EnemyAbilityData data, IEnemyAbilityGetter getter, ICombatant owner, int section) : base(data, getter, owner, section) { }
+        public override void Bind(IEnemyAbilityGetter bossAbilityGetter)
+        {
+            if(_owner.TryGet<IAttackable>(out var service))
+            {
+                _attackable = service;
+            }
+        }
 
-    public interface IEnemyAbilityGetter
-    {
-        ICombatantSensor CombatantSensor { get; }
-        IMoveRule MoveRule { get; }
-        IPlayerStatReader PlayerStatReader { get; }
-        IVisualController VisualController { get; }
+        public override IEnumerator Excute()
+        {
+            _attackable.AddDamageContextStatue(EStatusEffectType.KnockBack, (int)_data.BaseP1);
+            yield return null;
+        }
     }
-    public interface ICreatureRotator
+    public class RotateToPlayerAbility : EnemyAbilityBase
     {
-        public IEnumerator CoRotateCharacter(EDirectionType directionType);
-        public void SetRotation(EDirectionType directionType);
-        public IEnumerator CoRotateToTarget(ITilePosition combatant);
+        ICombatantSensor _sensor;
+        IMoveRule _moveRule;
+        public RotateToPlayerAbility(EnemyAbilityData data, IEnemyAbilityGetter getter, ICombatant owner, int section) : base(data, getter, owner, section) { }
+
+        public override void Bind(IEnemyAbilityGetter bossAbilityGetter)
+        {
+            _sensor = bossAbilityGetter.CombatantSensor;
+            _moveRule = bossAbilityGetter.MoveRule;
+        }
+
+        public override IEnumerator Excute()
+        {
+            _moveRule.SetIsMoveable(false);
+
+            var playerTile = _sensor.PlayerCombatant;
+
+            yield return _owner.CoRotateToTarget(playerTile);
+
+            _moveRule.SetIsMoveable(true);
+        }
     }
-    public interface IEnemyAbility
-    {
-        public IEnumerator Excute();
-        public void ReleaseAbility();
-    }
+
 }

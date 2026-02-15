@@ -4,31 +4,25 @@ using System;
 
 namespace JW.DungeonSliding 
 {
+    public enum EEnemyType
+    {
+        Nomal,
+        Boss
+    }
+
     public class EnemyPlacementService
     {
-        public void ProcessEnemyPoint(MapEditState mapEditState, Tile point, int templeteNum, string enemyUid)
+        private CretureTempleteEditor _cretureTempleteEditor = new CretureTempleteEditor();
+
+        public void ProcessCreturePoint(MapEditState mapEditState, Tile point, int templeteNum, EEditorCretureType cretureType)
         {
             if (!mapEditState.IsRoute(point)) return;
 
-            if (mapEditState.PlayerPoint == point) return;
+            if (mapEditState.IsEffectTile(point)) return;
 
-            EnemySettingData data = mapEditState.GetEnemy(templeteNum, point);
+            CreatureTemplete templete = mapEditState.GetCretureTemplete(templeteNum);
 
-            if(data == null)
-            {
-                mapEditState.SetEnemy(templeteNum, point, enemyUid);
-            }
-            else
-            {
-                if(data.EnemyUID == enemyUid)
-                {
-                    mapEditState.RemoveEnemy(templeteNum, point);
-                }
-                else
-                {
-                    mapEditState.SetEnemy(templeteNum, point, enemyUid);
-                }
-            }
+            _cretureTempleteEditor.SetCreturePos(templete, cretureType, point);
         }
     }
 }

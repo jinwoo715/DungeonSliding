@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Ability
 {
-    public class ExtraAttackChance : RuleAbilityBase
+    public class ExtraAttackChance : AbilityBase
     {
         INextAttackEnhancer _service;
         IMoveable _moveable;

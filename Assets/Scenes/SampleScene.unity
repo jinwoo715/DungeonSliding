@@ -1635,6 +1635,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _animatorController: {fileID: 726333317}
+  _isAttacked: 0
+  _isHitted: 0
   _level: 1
   _currentXp: 0
   _levelUpXp: 0
@@ -1924,7 +1926,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: c1c6d6805ae63944d891c79894b20680, type: 3}
+  m_Sprite: {fileID: 0}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -3653,45 +3655,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef2850c40c29e134990cc02b4b3b511f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mapDatas:
-  - {fileID: 11400000, guid: 66f1fb1ec015571438f01b5711e406aa, type: 2}
   _textDatas:
-  - {fileID: 4900000, guid: a2c9c46a9b2242549a437d6455be37c5, type: 3}
-  _abilities:
-  - UID: 
-    Name: 
-    Description: 
-    IconName: 
-    Rank: 0
-  - UID: 
-    Name: 
-    Description: 
-    IconName: 
-    Rank: 0
-  - UID: 
-    Name: 
-    Description: 
-    IconName: 
-    Rank: 0
-  - UID: 
-    Name: 
-    Description: 
-    IconName: 
-    Rank: 0
-  - UID: 
-    Name: 
-    Description: 
-    IconName: 
-    Rank: 0
+  - {fileID: 4900000, guid: ebcea919081798548add8fd9d44847a9, type: 3}
+  - {fileID: 4900000, guid: 2c46628783c17744790acd6b47d221be, type: 3}
+  - {fileID: 4900000, guid: 6d0a0ff7efb0885468677c933f5349b8, type: 3}
+  - {fileID: 4900000, guid: 02ec6e1fb37a46f4ea4e53a8998045d7, type: 3}
   _gameConfig: {fileID: 11400000, guid: af371193289e7284aa7e3bc27acbdb07, type: 2}
-  _playerData: {fileID: 11400000, guid: ad06b226f7d30a34f9ab64dfe9ab3fd0, type: 2}
-  _ruleAbilityJson: {fileID: 4900000, guid: 6d0a0ff7efb0885468677c933f5349b8, type: 3}
-  _statAbilityJson: {fileID: 4900000, guid: 02ec6e1fb37a46f4ea4e53a8998045d7, type: 3}
-  _enemyData: {fileID: 4900000, guid: be8b84c31c392864fa1d46bf4645ff55, type: 3}
-  _enemyAbilityData: {fileID: 4900000, guid: b6e66ff744f53314f8f2143e3ba5fa28, type: 3}
-  ruleAbilityDatas: []
-  statAbilityDatas: []
-  EnemyData: []
+  _mapBundle: {fileID: 11400000, guid: 0e7655a53bbab524f939b18867f4be2d, type: 2}
 --- !u!1 &1793553404
 GameObject:
   m_ObjectHideFlags: 0

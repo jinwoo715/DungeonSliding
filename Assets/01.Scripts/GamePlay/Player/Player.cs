@@ -1,4 +1,5 @@
 using DG.Tweening;
+using JW.DungeonSliding.Core;
 using JW.DungeonSliding.Core.Flow;
 using JW.DungeonSliding.GamePlay.Ability;
 using JW.DungeonSliding.GamePlay.Combat;
@@ -56,12 +57,10 @@ namespace JW.DungeonSliding.GamePlay.Entities
             RatioValueByStat.Clear();
         }
     }
-    public class Player : Creature, IMoveable, IAbilityHost, INextAttackEnhancer, IPlayerStatReader, IPlayerStatModifier, IRewardReceiver, IBarrierable, ICounterAttackable
+    public class Player : Creature, IMoveable, IAbilityHost, INextAttackEnhancer, IPlayerStatReader, IPlayerStatModifier, IRewardReceiver
     {
         private ECharacterStateType _characterState = ECharacterStateType.Idle;
         public ESlideResultType SlideResultType { get; private set; }
-
-        public bool IsBarrierActive { get; private set; } = false;
 
         public event Action<EPlayerStatType> OnStatChanged;
 
@@ -101,14 +100,14 @@ namespace JW.DungeonSliding.GamePlay.Entities
             _levelUpXp = MathUtil.GetFib(_level + ConstData.LEVELUP_XP_OFFSET);
             _nextAttackBuff.Reset();
         }
-        public void SetData(PlayerData playerData, IRouteService routeService, ITileCheckService tileCheckService, IMoveRule moveRule)
+        public void SetData(PlayerData player, IRouteService routeService, ITileCheckService tileCheckService, IMoveRule moveRule)
         {
-            MaxHp = new StatValue(playerData.HP);
-            MaxMoveCount = new StatValue(playerData.MoveCount);
-            Damage = new StatValue(playerData.Damage);
+            MaxHp = new StatValue(player.HP);
+            MaxMoveCount = new StatValue(player.MoveCount);
+            Damage = new StatValue(player.Damage);
 
-            _currentHP = playerData.HP;
-            _currentMoveCount = playerData.MoveCount;
+            _currentHP = player.HP;
+            _currentMoveCount = player.MoveCount;
 
             OnStatChanged?.Invoke(EPlayerStatType.CurrentHP);
             OnStatChanged?.Invoke(EPlayerStatType.CurrentMoveCount);
@@ -192,7 +191,10 @@ namespace JW.DungeonSliding.GamePlay.Entities
                 }
 
                 if (moveContext.OnEnterEffectTile)
+                {
+                    moveContext.OnStepEvent?.Invoke();
                     GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnStepEffectTile);
+                }
             }
 
             ChangeCharacterState(ECharacterStateType.Idle);
@@ -285,13 +287,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
         }
         public override bool TakeDamage(DamageContext damageInfo)
         {
-            if(IsBarrierActive)
-            {
-                ReleaseBarrier();
-                EndHittedAnimation();
-                return false;
-            }
-
             if (base.TakeDamage(damageInfo))
             {
                 GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnDamaged);
@@ -341,9 +336,9 @@ namespace JW.DungeonSliding.GamePlay.Entities
         {
             ModifyStat(new PlayerApplyStatContext(EPlayerStatType.CurrentHP, EApplyStatType.Add, EPlayerStatType.None, -damage));
         }
-        public override void EndBattle()
+        public override void OnBattleEnd()
         {
-            base.EndBattle();
+            base.OnBattleEnd();
 
             if (_currentHP == 0)
                 GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnDeathByHP);
@@ -538,31 +533,20 @@ namespace JW.DungeonSliding.GamePlay.Entities
         }
         #endregion
 
-        public void GainBarrier()
+        public override void GainBarrier()
         {
-            IsBarrierActive = true;
+            base.GainBarrier();
             _barrierObj.SetActive(IsBarrierActive);
         }
-        public void ReleaseBarrier()
+        public override void ReleaseBarrier()
         {
-            IsBarrierActive = false;
+            base.ReleaseBarrier();
             _barrierObj.SetActive(IsBarrierActive);
-        }
-
-        public bool TryGet<T>(out T service) where T : class
-        {
-            service = this as T;
-            return service != null;
         }
 
         private void OnDisable()
         {
             _isPushed = false;
-        }
-
-        public void RequestCounterAttack(ICombatant target)
-        {
-            OnCounterEvent?.Invoke(new ActPair(this, target));
         }
     }
 }

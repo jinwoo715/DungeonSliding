@@ -2,7 +2,7 @@ using JW.DungeonSliding.GamePlay.Combat;
 
 namespace JW.DungeonSliding.GamePlay.Ability
 {
-    public class BarrierAbility : RuleAbilityBase
+    public class BarrierAbility : AbilityBase
     {
         IBarrierable _barrierable;
         public BarrierAbility(RuleAbilityData data, AbilityHost host) : base(data, host) 

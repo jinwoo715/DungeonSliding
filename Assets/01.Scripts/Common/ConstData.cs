@@ -17,6 +17,15 @@ namespace JW.DungeonSliding
         public static readonly float ENEMY_XP_POW = 1.015f;
     }
 
+    public class ConstDataKey
+    {
+        public static readonly string ENEMY_DATA = "EnemyData";
+        public static readonly string ENEMY_ABILITY_DATA = "EnemyAbilityData";
+
+        public static readonly string RULE_ABILITY_DATA = "StatAbilityData";
+        public static readonly string STAT_ABILITY_DATA = "RuleAbilityData";
+    }
+
     public class ConstString
     {
         //Animation Trigger

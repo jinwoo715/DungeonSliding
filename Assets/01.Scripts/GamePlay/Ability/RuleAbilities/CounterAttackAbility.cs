@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Ability
 {
-    public class CounterAttackAbility : RuleAbilityBase
+    public class CounterAttackAbility : AbilityBase
     {
         IDamageable _damageable;
         ICounterAttackable _counterAttackable;

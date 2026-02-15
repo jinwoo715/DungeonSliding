@@ -5,16 +5,16 @@ namespace JW.DungeonSliding
     [System.Serializable]
     public struct Tile
     {
-        public int XPos;
-        public int ZPos;
+        public int X;
+        public int Z;
 
         public Tile(int x, int z)
         {
-            XPos = x;
-            ZPos = z;
+            X = x;
+            Z = z;
         }
 
-        public bool IsValid => (XPos >= 0 && ZPos >= 0);
+        public bool IsValid => (X >= 0 && Z >= 0);
         public static Tile Invalid => new Tile(-1, -1);
         public static Vector3 Direction(Tile destination, Tile start)
         {
@@ -22,8 +22,8 @@ namespace JW.DungeonSliding
         }
         public void Expire()
         {
-            XPos = -1;
-            ZPos = -1;
+            X = -1;
+            Z = -1;
         }
 
         public Tile GetNextTile(EDirectionType directionType)
@@ -31,10 +31,10 @@ namespace JW.DungeonSliding
             int[] xDir = { 0, 1, 0, -1 };
             int[] zDir = { 1, 0, -1, 0 };
 
-            return new Tile(XPos + xDir[(int)directionType], ZPos + zDir[(int)directionType]);
+            return new Tile(X + xDir[(int)directionType], Z + zDir[(int)directionType]);
         }
 
-        public Vector3 GetPosition => new Vector3(XPos, 0, ZPos);
+        public Vector3 GetPosition => new Vector3(X, 0, Z);
 
         public static bool IsNearPosition(Tile a, Tile b)
         {
@@ -43,7 +43,7 @@ namespace JW.DungeonSliding
 
         public static bool operator ==(Tile a, Tile b)
         {
-            return a.XPos == b.XPos && a.ZPos == b.ZPos;
+            return a.X == b.X && a.Z == b.Z;
         }
 
         public static bool operator !=(Tile a, Tile b)
@@ -60,7 +60,7 @@ namespace JW.DungeonSliding
         }
         public override int GetHashCode()
         {
-            return HashCode.Combine(XPos, ZPos);
+            return HashCode.Combine(X, Z);
         }
     }
 }

@@ -36,8 +36,8 @@ namespace JW.DungeonSliding
     public enum EEffectObjectType
     {
         Stop,
-        TurnRightUp,
-        TurnRightDown,
+        TurnRight,
+        TurnLeft,
         Teleport
     }
 
@@ -45,7 +45,6 @@ namespace JW.DungeonSliding
     {
         Route,
         Wall,
-        Empty,
     }
     public enum ECharacterStateType
     {
@@ -111,7 +110,8 @@ namespace JW.DungeonSliding
 
         OnClearStage        = 1 << 19,
 
-        OnTurnEnd           = 1 << 20,
+        OnTurnStart         = 1 << 20,
+        OnTurnEnd           = 1 << 21,
     }
 
     public enum EAbilityEffectKind
@@ -172,20 +172,18 @@ namespace JW.DungeonSliding
         Ratio
     }
 
-    public enum ERuleEffect
-    {
-        None,
-        ExtraAttack,    //추가 공격
-        CounterAttack,  //공격 받으면 공격하기
-        WallKnockBack,  //벽 방향으로 이동하면 반대쪽으로 한 칸 밀리기
-    }
-
     //Map Editor
     public enum EEditModeType
     {
         Tile,
+        Effect,
+        Creture,
+    }
+
+    public enum EEditorCretureType
+    {
         Player,
-        Enemy,
-        Effect
+        NomalEnemy,
+        BossEnemy
     }
 }

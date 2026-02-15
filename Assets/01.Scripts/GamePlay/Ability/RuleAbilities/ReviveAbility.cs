@@ -2,7 +2,7 @@ using JW.DungeonSliding.GamePlay.Combat;
 
 namespace JW.DungeonSliding.GamePlay.Ability
 {
-    public class ReviveAbility : RuleAbilityBase
+    public class ReviveAbility : AbilityBase
     {
         private IPlayerStatModifier _statModifier;
         private int isReviveCount = 0;

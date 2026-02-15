@@ -99,3 +99,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71af7eca88c7de1499be2cb323389059, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _mesh: {fileID: 7407135692950808877}
+  _offTexture: {fileID: 2800000, guid: 9ce9fc0ac0db0ab4b987e7781ff7d268, type: 3}
+  _onTexture: {fileID: 2800000, guid: cbfb445bbfbaded4190c1c5f9a3d9ac6, type: 3}

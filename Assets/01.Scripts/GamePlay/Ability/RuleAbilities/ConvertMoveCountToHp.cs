@@ -4,7 +4,7 @@ using JW.DungeonSliding.Map;
 
 namespace JW.DungeonSliding.GamePlay.Ability
 {
-    public class ConvertMoveCountToHp : RuleAbilityBase
+    public class ConvertMoveCountToHp : AbilityBase
     {
         Combat.IPlayerStatModifier _playerStatModifier;
         Stats.IPlayerStatReader _statReadOnly;

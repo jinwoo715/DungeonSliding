@@ -1,70 +1,33 @@
 using JW.DungeonSliding.GamePlay;
 using JW.DungeonSliding.GamePlay.Ability;
 using JW.DungeonSliding.GamePlay.Entities;
+using JW.DungeonSliding.Map;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 namespace JW.DungeonSliding.Core.Resource
 {
     public class ResourceManager : MonoBehaviour
     {
-        [SerializeField] private List<MapData> _mapDatas;
         [SerializeField] private List<TextAsset> _textDatas;
-        [SerializeField] private List<AbilityDataBase> _abilities;
-
         [SerializeField] private GameConfig _gameConfig;
+        [SerializeField] private MapBundle _mapBundle;
 
-        [SerializeField] private PlayerData _playerData;
+        public MapBundle MapBundle => _mapBundle;
 
-        [Header("Ability")]
-        [SerializeField] private TextAsset _ruleAbilityJson;
-        [SerializeField] private TextAsset _statAbilityJson;
-
-        [Header("Enemy")]
-        [SerializeField] private TextAsset _enemyData;
-        [SerializeField] private TextAsset _enemyAbilityData;
-
-        public List<MapData> MapData { get; private set; }
         public Dictionary<string, string> _textDataByName = new Dictionary<string, string>();
-        public List<AbilityDataBase> AllAbilityDatas => _abilities;
-
         public GameConfig GameConfig => _gameConfig;
-        public PlayerData PlayerData => _playerData;
-
-        public List<RuleAbilityData> ruleAbilityDatas;
-        public List<StatAbilityData> statAbilityDatas;
-
-
-        public List<EnemyData> EnemyData;
-        public List<EnemyAbilityData> EnemyAbilityData;
 
         internal void Init()
         {
-            MapData = _mapDatas;
             for (int i = 0; i < _textDatas.Count; i++)
             {
                 string textName = _textDatas[i].name;
                 _textDataByName[textName] = _textDatas[i].text;
             }
-
-            var settings = new JsonSerializerSettings
-            {
-                ContractResolver = new EmptyStringValueTypeResolver()
-            };
-
-            ruleAbilityDatas = JsonConvert.DeserializeObject<List<RuleAbilityData>>(_ruleAbilityJson.text, settings);
-            statAbilityDatas = JsonConvert.DeserializeObject<List<StatAbilityData>>(_statAbilityJson.text, settings);
-
-            _abilities = new List<AbilityDataBase>();
-            //_abilities.AddRange(statAbilityDatas);
-            _abilities.AddRange(ruleAbilityDatas);
-
-
-            EnemyData = JsonConvert.DeserializeObject<List<EnemyData>>(_enemyData.text, settings);
-            EnemyAbilityData = JsonConvert.DeserializeObject<List<EnemyAbilityData>>(_enemyAbilityData.text, settings);
-
         }
         public string GetTextData(string textName)
         {

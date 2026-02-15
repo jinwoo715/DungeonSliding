@@ -5,21 +5,76 @@ namespace JW.DungeonSliding.GamePlay
     [CreateAssetMenu(fileName = "CombatConfig", menuName = "Configs/CombatConfig")]
     public class GameConfig : ScriptableObject
     {
-        [Header("Combat Settings")]
-        [SerializeField] private float _backAttackDamageMultiplier;
+        [System.Serializable]
+        public class CombatConfig
+        {
+            [SerializeField] private float _backAttackDamageMultiplier;
+            public float BackAttackDMGMultiple => _backAttackDamageMultiplier;
+        }
 
-        [Header("Player Settings")]
-        [SerializeField] private float _moveSpeed;
+        [System.Serializable]
+        public class PlayerConfig
+        {
+            [SerializeField] private float _moveSpeed;
 
-        [Header("UI")]
-        [SerializeField] private float _fadeOutTime;
-        [SerializeField] private float _fadeInTime;
-        [SerializeField] private float _fadeOutWaitTime;
+            [SerializeField] private int _baseHP;
+            [SerializeField] private int _baseDamage;
+            [SerializeField] private int _baseMoveCount;
 
-        public float BackAttackDamageMultiplier => _backAttackDamageMultiplier;
-        public float MoveSpeed => _moveSpeed;
-        public float FadeOutTime => _fadeOutTime;
-        public float FadeInTime => _fadeInTime;
-        public float FadeOutWaitTime => _fadeOutWaitTime;
+            [SerializeField] private int _levelUpHp;
+            [SerializeField] private int _levelUpDamage;
+
+            [SerializeField] private int _levelUpHpRatio;
+            [SerializeField] private int _levelUpDamageRatio;
+
+            [SerializeField] private int _levelUpNeedValueRatio;
+
+            public int HP => _baseHP;
+            public int DMG => _baseDamage;
+            public int MVCount => _baseMoveCount;
+        }
+
+        [System.Serializable]
+        public class EnemyConfig
+        {
+            [SerializeField] private float _floorUpHpValue;
+            [SerializeField] private float _floorUpDMGValue;
+        }
+
+        [System.Serializable]
+        public class AbilityProbabilityConfig
+        {
+            [SerializeField] private float _nomalCardRatio;
+            [SerializeField] private float _rareCardRatio;
+            [SerializeField] private float _epicCardRatio;
+            [SerializeField] private float _legendaryCardRatio;
+        }
+
+        [System.Serializable]
+        public class UIConfig
+        {
+            [SerializeField] private float _fadeOutTime;
+            [SerializeField] private float _fadeInTime;
+            [SerializeField] private float _fadeOutWaitTime;
+        }
+
+        [System.Serializable]
+        public class MapConfig
+        {
+            public int _baseWidth;
+            public int _baseHeight;
+            public int _baseEnemyCount;
+            public float _baseWallFill;
+            
+        }
+
+        public CombatConfig Combat;
+        public PlayerConfig Player;
+        public EnemyConfig Enemy;
+        public AbilityProbabilityConfig Ability;
+        public UIConfig UI;
+
+        public float BackAttackDamageMultiplier => 0;
+
     }
 }

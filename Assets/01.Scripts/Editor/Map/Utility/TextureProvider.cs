@@ -12,27 +12,40 @@ namespace JW.DungeonSliding
     {
         private Dictionary<ETileType, Texture2D> _tileTextureDic = new Dictionary<ETileType, Texture2D>();
         private Texture2D _playerIconTexture;
-        private Dictionary<string, Texture2D> _enemyTextureDic = new Dictionary<string, Texture2D>();
+
+        private Dictionary<EEditorCretureType, Texture2D> _creatureTextureDic = new Dictionary<EEditorCretureType, Texture2D>();
         private Dictionary<EEffectObjectType, Texture2D> _effectObjectTextureDic = new Dictionary<EEffectObjectType, Texture2D>();
         
         public void Init()
         {
             string playerIconName = "Player.png";
-            string path = Path.Combine("00.Resources/Sprites/", playerIconName);
-            _playerIconTexture = LoadLocalAsset.GetSingleTexture(path);
 
-            string jsonName = "EnemyData.json";
-            string jsonPath = Path.Combine("00.Resources/Data/", jsonName);
-            string data = LoadLocalAsset.GetJsonData(jsonPath);
+            string[] cretureNames = Enum.GetNames(typeof(EEditorCretureType));
+            string basePath = "00.Resources/Sprites/Editor/Creature";
 
-            var enemyDatas = JsonConvert.DeserializeObject<List<EnemyDataSheet>>(data);
-
-            for (int i = 0; i < enemyDatas.Count; i++)
+            for (int i = 0; i < cretureNames.Length; i++)
             {
-                string imageName = enemyDatas[i].EnemyName + ".png";
-                string imagePath = Path.Combine("00.Resources/Sprites/Editor/Enemy", imageName);
-                _enemyTextureDic.Add(enemyDatas[i].EnemyUID, LoadLocalAsset.GetSingleTexture(imagePath));
+                string iconName = $"{cretureNames[i]}.png";
+                string path = Path.Combine(basePath, iconName);
+
+                Debug.Log(path);
+
+                _creatureTextureDic.Add((EEditorCretureType)i, LoadLocalAsset.GetSingleTexture(path));
             }
+
+
+            //string jsonName = "EnemyData.json";
+            //string jsonPath = Path.Combine("00.Resources/Data/", jsonName);
+            //string data = LoadLocalAsset.GetJsonData(jsonPath);
+
+            //var enemyDatas = JsonConvert.DeserializeObject<List<EnemyDataSheet>>(data);
+
+            //for (int i = 0; i < enemyDatas.Count; i++)
+            //{
+            //    string imageName = enemyDatas[i].EnemyName + ".png";
+            //    string imagePath = Path.Combine("00.Resources/Sprites/Editor/Enemy", imageName);
+            //    _creatureTextureDic.Add(enemyDatas[i].EnemyName, LoadLocalAsset.GetSingleTexture(imagePath));
+            //}
 
             string[] effectObjectNames = Enum.GetNames(typeof(EEffectObjectType));
             string effectPath = Path.Combine("00.Resources/Sprites/Editor/EffectObject/");
@@ -57,9 +70,9 @@ namespace JW.DungeonSliding
         {
             return _effectObjectTextureDic[type];
         }
-        public Texture2D GetEnemyIcon(string enemyUid)
+        public Texture2D GetCreatureIcon(EEditorCretureType type)
         {
-            return _enemyTextureDic[enemyUid];
+            return _creatureTextureDic[type];
         }
         public Texture2D GetPlayerIcon()
         {
@@ -84,7 +97,7 @@ namespace JW.DungeonSliding
     {
         Texture2D GetTileTexture(ETileType type);
         Texture2D GetPlayerIcon();
-        Texture2D GetEnemyIcon(string enemyUid);
+        Texture2D GetCreatureIcon(EEditorCretureType type);
         Texture2D GetEffectIcon(EEffectObjectType type);
     }
 }

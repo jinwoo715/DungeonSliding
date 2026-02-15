@@ -3,7 +3,7 @@ using JW.DungeonSliding.Map;
 
 namespace JW.DungeonSliding.GamePlay.Ability
 {
-    public class SlideTileDamageBounsAbility : RuleAbilityBase
+    public class SlideTileDamageBounsAbility : AbilityBase
     {
         INextAttackEnhancer _nextAttackEnhancer;
         IMoveable _moveable;

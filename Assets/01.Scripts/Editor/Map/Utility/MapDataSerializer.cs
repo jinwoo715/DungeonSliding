@@ -16,44 +16,48 @@ namespace JW.DungeonSliding
             mapData.Width = mapDataContext.XCount;
             mapData.Height = mapDataContext.ZCount;
             mapData.MapTiles = (int[])mapDataContext.TileArray.Clone();
-
-            mapData.PlayerPosition = mapDataContext.PlayerPoint;
-
-            if(mapData.PlayerPosition.IsValid == false)
+            mapData.CretureTempletes = mapDataContext.CreatureTempletes;
+            if (!IsPlayerValid(mapData.CretureTempletes))
             {
                 bool ok = UnityEditor.EditorUtility.DisplayDialog(
                 "맵 저장",
-                $"Player 위치를 지정해주세요.",
+                $"Player 위치가 없는 Templete이 있습니다.",
                 "확인"
                 );
 
                 return;
             }
 
-            var sheet = mapDataContext.EnemyTempleteSheet ?? new List<EnemyTempleteSheet>();
-
-            mapData.EnemyTemplete = new EnemyTemplete[sheet.Count];
-
-            for (int i = 0; i < sheet.Count; i++)
+            if (IsEnemyEmpty(mapData.CretureTempletes))
             {
-                EnemyTempleteSheet templeteSheet = mapDataContext.EnemyTempleteSheet[i];
-                EnemyTemplete templete = new EnemyTemplete();
+                bool ok = UnityEditor.EditorUtility.DisplayDialog(
+                "맵 저장",
+                $"Enemy가 비어있는 Templete이 있습니다.",
+                "확인"
+                );
 
-                foreach (var settingData in templeteSheet.EnemyData)
-                {
-                    templete.EnemyData.Add(settingData.Value);
-                }
-
-                mapData.EnemyTemplete[i] = templete;
+                return;
             }
 
-            mapData.effectTileDatas = new List<EffectObjectData>();
+            if (IsBossEmpty(mapData.CretureTempletes))
+            {
+                bool ok = UnityEditor.EditorUtility.DisplayDialog(
+                "맵 저장",
+                $"Boss가 비어있는 Templete이 있습니다.",
+                "확인"
+                );
+
+                return;
+            }
+            mapData.effectTileDatas = new EffectObjectData[mapDataContext.EffectObjData.Count];
 
             if (mapDataContext.EffectObjData != null)
             {
+                int index = 0;
                 foreach (var effectObj in mapDataContext.EffectObjData)
                 {
-                    mapData.effectTileDatas.Add(effectObj.Value);
+                    mapData.effectTileDatas[index] = effectObj.Value;
+                    index++;
                 }
             }
 
@@ -72,6 +76,37 @@ namespace JW.DungeonSliding
             SaveMapData(mapData, mapDataContext.MapName);
         }
 
+
+        private bool IsPlayerValid(List<CreatureTemplete> creatureTempletes)
+        {
+            foreach (var templete in creatureTempletes)
+            {
+                if (!templete.PlayerPos.IsValid) return false;
+            }
+
+            return true;
+        }
+
+        private bool IsEnemyEmpty(List<CreatureTemplete> creatureTempletes)
+        {
+            foreach (var templete in creatureTempletes)
+            {
+                if (templete.NomalEnemyPos.Count == 0) return true;
+            }
+
+            return false;
+        }
+
+        private bool IsBossEmpty(List<CreatureTemplete> creatureTempletes)
+        {
+            foreach (var templete in creatureTempletes)
+            {
+                if (templete.BossEnemyPos.Count == 0) return true;
+            }
+
+            return false;
+        }
+
         private void SaveMapData(MapData data, string fileName)
         {
             AssetDatabase.CreateAsset(data, GetSavePath(fileName));
@@ -80,12 +115,10 @@ namespace JW.DungeonSliding
             UnityEditor.EditorUtility.FocusProjectWindow();
             Selection.activeObject = data;
         }
-
         private bool IsExistSameNameData(string path)
         {
             return File.Exists(path);
         }
-
         private string GetSavePath(string fileName)
         {
             return Path.Combine(defaultPath, $"{fileName}.asset");

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Ability
 {
-    public class DoubleEdgedAbility : RuleAbilityBase
+    public class DoubleEdgedAbility : AbilityBase
     {
         IAttackable _attackable;
         IDamageable _damageable;

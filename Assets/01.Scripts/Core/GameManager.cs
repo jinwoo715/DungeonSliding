@@ -1,6 +1,7 @@
 using UnityEngine;
 using JW.DungeonSliding.Core.Resource;
 using JW.DungeonSliding.GamePlay;
+using JW.DungeonSliding.Core.Data;
 
 namespace JW.DungeonSliding.Core
 {
@@ -10,10 +11,10 @@ namespace JW.DungeonSliding.Core
         public static GameManager Instance => _instance;
 
         [SerializeField] private ResourceManager _resource;
-        public ResourceManager Resource => _resource;
 
-        public static Configs _configs = new Configs();
-        public static Configs Configs => _configs;
+        public static DataManager Data { get; } = new DataManager();
+        public static ResourceManager Resource => _instance._resource;
+        public static GameConfig Config => Resource.GameConfig;
 
         private void Awake()
         {
@@ -32,7 +33,7 @@ namespace JW.DungeonSliding.Core
         private void InitManagers()
         {
             Resource.Init();
-            _configs.Init(Resource.GameConfig);
+            Data.Initialize();
         }
     }
 }

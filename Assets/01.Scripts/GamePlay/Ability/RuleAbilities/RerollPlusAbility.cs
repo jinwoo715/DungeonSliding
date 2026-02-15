@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Ability
 {
-    public class RerollPlusAbility : RuleAbilityBase
+    public class RerollPlusAbility : AbilityBase
     {
         IRerollService _rerollService;
 

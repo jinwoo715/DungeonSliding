@@ -1,5 +1,6 @@
 #if UNITY_EDITOR
 
+using System;
 using System.Collections.Generic;
 
 namespace JW.DungeonSliding
@@ -10,23 +11,21 @@ namespace JW.DungeonSliding
         public readonly int[] TileArray;
         public readonly int XCount;
         public readonly int ZCount;
-        public readonly Tile PlayerPoint;
 
         public readonly IReadOnlyDictionary<Tile, EffectObjectData> EffectObjData;
-        public readonly IReadOnlyList<EnemyTempleteSheet> EnemyTempleteSheet;
+        public readonly List<CreatureTemplete> CreatureTempletes;
 
         public MapDataContext
-            (string name, int[] tiles, int xCount, int zCount, Tile playerPoint,
-            IReadOnlyDictionary<Tile, EffectObjectData> effectData, IReadOnlyList<EnemyTempleteSheet> enemyTemplete
+            (string name, int[] tiles, int xCount, int zCount, 
+            IReadOnlyDictionary<Tile, EffectObjectData> effectData, List<CreatureTemplete> creatureTempletes
             )
         {
             MapName = name;
             TileArray = tiles;
             XCount = xCount;
             ZCount = zCount;
-            PlayerPoint = playerPoint;
             EffectObjData = effectData;
-            EnemyTempleteSheet = enemyTemplete;
+            CreatureTempletes = creatureTempletes;
         }
     }
 
@@ -46,20 +45,17 @@ namespace JW.DungeonSliding
         private float _gridFieldX;
 
         private int[] _tileMap;
-        private Tile _playerPoint = new Tile(-1,-1);
-        private List<EnemyTempleteSheet> _enemyTempleteSheet = new List<EnemyTempleteSheet>();
         private Dictionary<Tile, EffectObjectData> _effectObjData = new Dictionary<Tile, EffectObjectData>();
+        private List<CreatureTemplete> _creatureTempletes = new List<CreatureTemplete>();
 
         public float WindowHeight => _windowHeight;
         public float GridFieldX => _gridFieldX;
 
-        public Tile PlayerPoint => _playerPoint;
         public IReadOnlyDictionary<Tile, EffectObjectData> EffectObjects => _effectObjData;
-
 
         public MapEditState()
         {
-            _enemyTempleteSheet.Add(new EnemyTempleteSheet());
+            AddEnemyTemplete();
         }
         public void UpdateFieldArea(float windowWidth, float windowHeight)
         {
@@ -80,10 +76,44 @@ namespace JW.DungeonSliding
             zCount = z;
             _tileMap = new int[zCount * xCount];
         }
-        public void SetTileType(Tile point, ETileType tileType)
+        public void SetTileType(Tile point)
         {
-            _tileMap[(xCount * point.ZPos) + point.XPos] = (int)tileType;
+            int value = (_tileMap[(xCount * point.Z) + point.X] + 1) % 2;
+
+            if((ETileType)value == ETileType.Wall)
+            {
+                if (IsSettedCreatureTile(point) || IsSettedEffectTile(point)) return;
+            }
+
+            _tileMap[(xCount * point.Z) + point.X] = value;
         }
+
+        public bool IsSettedCreatureTile(Tile point)
+        {
+            for (int i = 0; i < _creatureTempletes.Count; i++)
+            {
+                CreatureTemplete templete = _creatureTempletes[i];
+
+                if (templete.PlayerPos == point) return true;
+
+                for (int j = 0; j < templete.NomalEnemyPos.Count; j++)
+                {
+                    if (templete.NomalEnemyPos[j] == point) return true;
+                }
+                for (int j = 0; j < templete.BossEnemyPos.Count; j++)
+                {
+                    if (templete.BossEnemyPos[j] == point) return true;
+                }
+            }
+
+            return false;
+        }
+        private bool IsSettedEffectTile(Tile point)
+        {
+            return _effectObjData.ContainsKey(point);
+        }
+
+
         public int GetTileType(int x, int z)
         {
             if (_tileMap == null ||_tileMap.Length == 0) return 0;
@@ -99,9 +129,11 @@ namespace JW.DungeonSliding
             return _tileMap[ToIndex(point)] == (int)ETileType.Route;
         }
 
+        public bool IsEffectTile(Tile point) => _effectObjData.ContainsKey(point);
+
         private bool IsBounds(Tile p)
         {
-            return p.XPos >= 0 && p.ZPos >= 0 && p.XPos < xCount && p.ZPos < zCount;
+            return p.X >= 0 && p.Z >= 0 && p.X < xCount && p.Z < zCount;
         }
         private bool IsBounds(int x, int z)
         {
@@ -109,79 +141,30 @@ namespace JW.DungeonSliding
         }
         private int ToIndex(Tile p)
         {
-            return (xCount * p.ZPos) + p.XPos;
+            return (xCount * p.Z) + p.X;
         }
         private int ToIndex(int x, int z)
         {
             return (xCount * z) + x;
         }
-        
-        public bool IsExistEnemy(Tile point) 
-        {
-            for (int i = 0; i < _enemyTempleteSheet.Count; i++)
-            {
-                if (_enemyTempleteSheet[i].EnemyData.ContainsKey(point))
-                {
-                    return true;
-                }
-            }
 
-            return false;
-        }
-        public EnemyTempleteSheet GetEnemyTemplete(int templeteNum)
-        {
-            if (templeteNum < 0 || _enemyTempleteSheet.Count <= templeteNum)
-                return null;
-
-            return _enemyTempleteSheet[templeteNum];
-        }
-        public EnemySettingData GetEnemy(int templeteNum, Tile point)
-        {
-            if (_enemyTempleteSheet[templeteNum].EnemyData.TryGetValue(point, out EnemySettingData value))
-            {
-                return value;
-            }
-            else
-                return null;
-        }
-        public void SetEnemy(int templeteNum, Tile point, string enemyUid)
-        {
-            if(_enemyTempleteSheet[templeteNum].EnemyData.TryGetValue(point, out EnemySettingData data))
-            {
-                data.EnemyUID = enemyUid;
-                data.Point = point;
-            }
-            else
-            {
-                _enemyTempleteSheet[templeteNum].EnemyData.Add(point, new EnemySettingData(enemyUid,point));
-            }
-        }
-        public void RemoveEnemy(int templeteNum, Tile point)
-        {
-            _enemyTempleteSheet[templeteNum].EnemyData.Remove(point);
-        }
         public int AddEnemyTemplete()
         {
-            _enemyTempleteSheet.Add(new EnemyTempleteSheet());
-            return _enemyTempleteSheet.Count - 1;
+            _creatureTempletes.Add(new CreatureTemplete());
+
+            return _creatureTempletes.Count - 1;
         }
         public int RemoveEnemyTemplete(int index)
         {
-            if (_enemyTempleteSheet.Count == 1)
+            if (_creatureTempletes.Count == 1)
                 return 0;
 
-            _enemyTempleteSheet.RemoveAt(index);
-            return _enemyTempleteSheet.Count - 1 > index ? index : _enemyTempleteSheet.Count - 1;
+            _creatureTempletes.RemoveAt(index);
+            return _creatureTempletes.Count - 1 > index ? index : _creatureTempletes.Count - 1;
         }
         public int GetEnemyTempleteCount()
         {
-            return _enemyTempleteSheet.Count;
-        }
-
-        //Player
-        public void SetPlayerPoint(Tile point)
-        {
-            _playerPoint = point;
+            return _creatureTempletes.Count;
         }
 
         //EffectObject
@@ -233,7 +216,7 @@ namespace JW.DungeonSliding
 
         public MapDataContext GetMapDataContext()
         {
-            MapDataContext mapDataContext = new MapDataContext(MapName, _tileMap, xCount, zCount, _playerPoint, _effectObjData, _enemyTempleteSheet);
+            MapDataContext mapDataContext = new MapDataContext(MapName, _tileMap, xCount, zCount, _effectObjData, _creatureTempletes);
             return mapDataContext;
         }
 
@@ -245,24 +228,18 @@ namespace JW.DungeonSliding
             // 타일 복사
             _tileMap = (int[])data.MapTiles.Clone(); // 내부 필드 접근 가능하게 하거나 SetTileMap 메서드 추가
 
-            // 플레이어
-            _playerPoint = data.PlayerPosition;
-
-            // enemy template
-            _enemyTempleteSheet.Clear();
-            for (int i = 0; i < data.EnemyTemplete.Length; i++)
-            {
-                var sheet = new EnemyTempleteSheet();
-                foreach (var enemy in data.EnemyTemplete[i].EnemyData)
-                    sheet.EnemyData[enemy.Point] = enemy;
-
-                _enemyTempleteSheet.Add(sheet);
-            }
 
             // effect
             _effectObjData.Clear();
+
+            if (data.effectTileDatas == null) return;
             foreach (var e in data.effectTileDatas)
                 _effectObjData[e.Point] = e;
+        }
+
+        internal CreatureTemplete GetCretureTemplete(int templeteNum)
+        {
+            return _creatureTempletes[templeteNum];
         }
     }
 }

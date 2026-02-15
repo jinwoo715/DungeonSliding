@@ -54,23 +54,22 @@ namespace JW.DungeonSliding.Map
                 {
                     ETileType tileType = (ETileType)_tileArrayInfo[z * _width + x];
 
-                    if (tileType == ETileType.Empty) continue;
-
                     Tile tilePoint = new Tile(x, z);
-                    TileObject tile = _tilePoolDic.GetObject(tileType.ToString());
-
-                    _activeTiles.Add(tile);
 
                     if (tileType == ETileType.Route)
                     {
                         _board.RegisterTileBoard(tilePoint, true);
+                        TileObject tile = _tilePoolDic.GetObject(tileType.ToString());
+                        _activeTiles.Add(tile);
+                        tile.transform.localPosition = tilePoint.GetPosition;
+
+
                     }
                     else
                     {
                         _board.RegisterTileBoard(tilePoint, false);
                     }
 
-                    tile.transform.localPosition = tilePoint.GetPosition;
                 }
             }
         }

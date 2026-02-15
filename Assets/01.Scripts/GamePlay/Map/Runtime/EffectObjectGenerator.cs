@@ -17,14 +17,14 @@ namespace JW.DungeonSliding.Map
             _board = board;
         }
 
-        public void SetMap(List<EffectObjectData> effectTileDatas)
+        public void SetMap(EffectObjectData[] effectTileDatas)
         {
             for (int i = 0; i < _activeEffectObject.Count; i++)
             {
                 ReturnEffectObject(_activeEffectObject[i]);
             }
 
-            for (int i = 0; i < effectTileDatas.Count; i++)
+            for (int i = 0; i < effectTileDatas.Length; i++)
             {
                 EffectObjectBase obj = GetEffectObject(effectTileDatas[i].EffectObjectType);
                 obj.Init(effectTileDatas[i]);

@@ -4,6 +4,7 @@ using JW.DungeonSliding.GamePlay.Context;
 using JW.DungeonSliding.GamePlay.Combat;
 using JW.DungeonSliding.GamePlay.Stats;
 using JW.DungeonSliding.Core;
+using System.Collections.Generic;
 
 namespace JW.DungeonSliding.GamePlay.Entities
 {
@@ -18,12 +19,72 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public string EnemyUID => _enemyData.UID;
         public Transform StatUITransform => _statUITransform;
 
+       
+
         //TODO Enemy Skill ±¸Çö
+        #region Enemy Skill
+        private Dictionary<EGameTriggerType, List<IEnemyAbility>> gameTriggerAbilities = new();
+        private Dictionary<ECreatureTrigger, List<IEnemyAbility>> creatureTriggerAbilities = new ();
+
+        public void SetAbility(List<IEnemyAbility> abilities)
+        {
+            if (abilities == null) return;
+
+            foreach (var ability in abilities)
+            {
+                if(ability.GameTrigger != EGameTriggerType.None)
+                {
+                    if (!gameTriggerAbilities.ContainsKey(ability.GameTrigger))
+                    {
+                        gameTriggerAbilities.Add(ability.GameTrigger, new List<IEnemyAbility>());
+
+                        GameTriggerEventBus.Instance.SubscribeTriggerEvent(ability.GameTrigger, () => ExcuteGameTriggerAbility(ability.GameTrigger));
+                    }
+
+                    gameTriggerAbilities[ability.GameTrigger].Add(ability);
+                }
+
+                if(ability.CreatureTrigger != ECreatureTrigger.None)
+                {
+                    if (!creatureTriggerAbilities.ContainsKey(ability.CreatureTrigger))
+                        creatureTriggerAbilities.Add(ability.CreatureTrigger, new List<IEnemyAbility>());
+
+                    creatureTriggerAbilities[ability.CreatureTrigger].Add(ability);
+                }
+            }
+        }
+        private void ExcuteCreatureAbility(ECreatureTrigger creatureTrigger)
+        {
+            if(creatureTriggerAbilities.TryGetValue(creatureTrigger, out var list))
+            {
+                foreach (var ability in list)
+                {
+                    ability.Excute();
+                }
+            }
+        }
+        private void ExcuteGameTriggerAbility(EGameTriggerType trigger)
+        {
+            if (gameTriggerAbilities.TryGetValue(trigger, out var list))
+            {
+                foreach (var ability in list)
+                {
+                    StartCoroutine(ability.Excute());
+                }
+            }
+        }
+
+        #endregion
+        public override bool TakeDamage(DamageContext damageInfo)
+        {
+            ExcuteCreatureAbility(ECreatureTrigger.OnReceivedAttack);
+            return base.TakeDamage(damageInfo);
+        }
         public override void Init(ICombatEventListener combatEventListener, ECretureType cretureType)
         {
             base.Init(combatEventListener, cretureType);
          
-            _backAttackMultiplier = GameManager.Configs.GameConfig.BackAttackDamageMultiplier;
+            _backAttackMultiplier = GameManager.Config.Combat.BackAttackDMGMultiple;
         }
         public void SetData(EnemyData data, int floor)
         {
@@ -134,10 +195,15 @@ namespace JW.DungeonSliding.GamePlay.Entities
             OnDeathEvent?.Invoke(this);
         }
         public override void StartAttackAnimation() { }
+
         protected override DamageContext CreateDamageContext()
         {
-            DamageContext damageInfo = new DamageContext(this, Get(EEnemyStatType.Damage), false);
-            return damageInfo;
+            ExcuteCreatureAbility(ECreatureTrigger.OnAttack);
+
+            damageContext.Attacker = this;
+            damageContext.Damage = Get(EEnemyStatType.Damage);
+
+            return damageContext;
         }
 
         #region Calculate Stat
@@ -166,8 +232,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
         {
             return new RewardData(_enemyStat.XP);
         }
-
-
         #endregion
     }
 }

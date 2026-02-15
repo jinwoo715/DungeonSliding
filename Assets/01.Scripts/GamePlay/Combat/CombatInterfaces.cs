@@ -25,12 +25,11 @@ namespace JW.DungeonSliding.GamePlay.Combat
     public interface IAttackable
     {
         Action<ActPair> OnCounterEvent { get; set; }
-
         event Action OnAttackDoneEvent;
         ICombatant AttackTarget { get;}
-
         float DamageDealtMultiplier { get; }  // 가하는 피해 배율
 
+        void AddDamageContextStatue(EStatusEffectType effectType, int amount);
         void AddDamageDealtMultiplier(float value);
         bool TrySubmitAttackRequest(ICombatantSensor sensor, IAttackRequestListener attackRequestListener);
         void StartAttackAnimation();
@@ -82,6 +81,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
     public interface ICombatant : ITilePosition, IAttackable, IDamageable, IStatusEffectable, ICreatureRotator
     {
         public bool IsActive { get; }
+        public bool IsCombat { get; }
         public EDirectionType Direction { get; }
         bool TryGet<T>(out T service) where T : class;
     }

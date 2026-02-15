@@ -17,5 +17,14 @@ namespace JW.DungeonSliding.GamePlay.Combat
             StatusEffect = effectType;
             StatusAmount = statusAmount;
         }
+
+        public void Reset()
+        {
+            Attacker = null;
+            Damage = 0;
+            IsCritical = false;
+            StatusEffect = EStatusEffectType.None;
+            StatusAmount = 0;
+        }
     }
 }

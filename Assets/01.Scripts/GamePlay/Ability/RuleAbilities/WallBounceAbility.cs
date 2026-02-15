@@ -3,7 +3,7 @@ using JW.DungeonSliding.Map;
 
 namespace JW.DungeonSliding.GamePlay.Ability
 {
-    public class WallBounceAbility : RuleAbilityBase
+    public class WallBounceAbility : AbilityBase
     {
         public IMoveable _moveable;
         public ICombatant _combatant;

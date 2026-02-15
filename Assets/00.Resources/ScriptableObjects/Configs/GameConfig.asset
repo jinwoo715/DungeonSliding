@@ -12,8 +12,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a30a86fae2a1e6348af479c1da600c8d, type: 3}
   m_Name: GameConfig
   m_EditorClassIdentifier: 
-  _backAttackDamageMultiplier: 2
-  _moveSpeed: 5
-  _fadeOutTime: 0.5
-  _fadeInTime: 0.5
-  _fadeOutWaitTime: 0.5
+  Combat:
+    _backAttackDamageMultiplier: 0
+  Player:
+    _moveSpeed: 0
+    _baseHP: 5
+    _baseDamage: 1
+    _baseMoveCount: 10
+    _levelUpHp: 0
+    _levelUpDamage: 0
+    _levelUpHpRatio: 0
+    _levelUpDamageRatio: 0
+    _levelUpNeedValueRatio: 0
+  Enemy:
+    _floorUpHpValue: 0
+    _floorUpDMGValue: 0
+  Ability:
+    _nomalCardRatio: 0
+    _rareCardRatio: 0
+    _epicCardRatio: 0
+    _legendaryCardRatio: 0
+  UI:
+    _fadeOutTime: 0
+    _fadeInTime: 0
+    _fadeOutWaitTime: 0
