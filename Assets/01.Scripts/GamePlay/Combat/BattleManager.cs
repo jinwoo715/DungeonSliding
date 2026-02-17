@@ -23,7 +23,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
         private void OnDisable()
         {
-            GameTriggerEventBus.Instance.UnSubscribeTriggerEvent(EGameTriggerType.OnMoveEnd, StartBattleSequence);
+            GameTriggerEventBus.Instance?.UnSubscribeTriggerEvent(EGameTriggerType.OnMoveEnd, StartBattleSequence);
         }
 
         public void StartBattleSequence()

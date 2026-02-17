@@ -11,15 +11,16 @@ namespace JW.DungeonSliding.GamePlay.Entities
     public abstract class Enemy : Creature, IEnemyStatModifier, IRewardSender
     {
         [SerializeField] private Transform _statUITransform;
-        private EnemyData _enemyData;
         [SerializeField] private EnemyStat _enemyStat;
+
+        [SerializeField] private EnemyData _enemyData;
+
         public event Action<Enemy> OnDeathEvent;
         public event Action<EEnemyStatType> OnStatChangedEvent;
-        private float _backAttackMultiplier;
+        private float _backAttackMultiplier = 2f;
+
         public string EnemyUID => _enemyData.UID;
         public Transform StatUITransform => _statUITransform;
-
-       
 
         //TODO Enemy Skill ±¸Çö
         #region Enemy Skill

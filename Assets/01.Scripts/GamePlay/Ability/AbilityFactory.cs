@@ -10,6 +10,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
             if (abilityType == "SA")
             {
+                StatAbilityData statAbility = data as StatAbilityData;
                 return CreateStatAbility(data as StatAbilityData, host);
             }
             else if(abilityType == "RA")

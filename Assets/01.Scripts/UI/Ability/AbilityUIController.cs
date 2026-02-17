@@ -7,13 +7,18 @@ namespace JW.DungeonSliding.UI
     public class AbilityUIController : MonoBehaviour
     {
         private AbilitySession _currentSession;
+        private IAbilityService _abilityService;
 
         [SerializeField] private AbilitySelectView _abilitySelectView;
 
-        public void Init()
+        public void Initialize(IAbilityService abilityService)
         {
             _abilitySelectView.Init();
             _abilitySelectView.Bind(SelectAbility, Reroll);
+
+            _abilityService = abilityService;
+
+            _abilityService.OnAbilitySelectEvent += OpenSelectAbilityView;
         }
 
         public void OpenSelectAbilityView(AbilitySession session)
@@ -26,7 +31,6 @@ namespace JW.DungeonSliding.UI
 
         public void Reroll()
         {
-            Debug.Log("ReRoll");
             if (_currentSession.TryRerollAbilities())
             {
                 _abilitySelectView.SetAilityDatas(_currentSession.Abilities, _currentSession.RerollCount);
@@ -38,6 +42,11 @@ namespace JW.DungeonSliding.UI
             _currentSession.SelectAbiltyUIDEvent(abilityUid);
             _abilitySelectView.gameObject.SetActive(false);
             _currentSession = null;
+        }
+
+        private void OnDisable()
+        {
+            _abilityService.OnAbilitySelectEvent -= OpenSelectAbilityView;
         }
     }
 }

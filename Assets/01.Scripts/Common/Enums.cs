@@ -162,6 +162,18 @@ namespace JW.DungeonSliding
         Damage,
         CurrentMoveCount,
         MaxMoveCount,
+        Level,
+        CurrentXp,
+        RequiredXp,
+    }
+
+    public enum EPlayerStatChangeType
+    {
+        HP,
+        Damage,
+        Move,
+        Level,
+        Xp
     }
 
     public enum EApplyStatType

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: GameConfig
   m_EditorClassIdentifier: 
   Combat:
-    _backAttackDamageMultiplier: 0
+    _backAttackDamageMultiplier: 2
   Player:
     _moveSpeed: 0
     _baseHP: 5
@@ -36,3 +36,6 @@ MonoBehaviour:
     _fadeOutTime: 0
     _fadeInTime: 0
     _fadeOutWaitTime: 0
+  Act:
+    _actPerFloorCount: 3
+    _actCount: 5

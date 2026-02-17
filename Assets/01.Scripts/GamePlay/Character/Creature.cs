@@ -170,6 +170,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
                 return false;
             }
 
+            Debug.Log("On Damaged");
+
             LastAttacker = damageInfo.Attacker;
             return ApplyDamage(damageInfo);
         }
@@ -205,7 +207,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
         protected virtual void ApplyAttack()
         {
             if (!IsActive || AttackTarget == null || !AttackTarget.IsActive) return;
-            
+
+            Debug.Log($"{this.name} : Attacked");
             AttackTarget.TakeDamage(CreateDamageContext());
 
             damageContext.Reset();

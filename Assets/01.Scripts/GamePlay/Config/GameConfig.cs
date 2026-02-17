@@ -65,7 +65,15 @@ namespace JW.DungeonSliding.GamePlay
             public int _baseHeight;
             public int _baseEnemyCount;
             public float _baseWallFill;
-            
+        }
+
+        [System.Serializable]
+        public class ActConfig
+        {
+            [SerializeField] private int _actPerFloorCount;
+            [SerializeField] private int _actCount;
+            public int ActPerFloor => _actPerFloorCount;
+            public int ActCount => _actCount;
         }
 
         public CombatConfig Combat;
@@ -73,8 +81,6 @@ namespace JW.DungeonSliding.GamePlay
         public EnemyConfig Enemy;
         public AbilityProbabilityConfig Ability;
         public UIConfig UI;
-
-        public float BackAttackDamageMultiplier => 0;
-
+        public ActConfig Act;
     }
 }

@@ -11,15 +11,20 @@ namespace JW.DungeonSliding.Map
         [SerializeField] private TileGenerator _tileMap;
         [SerializeField] private EffectObjectGenerator _effectObjectGenerator;
 
+        [Header("Outer Wall")]
+        [SerializeField] private Transform _upperWall;
+        [SerializeField] private Transform _leftWall;
+        [SerializeField] private Transform _rightWall;
 
-        public Action<EnemyTemplete[], int> SetEnemyEvent;
-        public Action<List<Tile>,List<Tile>> RequestSpawnEnemyEvent;
+        [Header("Camera Controller")]
+        [SerializeField] private CameraController cameraController;
+
+        public Action<List<Tile>,List<Tile>, int, int> RequestSpawnEnemyEvent;
         
         private bool[] _tileMapData;
         private HashSet<Tile> _enemyTiles = new HashSet<Tile>();
         private HashSet<Tile> _obstacleTiles = new HashSet<Tile>();
         private Dictionary<Tile, IEffectTile> _effectTileDic = new Dictionary<Tile, IEffectTile>();
-        
 
         private MapBundle MapData;
         private ShuffleBag<MapData> _mapBag;
@@ -41,7 +46,7 @@ namespace JW.DungeonSliding.Map
             _tileMap.Init(this);
             _effectObjectGenerator.SetBoard(this);
         }
-        public void SetMap(int floor)
+        public void SetMap(int act, int floor)
         {
             _currentMapData = _mapBag.GetItem();
             _creatureShuffleBag = new ShuffleBag<CreatureTemplete>(_currentMapData.CretureTempletes);
@@ -53,11 +58,24 @@ namespace JW.DungeonSliding.Map
 
             var templete = _creatureShuffleBag.GetItem();
 
-            //SetEnemyEvent?.Invoke(_currentMapData.EnemyTemplete, floor);
-            RequestSpawnEnemyEvent?.Invoke(templete.NomalEnemyPos, templete.BossEnemyPos);
+            int actNum = floor % 3;
 
+            RequestSpawnEnemyEvent?.Invoke(templete.NomalEnemyPos, templete.BossEnemyPos, act, floor);
 
             _player.SetPosition(templete.PlayerPos);
+
+            float x = (_currentMapData.Height / 2) - 0.5f;
+
+            _leftWall.transform.localScale = new Vector3(1, 10, _currentMapData.Height);
+            _leftWall.transform.transform.position = new Vector3(-1, 0, x);
+
+            _rightWall.transform.localScale = new Vector3(1, 10, _currentMapData.Height);
+            _rightWall.transform.transform.position = new Vector3(_currentMapData.Width, 0, x);
+
+            _upperWall.transform.localScale = new Vector3(1, 10, _currentMapData.Width);
+            _upperWall.transform.transform.position = new Vector3(x, 0, _currentMapData.Height);
+
+            cameraController.SetCamera(_currentMapData.Width, _currentMapData.Height);
         }
         public MoveContext GetMoveContext(Tile startPoint, EDirectionType direction, ETileEnterType enterType)
         {

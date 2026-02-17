@@ -62,8 +62,6 @@ namespace JW.DungeonSliding.Map
                         TileObject tile = _tilePoolDic.GetObject(tileType.ToString());
                         _activeTiles.Add(tile);
                         tile.transform.localPosition = tilePoint.GetPosition;
-
-
                     }
                     else
                     {

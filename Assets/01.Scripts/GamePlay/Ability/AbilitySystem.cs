@@ -39,7 +39,15 @@ namespace JW.DungeonSliding.GamePlay.Ability
         }
     }
 
-    public class AbilitySystem : IRerollService
+    //어빌리티 추가
+    //
+    public interface IAbilityService
+    {
+        event Action<AbilityDataBase> OnAddAbilityEvent;
+        event Action<AbilitySession> OnAbilitySelectEvent;
+    }
+
+    public class AbilitySystem : IRerollService, IAbilityService
     {
         private ShuffleBag<AbilityDataBase> _abilityBag;
         private Dictionary<string, AbilityDataBase> _abilityDataByUID = new();
@@ -49,16 +57,15 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         public AbilityFactory _abilityFactory = new AbilityFactory();
 
-        private IAbilitySelectService _selectServeice;
-        
         private int _maxRerollCount = 1;
         
         AbilityHost _abilityHost;
 
-        public AbilitySystem(IAbilitySelectService abilitySelectService, ICombatantSensor combatantSensor, IAbilityHost host)
-        {
-            _selectServeice = abilitySelectService;
+        public event Action<AbilityDataBase> OnAddAbilityEvent;
+        public event Action<AbilitySession> OnAbilitySelectEvent;
 
+        public AbilitySystem(ICombatantSensor combatantSensor, IAbilityHost host)
+        {
             _abilityHost = new AbilityHost(host);
             _abilityHost.Register<IRerollService>(this);
             _abilityHost.Register<ICombatantSensor>(combatantSensor);
@@ -83,7 +90,8 @@ namespace JW.DungeonSliding.GamePlay.Ability
         {
             GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnShowAbility);
             var session = new AbilitySession(GetAbilityDataSet(), GrantAbility, GetAbilityDataSet, _maxRerollCount);
-            _selectServeice.SetAbilitySession(session);
+
+            OnAbilitySelectEvent?.Invoke(session);
         }
 
         public AbilityDataBase[] GetAbilityDataSet()
@@ -103,6 +111,8 @@ namespace JW.DungeonSliding.GamePlay.Ability
             IAbility ability = _abilityFactory.CreateAbility(data, _abilityHost);
 
             EnrollAbility(ability.ProgTriggers, ability);
+
+            OnAddAbilityEvent?.Invoke(data);
 
             GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnHideAbility);
         }

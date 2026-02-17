@@ -14,11 +14,6 @@ namespace JW.DungeonSliding.GamePlay
 
         public GameTriggerEventBus()
         {
-            if (Instance != null && Instance != this)
-            {
-                Debug.Log($"{Instance}");                                                                                             
-                Debug.LogWarning("이미 존재하는 GameTriggerEventBus 인스턴스가 있습니다. 기존 인스턴스를 덮어씁니다.");
-            }
             Instance = this;
         }
 
@@ -42,7 +37,6 @@ namespace JW.DungeonSliding.GamePlay
         }
         public void ExcuteAbilityEvent(EGameTriggerType triggerType)
         {
-            Debug.Log(triggerType);
             if(_triggerEventsByTriggerType.TryGetValue(triggerType, out Action action))
             {
                 action?.Invoke();

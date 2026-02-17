@@ -25,6 +25,8 @@ namespace JW.DungeonSliding
         {
             EnemyStatViewItem item = _statViewItemPool.GetObject();
             item.Init(transform, enemyStatReadOnly);
+
+            Debug.Log("Attach");
             _activeEnemyStatItemByEnemy.Add(enemyStatReadOnly, item);
         }
 

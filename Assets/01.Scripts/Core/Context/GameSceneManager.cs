@@ -9,10 +9,18 @@ using JW.DungeonSliding.Core.Flow;
 using System.Collections;
 using JW.DungeonSliding.UI;
 using UnityEngine.SceneManagement;
+using System;
+using JW.DungeonSliding.Core;
 
 namespace JW.DungeonSliding.GamePlay.Context
 {
-    public class GameSceneManager : MonoBehaviour
+    public interface IActService
+    {
+        event Action<int, int> OnChangeActEvent;
+        event Action<int, int> OnChangeFloorEvent;
+    }
+
+    public class GameSceneManager : MonoBehaviour, IActService
     {
         private RewardManager PlayerReward { get; set; }
         private MapManager _mapManager;
@@ -23,8 +31,16 @@ namespace JW.DungeonSliding.GamePlay.Context
         private GameModeController _gameModeController;
         private IUIFader _uiFader;
         private IObstacleRequest _obstacleRequest;
-        
-        public int Floor { get; private set; }
+
+        public event Action<int, int> OnChangeActEvent;
+        public event Action<int, int> OnChangeFloorEvent;
+
+        public int Floor { get; private set; } = 0;
+        public int Act { get; private set; } = 0;
+
+        private int _floorPerAct;
+        private int _actCount;
+
         public void Init(RewardManager reward, MapManager map, 
             Player player, EnemyManager enemyManager, BattleManager battleManager, 
             InputSystem input, GameModeController gameModeController, IUIFader uiFader
@@ -40,7 +56,10 @@ namespace JW.DungeonSliding.GamePlay.Context
             _uiFader = uiFader;
             _obstacleRequest = obstacleRequest;
 
-            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.OnClearStage, PrepareStage);
+            _floorPerAct = GameManager.Config.Act.ActPerFloor;
+            _actCount = GameManager.Config.Act.ActCount;
+
+            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.OnClearStage, ClearFloor);
             GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.OnTurnEnd, CheckGameOver);
         }
 
@@ -56,6 +75,27 @@ namespace JW.DungeonSliding.GamePlay.Context
         {
             StartCoroutine(CoWaitStartStage());
         }
+
+        private void UpdateActFloor()
+        {
+            Floor++;
+
+            if (Floor > _floorPerAct-1)
+            {
+                Act++;
+                Floor -= _floorPerAct;
+
+            }
+
+            OnChangeActEvent?.Invoke(Act, _actCount);
+            OnChangeFloorEvent?.Invoke(Floor, _floorPerAct);
+        }
+
+        public void ClearFloor()
+        {
+            PrepareStage();
+        }
+
         public IEnumerator CoWaitStartStage()
         {
             yield return new WaitUntil(() => _gameModeController.Flow == EGameModeType.Play);
@@ -66,14 +106,16 @@ namespace JW.DungeonSliding.GamePlay.Context
 
             _obstacleRequest.ClearObstacles();
 
-            _mapManager.SetMap(Floor);
+            _mapManager.SetMap(Act, Floor);
+            
+            UpdateActFloor();
 
             yield return _uiFader.FadeIn();
 
             _gameModeController.ExitGameMode(EGameModeType.PrepareStage);
             GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnEnterRoom);
-        }
 
+        }
         public void CheckGameOver()
         {
             if (!_player.IsActive)

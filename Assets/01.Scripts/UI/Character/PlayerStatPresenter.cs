@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.UI
 {
-    public class PlayerStatUIContoller : MonoBehaviour
+    public class PlayerStatPresenter : MonoBehaviour
     {
         [SerializeField] private PlayerStatViewer _viewer;
 
@@ -31,6 +31,8 @@ namespace JW.DungeonSliding.UI
 
         public void ChangePlayerStat(EPlayerStatType changedStat)
         {
+            Debug.Log(changedStat);
+
             switch (changedStat)
             {
                 case EPlayerStatType.CurrentHP:
@@ -53,6 +55,14 @@ namespace JW.DungeonSliding.UI
                 case EPlayerStatType.MaxMoveCount:
                     _viewer.UpdateMoveCount(_statReadOnly.Get(EPlayerStatType.CurrentMoveCount), _statReadOnly.Get(EPlayerStatType.MaxMoveCount));
 
+                    break;
+
+                case EPlayerStatType.Level:
+                    _viewer.UpdateLevelText(_statReadOnly.Get(EPlayerStatType.Level));
+                    break;
+
+                case EPlayerStatType.CurrentXp:
+                    _viewer.UpdateLevelProgress(_statReadOnly.Get(EPlayerStatType.CurrentXp), _statReadOnly.Get(EPlayerStatType.RequiredXp));
                     break;
             }
         }

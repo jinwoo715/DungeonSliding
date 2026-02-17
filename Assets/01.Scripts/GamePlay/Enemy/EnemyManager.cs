@@ -15,17 +15,18 @@ namespace JW.DungeonSliding.GamePlay.Entities
     public class EnemyManager : MonoBehaviour, ICombatProvider
     {
         [SerializeField] private CretureStatController _cretureStatController;
-        [SerializeField] private List<Enemy> _enemyPrefabList;
+        [SerializeField] private Enemy _enemyPrefabList;
         [SerializeField] private List<EnemyBossBase> _enemyBossPrefabList;
 
-        private Dictionary<string, Stack<Enemy>> _enemyPoolByUID = new Dictionary<string, Stack<Enemy>>();
+        private Stack<Enemy> _enemyPoolByUID = new Stack<Enemy>();
         
         private Dictionary<Tile, ICombatant> _activeEnemyByTile = new Dictionary<Tile, ICombatant>();
 
         private Dictionary<string, EnemyData> _enemyDataByUID = new();
         private Dictionary<string, EnemyData> _enemyBossDataByUID = new();
 
-        public event Action<RewardData> OnEnemyRewardEvent;
+        private List<EnemyData> _nomalEnemyDatas = new();
+        private List<EnemyData> _bossEnemyDatas = new();
 
         private IBoard _board;
         private IObstacleRequest _obstacleRequest;
@@ -42,94 +43,57 @@ namespace JW.DungeonSliding.GamePlay.Entities
         }
         public void LoadData()
         {
-            string enemyJsonData = GameManager.Resource.GetTextData("EnemyData");
-            string enemyBossJsonData = GameManager.Resource.GetTextData("EnemyBossData");
+            _nomalEnemyDatas = GameManager.Data.EnemyData;
+            _bossEnemyDatas = GameManager.Data.EnemyBossData;
 
-            var enemyDatas = JsonConvert.DeserializeObject<List<EnemyData>>(enemyJsonData);
-            //var enemyBossDatas = JsonConvert.DeserializeObject<List<EnemyBossData>>(enemyBossJsonData);
-
-            for (int i = 0; i < enemyDatas.Count; i++)
+            for (int i = 0; i < _nomalEnemyDatas.Count; i++)
             {
-                _enemyDataByUID[enemyDatas[i].UID] = enemyDatas[i];
+                _enemyDataByUID[_nomalEnemyDatas[i].UID] = _nomalEnemyDatas[i];
             }
 
-            //for (int i = 0; i < enemyBossDatas.Count; i++)
-            //{
-            //    _enemyBossDataByUID[enemyBossDatas[i].UID] = enemyBossDatas[i];
-            //}
-        }
-
-        public void SetEnemy(EnemyTemplete[] enemyTempletes, int floor)
-        {
-            int templeteNum = UnityEngine.Random.Range(0, enemyTempletes.Length);
-            EnemyTemplete templete = enemyTempletes[templeteNum];
-
-            for (int i = 0; i < templete.EnemyData.Count; i++)
+            for (int i = 0; i < _bossEnemyDatas.Count; i++)
             {
-                EnemySettingData data = templete.EnemyData[i];
-
-                Enemy boss = Instantiate(_enemyPrefabList[0]);
-                boss.SetData(_enemyDataByUID["ENEMY_BOSS_EREBOS"], floor);
-
-
-                //boss.SetData(new EnemyData(), floor);
-                boss.SetPosition(data.Point);
-                boss.Init(_combatEventListener, ECretureType.Enemy);
-                
-                boss.SetAbility(EnemyAbilityFactory.Instance.GetAbility(_enemyDataByUID["ENEMY_BOSS_EREBOS"].AbilityList, boss, floor));
-
-                _enemyStatUIService.Attach(boss.StatUITransform, boss);
-
-                //IBossAbility bossAbility = boss as IBossAbility;
-                //if (bossAbility != null)
-                //{
-                //    bossAbility.SetAbilityGetter(_bossAbilityGetter);
-                //}
-
-                _activeEnemyByTile.Add(data.Point, boss);
-                _board.RegisterEnemyTile(data.Point);
-                //                Enemy enemy = GetEnemy(data.EnemyUID);
-                //                enemy.SetData(_enemyDataByUID[data.EnemyUID], floor);
-                //                enemy.SetPosition(data.Point);
-
-                //_activeEnemyByTile.Add(data.Point, enemy);
-                //_board.RegisterEnemyTile(data.Point);
+                _enemyBossDataByUID[_bossEnemyDatas[i].UID] = _bossEnemyDatas[i];
             }
         }
 
-        internal void SpawnEnemy(List<Tile> NomalEnemyPos, List<Tile> BossEnemyPos) 
+        internal void SpawnEnemy(List<Tile> NomalEnemyPos, List<Tile> BossEnemyPos, int act, int floor) 
         { 
+            int maxNum = Mathf.Min(act, _nomalEnemyDatas.Count);
+
             for (int i = 0; i < NomalEnemyPos.Count; i++)
             {
+                int ranNum = UnityEngine.Random.Range(0, maxNum);
+
                 Tile tile = NomalEnemyPos[i];
 
-                Enemy boss = Instantiate(_enemyPrefabList[0]);
-                boss.SetData(_enemyDataByUID["ENEMY_BOSS_EREBOS"], 1);
+                EnemyData data = _nomalEnemyDatas[ranNum];
 
-                //boss.SetData(new EnemyData(), floor);
+                Enemy boss = GetEnemy();
+                
+                boss.SetData(data, floor);
+
                 boss.SetPosition(tile);
-                boss.Init(_combatEventListener, ECretureType.Enemy);
 
-                boss.SetAbility(EnemyAbilityFactory.Instance.GetAbility(_enemyDataByUID["ENEMY_BOSS_EREBOS"].AbilityList, boss, 1));
-
-                _enemyStatUIService.Attach(boss.StatUITransform, boss);
+                boss.SetAbility(EnemyAbilityFactory.Instance.GetAbility(data.AbilityList, boss, 1));
 
                 _activeEnemyByTile.Add(tile, boss);
                 _board.RegisterEnemyTile(tile);
             }
+
+            if (floor+1 % 3 != 0) return;
 
             for (int i = 0; i < BossEnemyPos.Count; i++)
             {
                 Tile tile = BossEnemyPos[i];
 
-                Enemy boss = Instantiate(_enemyPrefabList[0]);
-                boss.SetData(_enemyDataByUID["ENEMY_BOSS_EREBOS"], 1);
+                Enemy boss = GetEnemy();
+                boss.SetData(_enemyBossDataByUID["ENEMY_BOSS_EREBOS"], 1);
 
                 //boss.SetData(new EnemyData(), floor);
                 boss.SetPosition(tile);
-                boss.Init(_combatEventListener, ECretureType.Enemy);
 
-                boss.SetAbility(EnemyAbilityFactory.Instance.GetAbility(_enemyDataByUID["ENEMY_BOSS_EREBOS"].AbilityList, boss, 1));
+                boss.SetAbility(EnemyAbilityFactory.Instance.GetAbility(_enemyBossDataByUID["ENEMY_BOSS_EREBOS"].AbilityList, boss, 1));
 
                 _enemyStatUIService.Attach(boss.StatUITransform, boss);
 
@@ -138,31 +102,23 @@ namespace JW.DungeonSliding.GamePlay.Entities
             }
         }
 
-        private Enemy GetEnemy(string enemyUID)
+        private Enemy GetEnemy()
         {
             Enemy enemy = null;
 
-            if(_enemyPoolByUID.TryGetValue(enemyUID, out Stack<Enemy> pool))
-            {
-                if (pool.Count > 0)
-                    enemy = pool.Pop();
-                else
-                    enemy = SpawnEnemy(enemyUID);
-            }
+            if (_enemyPoolByUID.Count > 0)
+                enemy = _enemyPoolByUID.Pop();
             else
-            {
-                _enemyPoolByUID[enemyUID] = new Stack<Enemy>();
-                enemy = SpawnEnemy(enemyUID);
-            }
+                enemy = SpawnEnemy();
 
             enemy.gameObject.SetActive(true);
             _enemyStatUIService.Attach(enemy.StatUITransform, enemy);
 
             return enemy;
         }
-        private Enemy SpawnEnemy(string enemyUID)
+        private Enemy SpawnEnemy()
         {
-            Enemy enemy = Instantiate(_enemyPrefabList[0], this.transform);
+            Enemy enemy = Instantiate(_enemyPrefabList, this.transform);
             enemy.OnDeathEvent += OnEnemyDeath;
             enemy.Init(_combatEventListener, ECretureType.Enemy);
 
@@ -171,11 +127,13 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public void ReturnEnemy(Enemy enemy)
         {
             enemy.gameObject.SetActive(false);
-            _enemyPoolByUID[enemy.EnemyUID].Push(enemy);
+            _enemyPoolByUID.Push(enemy);
         }
         private void OnEnemyDeath(Enemy enemy)
         {
             ReturnEnemy(enemy);
+
+            Debug.Log("DeathEvent");
 
             _activeEnemyByTile.Remove(enemy.TilePosition);
             _obstacleRequest.SpawnObstacle(enemy.TilePosition, EObstacleObjectType.Rubble);

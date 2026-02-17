@@ -27,6 +27,9 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
         private GameVisualController _visualContoller;
         private EnemyAbilityFactory _enemyAbilityFactory;
 
+        [Header("Camera Controller")]
+        [SerializeField] private CameraController cameraController;
+
         [SerializeField] private Camera cam;
         [SerializeField] private GameObject dirLight;
         [SerializeField] private GameObject playerLight;
@@ -47,15 +50,15 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
             BindEvent();
             ChildInit();
 
-            _gameSceneManager.PrepareStage();
+            _gameSceneManager.ClearFloor();
         }
 
         private void ChildInit()
         {
             _routeBuilder = new RouteBuilder(_mapManager);
-            _abilitySystem = new AbilitySystem(_gameSceneUIManager, _fieldCombatantManager, _player);
+            _abilitySystem = new AbilitySystem(_fieldCombatantManager, _player);
             
-            _gameSceneUIManager.Init(_player, _combatEventBus);
+            _gameSceneUIManager.Init(_player, _combatEventBus, _abilitySystem, _gameSceneManager);
 
             _player.Init(_combatEventBus, ECretureType.Player);
 
@@ -64,7 +67,6 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
             _player.SetData(player, _routeBuilder, _mapManager, _moveRule);
 
             _inputCoordinator.Init(_player);
-
 
             _enemyManager.WireInterfaces(_mapManager, _obstacleController, _gameSceneUIManager.EnemyStatUIService, _combatEventBus);
             _enemyManager.LoadData();
@@ -89,7 +91,6 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
             
             _inputCoordinator.IsMoveableFlowFunc += () => _modeController.IsCanMove;
             
-            _mapManager.SetEnemyEvent += _enemyManager.SetEnemy;
             _mapManager.RequestSpawnEnemyEvent += _enemyManager.SpawnEnemy;
         }
 

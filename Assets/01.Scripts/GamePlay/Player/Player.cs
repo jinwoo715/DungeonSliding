@@ -78,7 +78,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
         [SerializeField] private int _level = 1;
         [SerializeField] private int _currentXp = 0;
-        [SerializeField] private int _levelUpXp = 0;
+        [SerializeField] private int _requireXp = 0;
 
         [SerializeField] private GameObject _barrierObj;
 
@@ -97,7 +97,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public override void Init(ICombatEventListener combatEventListener, ECretureType cretureType)
         {
             base.Init(combatEventListener, cretureType);
-            _levelUpXp = MathUtil.GetFib(_level + ConstData.LEVELUP_XP_OFFSET);
+            _requireXp = MathUtil.GetFib(_level + ConstData.LEVELUP_XP_OFFSET);
             _nextAttackBuff.Reset();
         }
         public void SetData(PlayerData player, IRouteService routeService, ITileCheckService tileCheckService, IMoveRule moveRule)
@@ -112,6 +112,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
             OnStatChanged?.Invoke(EPlayerStatType.CurrentHP);
             OnStatChanged?.Invoke(EPlayerStatType.CurrentMoveCount);
             OnStatChanged?.Invoke(EPlayerStatType.Damage);
+            OnStatChanged?.Invoke(EPlayerStatType.Level);
+            OnStatChanged?.Invoke(EPlayerStatType.CurrentXp);
 
             _tileCheckService = tileCheckService;
             _routeService = routeService;
@@ -119,20 +121,26 @@ namespace JW.DungeonSliding.GamePlay.Entities
         }
         public void AddReward(RewardData rewardData)
         {
+            Debug.Log("Reward");
+
             _currentXp += rewardData.Xp;
 
-            while (_currentXp >= _levelUpXp)
+            while (_currentXp >= _requireXp)
             {
-                int remainXp = _currentXp - _levelUpXp;
+                int remainXp = _currentXp - _requireXp;
                 _currentXp = remainXp;
 
                 LevelUp();
             }
+
+            OnStatChanged?.Invoke(EPlayerStatType.CurrentXp);
         }
         private void LevelUp()
         {
             _level++;
-            _levelUpXp = MathUtil.GetFib(_level + ConstData.LEVELUP_XP_OFFSET);
+            _requireXp = MathUtil.GetFib(_level + ConstData.LEVELUP_XP_OFFSET);
+
+            OnStatChanged?.Invoke(EPlayerStatType.Level);
 
             GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnLevelUp);
         }
@@ -198,6 +206,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             }
 
             ChangeCharacterState(ECharacterStateType.Idle);
+            ModifyStat(new PlayerApplyStatContext(EPlayerStatType.CurrentMoveCount, EApplyStatType.Add, EPlayerStatType.None, -_moveRule.MoveCost));
             GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnSlideEnd);
             FinishMove();
         }
@@ -217,9 +226,9 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
             SetPosition(moveContext.DestTile);
         }
+
         public void FinishMove()
         {
-            ModifyStat(new PlayerApplyStatContext(EPlayerStatType.CurrentMoveCount, EApplyStatType.Add, EPlayerStatType.None, -_moveRule.MoveCost));
             GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnMoveEnd);
             SlideResultType = ESlideResultType.None;
         }
@@ -497,6 +506,17 @@ namespace JW.DungeonSliding.GamePlay.Entities
                     break;
                 case EPlayerStatType.MaxMoveCount:
                     value = (int)(MaxMoveCount.Final(this));
+                    break;
+
+                case EPlayerStatType.Level:
+                    value = _level;
+                    break;
+
+                case EPlayerStatType.CurrentXp:
+                    value = _currentXp;
+                    break;
+                case EPlayerStatType.RequiredXp:
+                    value = _requireXp;
                     break;
             }
 

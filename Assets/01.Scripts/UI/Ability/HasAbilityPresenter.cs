@@ -1,0 +1,33 @@
+using JW.DungeonSliding.GamePlay.Ability;
+using UnityEngine;
+
+namespace JW.DungeonSliding.UI
+{
+    public class HasAbilityPresenter : MonoBehaviour
+    {
+        [SerializeField] private HasAbilityItem _abilityItemPrefab;
+        [SerializeField] private Transform _abilityParentTransform;
+
+        ITooltipService _tooltipService;
+        IAbilityService _abilityService;
+
+        public void Initialize(ITooltipService tooltipService, IAbilityService abilityService)
+        {
+            _tooltipService = tooltipService;
+            _abilityService = abilityService;
+
+            _abilityService.OnAddAbilityEvent += AddAbility;
+        }
+
+        public void AddAbility(AbilityDataBase data)
+        {
+            HasAbilityItem item = Instantiate(_abilityItemPrefab, _abilityParentTransform);
+            item.SetData(data, _tooltipService.ShowTooltip, _tooltipService.CloseTooltip);
+        }
+
+        private void OnDisable()
+        {
+            _abilityService.OnAddAbilityEvent -= AddAbility;
+        }
+    }
+}

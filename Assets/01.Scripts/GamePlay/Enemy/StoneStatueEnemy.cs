@@ -13,6 +13,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public override void StartAttackAnimation()
         {
             _eyeLight.SetActive(true);
+            _animatorController.SetAnimationTrigger(ConstString.ONE_HAND_ATTACK_ANIM);
         }
         public override void EndAttackAnimation()
         {
@@ -43,7 +44,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             float targetRotation = GetEulerYByDirection(toDir);
             particle.transform.rotation = Quaternion.Euler(-20, targetRotation, 0);
 
-            if(!HasStatus(ECreatureStatus.Bind) && !HasStatus(ECreatureStatus.Stun))
+            if(!HasStatus(ECreatureStatus.Bind) && !HasStatus(ECreatureStatus.Stun) && toDir != Direction)
                 StartCoroutine(CoRotationToPlayer(toDir));
             else EndHittedAnimation();
 
