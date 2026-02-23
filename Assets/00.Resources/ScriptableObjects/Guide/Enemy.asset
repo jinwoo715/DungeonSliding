@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f2b4db74f870924caab71fb3bdc4a79, type: 3}
+  m_Name: Enemy
+  m_EditorClassIdentifier: 
+  GuideType: 0
+  Datas:
+  - _sprite: {fileID: 0}
+    _description: "\uC11D\uC0C1\uC740 \uD53C\uACA9 \uC2DC \uD574\uB2F9 \uBC29\uD5A5\uC73C\uB85C
+      \uD68C\uC804"
+  - _sprite: {fileID: 0}
+    _description: "\uC11D\uC0C1\uC744 \uD074\uB9AD\uD558\uBA74 \uC801\uC758 \uC815\uBCF4(\uD328\uD134)
+      \uD655\uC778 \uAC00\uB2A5"
