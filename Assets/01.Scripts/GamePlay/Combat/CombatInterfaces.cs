@@ -20,6 +20,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
         void AddDamageTakenMultiplier(float value);
         bool TakeDamage(DamageContext damageInfo);
+        void ApplyDamage(int damage);
         void OnDeath();
     }
     public interface IAttackable
@@ -61,14 +62,16 @@ namespace JW.DungeonSliding.GamePlay.Combat
         ExtraAttack
     }
 
-    // 3. 상태 및 버프 (선택 사항)
-    public interface IStatusEffectable
+    public interface IStatusModifier
     {
-        public ECreatureStatus StatusFlags { get; }
-        bool HasStatus(ECreatureStatus status);
         void ApplyStatus(ECreatureStatus status, int durationTurnCount);
         void RemoveStatus(ECreatureStatus status);
-        void ClearStatus();
+        void TimePassStatueUpdate();
+        void ClearAllStatus();
+    }
+    public interface IStatusReadOnly
+    {
+        bool HasStatus(ECreatureStatus status);
     }
 
     public interface IPlayerStatModifier
@@ -78,7 +81,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
         public void SetCurrentMoveCount(PlayerApplyStatContext context);
     }
 
-    public interface ICombatant : ITilePosition, IAttackable, IDamageable, IStatusEffectable, ICreatureRotator
+    public interface ICombatant : ITileObject, IAttackable, IDamageable, ICreatureRotator
     {
         public bool IsActive { get; }
         public bool IsCombat { get; }

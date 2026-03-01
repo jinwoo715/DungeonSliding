@@ -44,8 +44,10 @@ namespace JW.DungeonSliding.GamePlay.Entities
             float targetRotation = GetEulerYByDirection(toDir);
             particle.transform.rotation = Quaternion.Euler(-20, targetRotation, 0);
 
-            if(!HasStatus(ECreatureStatus.Bind) && !HasStatus(ECreatureStatus.Stun) && toDir != Direction)
+            if (IsCanRotate())
+            {
                 StartCoroutine(CoRotationToPlayer(toDir));
+            }
             else EndHittedAnimation();
 
             return true;
@@ -57,7 +59,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             var particle = ParticlePool.Instance.GetParticle("RotationDust");
             particle.SetParticle(this.transform.position + Vector3.up * 0.15f, 2.0f);
 
-            yield return CoRotateCharacter(rotationDir);
+            yield return CoRotateToDirection(rotationDir);
 
             EndHittedAnimation();
         }

@@ -21,11 +21,10 @@ namespace JW.DungeonSliding.UI
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            Debug.Log("On Pointer Down");
             TooltipRequest request = new TooltipRequest();
             request.Name = _abilityData.Name;
             request.Description = _abilityData.Description;
-            request.Position = eventData.position;
+            request.Anchor = TextAnchor.LowerLeft;
 
             ShowTooltipEvent?.Invoke(request);
         }

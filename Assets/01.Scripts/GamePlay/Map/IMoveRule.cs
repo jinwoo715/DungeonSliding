@@ -50,10 +50,10 @@ namespace JW.DungeonSliding
     {
         public ICombatantSensor CombatantSensor { get; private set; }
         public IMoveRule MoveRule { get; private set; }
-        public IPlayerStatReader PlayerStatReader { get; private set; }
+        public IStatReadOnly PlayerStatReader { get; private set; }
         public IVisualController VisualController { get; private set; }
 
-        public BossAbilityManager(ICombatantSensor sensor, IMoveRule rule, IPlayerStatReader reader, IVisualController visualController)
+        public BossAbilityManager(ICombatantSensor sensor, IMoveRule rule, IStatReadOnly reader, IVisualController visualController)
         {
             CombatantSensor = sensor;
             MoveRule = rule;
@@ -113,14 +113,14 @@ namespace JW.DungeonSliding
     {
         ICombatantSensor CombatantSensor { get; }
         IMoveRule MoveRule { get; }
-        IPlayerStatReader PlayerStatReader { get; }
+        IStatReadOnly PlayerStatReader { get; }
         IVisualController VisualController { get; }
     }
     public interface ICreatureRotator
     {
-        public IEnumerator CoRotateCharacter(EDirectionType directionType);
+        public IEnumerator CoRotateToDirection(EDirectionType directionType);
         public void SetRotation(EDirectionType directionType);
-        public IEnumerator CoRotateToTarget(ITilePosition combatant, Action DoneCallback = null);
+        public IEnumerator CoRotateToTarget(ITileObject combatant, Action DoneCallback = null);
     }
     public interface IEnemyAbility
     {
@@ -185,7 +185,7 @@ namespace JW.DungeonSliding
             {
                 _moveRule.SetIsMoveable(false);
                 EDirectionType nextDirection = (EDirectionType)(((int)_owner.Direction + 1) % 4);
-                yield return _creatureRotator.CoRotateCharacter(nextDirection);
+                yield return _creatureRotator.CoRotateToDirection(nextDirection);
                 _moveRule.SetIsMoveable(true);
             }
         }
@@ -231,7 +231,7 @@ namespace JW.DungeonSliding
     }
     public class CopyAbility : EnemyAbilityBase
     {
-        IPlayerStatReader _playerStatReader;
+        IStatReadOnly _playerStatReader;
         IEnemyStatModifier _enemyStatModifier;
         public CopyAbility(EnemyAbilityData data, IEnemyAbilityGetter getter, ICombatant owner, int section) : base(data, getter, owner, section) { }
 
@@ -246,8 +246,8 @@ namespace JW.DungeonSliding
 
         public override IEnumerator Excute()
         {
-            _enemyStatModifier.SetEnemyStat(EEnemyStatType.HP, _playerStatReader.Get(EPlayerStatType.CurrentHP));
-            _enemyStatModifier.SetEnemyStat(EEnemyStatType.Damage, _playerStatReader.Get(EPlayerStatType.Damage));
+            //_enemyStatModifier.SetEnemyStat(EEnemyStatType.HP, _playerStatReader.Get(EPlayerStatType.CurrentHP));
+            //_enemyStatModifier.SetEnemyStat(EEnemyStatType.Damage, _playerStatReader.Get(EPlayerStatType.Damage));
 
             yield return null;
         }

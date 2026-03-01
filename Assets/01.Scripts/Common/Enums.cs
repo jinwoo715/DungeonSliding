@@ -167,6 +167,17 @@ namespace JW.DungeonSliding
         RequiredXp,
     }
 
+    public enum ECreatureStatType
+    {
+        None,
+        CurrentHP,
+        MaxHp,
+        Damage,
+        CurrentMoveCount,
+        MaxMoveCount,
+        BarrierCount,
+    }
+
     public enum EPlayerStatChangeType
     {
         HP,

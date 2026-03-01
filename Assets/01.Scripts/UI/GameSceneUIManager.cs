@@ -23,7 +23,9 @@ namespace JW.DungeonSliding.UI
         [SerializeField] private HitDamageViewer _hitDamageViewer;
 
         [Header("Presenter")]
-        [SerializeField] private GameTooltipPresenter _tooltipPresenter;
+        [SerializeField] private GameTooltipPresenter _abilityTooltipPresenter;
+        [SerializeField] private GameTooltipPresenter _enemyTooltipPresenter;
+
         [SerializeField] private HasAbilityPresenter _hasAbilityPresenter;
         [SerializeField] private PlayerStatPresenter _playerStatPresenter;
 
@@ -31,15 +33,16 @@ namespace JW.DungeonSliding.UI
         [SerializeField] private ActViewer _actViewer;
 
         public IEnemyStatUIService EnemyStatUIService => _enemyStatUIManager;
+        public ITooltipService EnemyTooltipService => _enemyTooltipPresenter;
 
-        public void Init(IPlayerStatReader statReadOnly, ICombatEventPresenter combatEventPresenter, IAbilityService abilityService, IActService actService)
+        public void Init(IStatReadOnly statReadOnly, ICombatEventPresenter combatEventPresenter, IAbilityService abilityService, IActService actService)
         {
             _abilityUIController.Initialize(abilityService);
             _playerStatPresenter.Init(statReadOnly);
             _enemyStatUIManager.Init();
             _hitDamageViewer.Init(combatEventPresenter);
 
-            _hasAbilityPresenter.Initialize(_tooltipPresenter, abilityService);
+            _hasAbilityPresenter.Initialize(_abilityTooltipPresenter, abilityService);
             _actViewer.Initialize(actService);
         }
 

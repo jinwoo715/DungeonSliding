@@ -98,7 +98,7 @@ namespace JW.DungeonSliding.GamePlay.Context
 
         public IEnumerator CoWaitStartStage()
         {
-            yield return new WaitUntil(() => _gameModeController.Flow == EGameModeType.Play);
+            yield return new WaitUntil(() => _gameModeController.GameMode == EGameModeType.Play);
             
             _gameModeController.EnterGameMode(EGameModeType.PrepareStage);
 

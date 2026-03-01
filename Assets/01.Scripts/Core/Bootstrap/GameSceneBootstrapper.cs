@@ -43,6 +43,8 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
         [SerializeField] private InputSystem _inputSystem;
         [SerializeField] private ObstacleObjectController _obstacleController;
 
+        [SerializeField] private EnemyTooltipClicker _enemyTooltipClicker;
+
         private void Start()
         {
             _gameSceneManager.Init(_rewardManager, _mapManager, _player, _enemyManager, _battleManager, _inputSystem, _modeController, _gameSceneUIManager, _obstacleController);
@@ -78,6 +80,10 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
             _rewardManager.Init(_combatEventBus);
 
             _modeController.Init();
+
+
+            _enemyTooltipClicker.Initialize(_gameSceneUIManager.EnemyTooltipService);
+
             _visualContoller = new GameVisualController(cam, dirLight, playerLight, _gameSceneUIManager.EnemyStatUIService);
             _bossAbilityManager = new BossAbilityManager(_fieldCombatantManager, _moveRule, _player, _visualContoller);
             _enemyAbilityFactory = new EnemyAbilityFactory(_bossAbilityManager);

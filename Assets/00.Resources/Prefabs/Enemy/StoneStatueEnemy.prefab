@@ -10,7 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1556708312922740266}
   - component: {fileID: 2697088117165034762}
-  m_Layer: 0
+  - component: {fileID: 4672965507736980945}
+  m_Layer: 3
   m_Name: StoneStatueEnemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -55,8 +56,37 @@ MonoBehaviour:
     HP: 0
     Damage: 0
     XP: 0
+  _enemyData:
+    UID: 
+    Name: 
+    Description: 
+    BaseHP: 0
+    BaseDamage: 0
+    BaseXP: 0
+    AbilityList: 
   _avatar: {fileID: 5895618724755450724}
   _eyeLight: {fileID: 1822302849482869574}
+--- !u!65 &4672965507736980945
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 588495070571079937}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.3, y: 0.8244833, z: 0.3}
+  m_Center: {x: 0, y: 0.45334774, z: 0}
 --- !u!1 &1822302849482869574
 GameObject:
   m_ObjectHideFlags: 0

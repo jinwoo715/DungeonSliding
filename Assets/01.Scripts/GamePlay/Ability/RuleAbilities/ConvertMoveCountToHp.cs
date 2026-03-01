@@ -7,7 +7,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
     public class ConvertMoveCountToHp : AbilityBase
     {
         Combat.IPlayerStatModifier _playerStatModifier;
-        Stats.IPlayerStatReader _statReadOnly;
+        Stats.IStatReadOnly _statReadOnly;
         public ConvertMoveCountToHp(RuleAbilityData data, AbilityHost host) : base(data, host)
         {
             
@@ -15,7 +15,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         public override void ExcuteAbility()
         {
-            if (_statReadOnly.Get(EPlayerStatType.CurrentMoveCount) > _data.P1)
+            if (_statReadOnly.Get(ECreatureStatType.CurrentMoveCount) > _data.P1)
             {
                 _playerStatModifier.ModifyStat(new PlayerApplyStatContext(EPlayerStatType.CurrentMoveCount, EApplyStatType.Add, EPlayerStatType.None, -_data.P1));
                 _playerStatModifier.ModifyStat(new PlayerApplyStatContext(EPlayerStatType.CurrentHP, EApplyStatType.Add, EPlayerStatType.None, _data.P2));

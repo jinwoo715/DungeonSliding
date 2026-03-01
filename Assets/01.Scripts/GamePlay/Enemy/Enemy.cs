@@ -19,6 +19,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public event Action<EEnemyStatType> OnStatChangedEvent;
         private float _backAttackMultiplier = 2f;
 
+        public string Name => _enemyData.Name;
+        public string Description => _enemyData.Description;
         public string EnemyUID => _enemyData.UID;
         public Transform StatUITransform => _statUITransform;
 

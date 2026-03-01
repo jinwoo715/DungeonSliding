@@ -1,5 +1,6 @@
 using JW.DungeonSliding.GamePlay.Combat;
 using JW.DungeonSliding.GamePlay.Stats;
+using JW.DungeonSliding.GamePlay.Statues;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -17,10 +18,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public ICombatant LastAttacker { get; private set; }
         public ICombatant AttackTarget { get; protected set; }
         public bool IsCombat { get; private set; }
-        public ECreatureStatus StatusFlags { get; private set; }
-        protected Dictionary<ECreatureStatus, int> _statusDurations = new();
-        private readonly List<ECreatureStatus> _statusKeys = new();
-
         public float DamageDealtMultiplier { get; private set; } = 1;
         public float DamageTakenMultiplier { get; private set; } = 1;
         
@@ -30,12 +27,14 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public bool _isAttacked = false;
         public bool _isHitted = false;
         public Action<ActPair> OnCounterEvent { get; set; }
-
         public bool IsBarrierActive { get; private set; }
 
         protected DamageContext damageContext = new DamageContext();
         private ECretureType _cretureType;
         private ICombatEventListener _combatEventListener;
+
+        private CreatureStat _stat;
+        private StatusEffectManager _statusManager;
 
         public virtual void Init(ICombatEventListener combatEventListener, ECretureType cretureType) 
         {
@@ -97,7 +96,12 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
             return (EDirectionType)reverse;
         }
-        public IEnumerator CoRotateCharacter(EDirectionType directionType)
+
+        public bool IsCanRotate()
+        {
+            return !(_statusManager.HasStatus(ECreatureStatus.Bind) || _statusManager.HasStatus(ECreatureStatus.Stun));
+        }
+        public IEnumerator CoRotateToDirection(EDirectionType directionType)
         {
             if (directionType != Direction)
             {
@@ -121,6 +125,12 @@ namespace JW.DungeonSliding.GamePlay.Entities
                 SetRotation(directionType);
             }
         }
+        public IEnumerator CoRotateToTarget(ITileObject combatant, Action DoneCallback = null)
+        {
+            EDirectionType dir = DirectionToTile(combatant.TilePosition);
+            yield return StartCoroutine(CoRotateToDirection(dir));
+            DoneCallback?.Invoke();
+        }
 
         public void SetRotation(EDirectionType directionType)
         {
@@ -138,7 +148,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         //Attack
         public bool TrySubmitAttackRequest(ICombatantSensor sensor, IAttackRequestListener attackRequestListener)
         {
-            if (_statusDurations.ContainsKey(ECreatureStatus.Stun)) return false;
+            if (_statusManager.HasStatus(ECreatureStatus.Stun)) return false;
 
             ECretureType searchType = _cretureType == ECretureType.Player ? ECretureType.Enemy : ECretureType.Player;
          
@@ -170,25 +180,26 @@ namespace JW.DungeonSliding.GamePlay.Entities
                 return false;
             }
 
-            Debug.Log("On Damaged");
-
             LastAttacker = damageInfo.Attacker;
+
+            damageInfo.Damage = CalculateRealAppliedDamage(damageInfo.Damage);
+            if (damageInfo.Damage <= 0) return false;
+
             return ApplyDamage(damageInfo);
         }
         private bool ApplyDamage(DamageContext damageInfo)
         {
-            DamageContext info = CalculateRealAppliedDamage(damageInfo);
+            int damage = CalculateRealAppliedDamage(damageInfo.Damage);
 
-            if (info.Damage <= 0) return false;
+            if (damage <= 0) return false;
 
-            ReduceHP(info.Damage);
+            ApplyDamage(damage);
 
-            _combatEventListener.RaiseDamageEvent(new DamageEvent(LastAttacker, this, info.Damage));
+            _combatEventListener.RaiseDamageEvent(new DamageEvent(LastAttacker, this, damage));
 
             return true;
         }
-        protected abstract DamageContext CalculateRealAppliedDamage(DamageContext damageInfo);
-        protected abstract void ReduceHP(int damage);
+        protected abstract int CalculateRealAppliedDamage(int takeDamage);
         public virtual void OnDeath()
         {
             IsActive = false;
@@ -196,7 +207,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             
             _combatEventListener.RaiseDeathEvent(new DeathEvent(LastAttacker, this));
 
-            ClearStatus();
+            _statusManager.ClearAllStatus();
 
             OnHitDoneEvent?.Invoke();
             OnAttackDoneEvent?.Invoke();
@@ -238,10 +249,9 @@ namespace JW.DungeonSliding.GamePlay.Entities
         {
             IsCombat = _isAttacked || _isHitted;
         }
-
         public void OnTurnEnd()
         {
-            UpdateStatusDuration();
+            _statusManager.TimePassStatueUpdate();
         }
         public void OnTurnStart()
         {
@@ -258,51 +268,14 @@ namespace JW.DungeonSliding.GamePlay.Entities
         {
             DamageTakenMultiplier += value;
         }
+        public void ApplyDamage(int damage)
+        {
+            _stat.ModifyStat(new StatModifierContext(ECreatureStatType.CurrentHP, StatModifyType.Add, -damage));
+        }
+        
         #endregion
 
         #region Status
-        public bool HasStatus(ECreatureStatus status)
-        {
-            return status != ECreatureStatus.None && (StatusFlags & status) == status;
-        }
-        public void ApplyStatus(ECreatureStatus status, int duration)
-        {
-            if (duration <= 0 || status == ECreatureStatus.None) return;
-
-            StatusFlags |= status;
-            _statusDurations[status] = Mathf.Max(_statusDurations.GetValueOrDefault(status), duration);
-        }
-        public void RemoveStatus(ECreatureStatus status)
-        {
-            StatusFlags &= ~status;
-
-            _statusDurations.Remove(status);
-        }
-        private void UpdateStatusDuration()
-        {
-            if (_statusDurations.Count == 0) return;
-
-            _statusKeys.Clear();
-            foreach (var kv in _statusDurations)
-                _statusKeys.Add(kv.Key);
-
-            foreach (var key in _statusKeys)
-            {
-                _statusDurations[key]--;
-
-                if (_statusDurations[key] <= 0)
-                {
-                    _statusDurations.Remove(key);
-                    StatusFlags &= ~key;
-                }
-            }
-        }
-
-        public void ClearStatus()
-        {
-            _statusDurations.Clear();
-            StatusFlags = ECreatureStatus.None;
-        }
 
         public bool TryGet<T>(out T service) where T : class
         {
@@ -310,29 +283,19 @@ namespace JW.DungeonSliding.GamePlay.Entities
             service = (object)this as T;
             return service != null;
         }
-
-        public IEnumerator CoRotateToTarget(ITilePosition combatant, Action DoneCallback = null)
-        {
-            EDirectionType dir = DirectionToTile(combatant.TilePosition);
-            yield return StartCoroutine(CoRotateCharacter(dir));
-            DoneCallback?.Invoke();
-        }
-
+        
         public void RequestCounterAttack(ICombatant target)
         {
             OnCounterEvent?.Invoke(new ActPair(this, target));
         }
-
         public virtual void GainBarrier()
         {
             IsBarrierActive = true;
         }
-
         public virtual void ReleaseBarrier()
         {
             IsBarrierActive = false;
         }
-
         public void AddDamageContextStatue(EStatusEffectType effectType, int amount)
         {
             damageContext.StatusEffect = effectType;

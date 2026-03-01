@@ -16,11 +16,6 @@ namespace JW.DungeonSliding.UI
         [SerializeField] private TMP_Text _nameText;
         [SerializeField] private TMP_Text _contentsText;
 
-        public void SetPosition(Vector2 position)
-        {
-            this.transform.position = position;
-        }
-
         public void SetData(Sprite icon, string name, string content)
         {
             if (icon == null) _iconImage.gameObject.SetActive(false);

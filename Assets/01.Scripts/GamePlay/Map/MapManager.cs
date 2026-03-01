@@ -32,11 +32,11 @@ namespace JW.DungeonSliding.Map
         private ShuffleBag<CreatureTemplete> _creatureShuffleBag;
 
         private int[,] _dir = { { 0,1 }, {1,0 }, {0,-1 }, { -1, 0 } };
-        private ITilePosition _player;
+        private ITileObject _player;
 
         int _currentAct = 0;
 
-        public void Init(ITilePosition player)
+        public void Init(ITileObject player)
         {
             _player = player;
             MapData = GameManager.Resource.MapBundle;

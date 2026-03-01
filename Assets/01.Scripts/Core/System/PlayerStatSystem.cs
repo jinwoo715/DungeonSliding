@@ -3,11 +3,24 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Stats
 {
-    public interface IPlayerStatReader
+    public interface IStatReadOnly
     {
-        public int Get(EPlayerStatType stat);
-        public event Action<EPlayerStatType> OnStatChanged;
+        public int Get(ECreatureStatType stat);
     }
+    public interface IStatModifier
+    {
+        public event Action<ECreatureStatType> OnStatChanged;
+        public void ModifyStat(StatModifierContext modifierContext);
+    }
+
+    public enum StatModifyType
+    {
+        Add,
+        Multiple,
+        Ratio
+    }
+
+
     public interface IEnemyStatModifier
     {
         int Get(EEnemyStatType stat);

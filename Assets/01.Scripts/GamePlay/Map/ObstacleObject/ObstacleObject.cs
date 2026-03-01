@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace JW.DungeonSliding
 {
-    public class ObstacleObject : MonoBehaviour, ITilePosition
+    public class ObstacleObject : MonoBehaviour, ITileObject
     {
         public EObstacleObjectType ObjectType;
         public ParticleSystem Particle;

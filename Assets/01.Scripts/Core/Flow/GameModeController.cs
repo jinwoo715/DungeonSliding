@@ -8,8 +8,7 @@ namespace JW.DungeonSliding.Core.Flow
     public class GameModeController : IGameModeReader
     {
         private EGameModeType _gameFlowType = EGameModeType.Play;
-        public EGameModeType Flow => _gameFlowType;
-        public bool IsCanMove => Flow == 0;
+        public bool IsCanMove => GameMode == 0;
         public EGameModeType GameMode => _gameFlowType;
 
         public Dictionary<EGameModeType, Action> GameModeEvent = new();
