@@ -13,9 +13,9 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
     public interface IDamageable
     {
-        event Action OnHitDoneEvent;
+        event Action OnHitSequenceEnd;
+        event Action OnDeathEvent;
 
-        float DamageTakenMultiplier { get;}  // 받는 피해 배율
         ICombatant LastAttacker { get;}
 
         void AddDamageTakenMultiplier(float value);
@@ -23,17 +23,22 @@ namespace JW.DungeonSliding.GamePlay.Combat
         void ApplyDamage(int damage);
         void OnDeath();
     }
+
+    public interface IAttackRequester
+    {
+        bool TrySubmitAttackRequest(ICombatantSensor sensor, IAttackRequestListener attackRequestListener);
+    }
+
     public interface IAttackable
     {
-        Action<ActPair> OnCounterEvent { get; set; }
-        event Action OnAttackDoneEvent;
+        event Action<ActPair> OnCounterAttackTriggered;
+        event Action OnAttackSequenceEnd;
         ICombatant AttackTarget { get;}
-        float DamageDealtMultiplier { get; }  // 가하는 피해 배율
 
         void AddDamageContextStatue(EStatusEffectType effectType, int amount);
         void AddDamageDealtMultiplier(float value);
-        bool TrySubmitAttackRequest(ICombatantSensor sensor, IAttackRequestListener attackRequestListener);
         void StartAttackAnimation();
+        void ExcuteAttack();
     }
 
     public interface ICounterAttackable
@@ -81,12 +86,20 @@ namespace JW.DungeonSliding.GamePlay.Combat
         public void SetCurrentMoveCount(PlayerApplyStatContext context);
     }
 
-    public interface ICombatant : ITileObject, IAttackable, IDamageable, ICreatureRotator
+    public interface ICombatant : IAttackable, IDamageable, ICreatureRotator, ITileObject
     {
         public bool IsActive { get; }
         public bool IsCombat { get; }
-        public EDirectionType Direction { get; }
+        
         bool TryGet<T>(out T service) where T : class;
+
+        IStatModifier StatModifier { get; }
+        IStatReadOnly StatReadOnly { get; }
+
+        IStatusModifier StatusModifier { get; }
+        IStatusReadOnly StatusReadOnly { get; }
+
+        IAttackRequester AttackRequester { get; }
     }
 
     public interface ICombatProvider
@@ -98,7 +111,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
     {
         public ICombatant PlayerCombatant { get; }
         public List<ICombatant> AllEnemyCombatants { get; }
-        public bool GetCombatant(Tile tile, ECretureType targetType, out ICombatant combatant);
+        public bool GetCombatant(Tile tile, ECreatureType targetType, out ICombatant combatant);
         public int GetNearEnemyCount(Tile pivot);
     }
 

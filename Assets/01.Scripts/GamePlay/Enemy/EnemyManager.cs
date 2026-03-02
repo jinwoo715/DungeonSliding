@@ -120,7 +120,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         {
             Enemy enemy = Instantiate(_enemyPrefabList, this.transform);
             enemy.OnDeathEvent += OnEnemyDeath;
-            enemy.Init(_combatEventListener, ECretureType.Enemy);
+            enemy.Init(_combatEventListener, ECreatureType.Enemy);
 
             return enemy;
         }

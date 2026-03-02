@@ -37,7 +37,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
                 _animatorController.SetInt(ConstString.PLAYER_STATE_KEY, (int)_characterState);
             }
         }
-        public override void Init(ICombatEventListener combatEventListener, ECretureType cretureType)
+        public override void Init(ICombatEventListener combatEventListener, ECreatureType cretureType)
         {
             base.Init(combatEventListener, cretureType);
             _leveling.Initialize(1, 0);

@@ -62,7 +62,7 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
             
             _gameSceneUIManager.Init(_player, _combatEventBus, _abilitySystem, _gameSceneManager);
 
-            _player.Init(_combatEventBus, ECretureType.Player);
+            _player.Init(_combatEventBus, ECreatureType.Player);
 
             PlayerData player = new PlayerData(GameManager.Config.Player.HP, GameManager.Config.Player.DMG, GameManager.Config.Player.MVCount);
 

@@ -12,6 +12,9 @@ namespace JW.DungeonSliding.GamePlay.Stats
         private int _currentHP;
         private int _currentMove;
 
+        private int _damageDealMultiplier;
+        private int _damageTakeMultiplier;
+
         public event Action<ECreatureStatType> OnStatChanged;
        
         public CreatureStat(int hp, int damage, int moveCount)
@@ -22,13 +25,17 @@ namespace JW.DungeonSliding.GamePlay.Stats
 
             _currentHP = hp;
             _currentMove = moveCount;
+
+            _damageDealMultiplier = 1;
+            _damageTakeMultiplier = 1;
         }
 
         public int Get(ECreatureStatType stat)
         {
             if (stat == ECreatureStatType.CurrentHP) return _currentHP;
             if (stat == ECreatureStatType.CurrentMoveCount) return _currentMove;
-
+            if (stat == ECreatureStatType.DamageTakeMultiplier) return _damageTakeMultiplier;
+            if (stat == ECreatureStatType.DamageDealtMultiplier) return _damageDealMultiplier;
             if (_stats.TryGetValue(stat, out StatValue value))
             {
                 // 1. 이미 계산 중인 스탯을 또 물어본다면? (순환 참조 발견!)
@@ -52,23 +59,32 @@ namespace JW.DungeonSliding.GamePlay.Stats
 
         public void ModifyStat(StatModifierContext modifierContext)
         {
-            if(modifierContext.TargetStat == ECreatureStatType.CurrentHP)
+            if (modifierContext.TargetStat == ECreatureStatType.CurrentHP)
             {
                 _currentHP += Mathf.RoundToInt(modifierContext.Value);
 
                 int maxHp = Get(ECreatureStatType.MaxHp);
                 _currentHP = Mathf.Clamp(_currentHP, 0, maxHp);
             }
-            else if(modifierContext.TargetStat == ECreatureStatType.CurrentMoveCount)
+            else if (modifierContext.TargetStat == ECreatureStatType.CurrentMoveCount)
             {
                 _currentMove += Mathf.RoundToInt(modifierContext.Value);
 
                 int maxMove = Get(ECreatureStatType.MaxMoveCount);
                 _currentMove = Mathf.Clamp(_currentMove, 0, maxMove);
             }
+            else if (modifierContext.TargetStat == ECreatureStatType.DamageTakeMultiplier)
+            {
+                _damageTakeMultiplier += Mathf.RoundToInt(modifierContext.Value);
+
+            }
+            else if (modifierContext.TargetStat == ECreatureStatType.DamageDealtMultiplier)
+            {
+                _damageDealMultiplier += Mathf.RoundToInt(modifierContext.Value);
+            }
             else
             {
-                if(_stats.TryGetValue(modifierContext.TargetStat, out StatValue value))
+                if (_stats.TryGetValue(modifierContext.TargetStat, out StatValue value))
                 {
                     value.ModifiyStat(modifierContext);
 

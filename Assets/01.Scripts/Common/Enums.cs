@@ -51,7 +51,7 @@ namespace JW.DungeonSliding
         Idle,
         Run,
     }
-    public enum ECretureType
+    public enum ECreatureType
     {
         Player,
         Enemy
@@ -173,6 +173,8 @@ namespace JW.DungeonSliding
         CurrentHP,
         MaxHp,
         Damage,
+        DamageTakeMultiplier,
+        DamageDealtMultiplier,
         CurrentMoveCount,
         MaxMoveCount,
         BarrierCount,

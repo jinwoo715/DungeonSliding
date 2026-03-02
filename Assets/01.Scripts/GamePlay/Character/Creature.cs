@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Entities
 {
-    public abstract class Creature : MonoBehaviour, ICombatant, ICounterAttackable, IBarrierable
+    public abstract class Creature : MonoBehaviour, ICombatant, ICounterAttackable, IBarrierable, IAttackRequester
     {
         [SerializeField] protected AnimatorController _animatorController;
 
@@ -18,31 +18,47 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public ICombatant LastAttacker { get; private set; }
         public ICombatant AttackTarget { get; protected set; }
         public bool IsCombat { get; private set; }
-        public float DamageDealtMultiplier { get; private set; } = 1;
-        public float DamageTakenMultiplier { get; private set; } = 1;
-        
-        public event Action OnAttackDoneEvent;
-        public event Action OnHitDoneEvent;
+
+        public event Action OnAttackSequenceEnd;
+        public event Action OnHitSequenceEnd;
+        public event Action<ActPair> OnCounterAttackTriggered;
+        public event Action OnDeathEvent;
 
         public bool _isAttacked = false;
         public bool _isHitted = false;
         public Action<ActPair> OnCounterEvent { get; set; }
         public bool IsBarrierActive { get; private set; }
 
+        public IStatModifier StatModifier => throw new NotImplementedException();
+        public IStatReadOnly StatReadOnly => throw new NotImplementedException();
+        public IStatusModifier StatusModifier => _statusManager;
+        public IStatusReadOnly StatusReadOnly => _statusManager;
+
         protected DamageContext damageContext = new DamageContext();
-        private ECretureType _cretureType;
+        private ECreatureType _cretureType;
         private ICombatEventListener _combatEventListener;
 
         private CreatureStat _stat;
         private StatusEffectManager _statusManager;
+        private AttackRequester _attackRequester;
 
-        public virtual void Init(ICombatEventListener combatEventListener, ECretureType cretureType) 
+        public virtual void Init(ICombatEventListener combatEventListener, ECreatureType cretureType) 
         {
             _combatEventListener = combatEventListener;
             _cretureType = cretureType;
             IsActive = true;
             BindAnimEvent();
         }
+        public void RegisterRequester(Action<IAttackRequester> registerAction)
+        {
+            registerAction?.Invoke(_attackRequester);
+        }
+        public void UnRegisterRequester(Action<IAttackRequester> unregisterAction)
+        {
+            unregisterAction?.Invoke(_attackRequester);
+        }
+
+
         private void OnEnable()
         {
             GameTriggerEventBus.Instance?.SubscribeTriggerEvent(EGameTriggerType.OnBattleEnd, OnBattleEnd);
@@ -150,7 +166,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         {
             if (_statusManager.HasStatus(ECreatureStatus.Stun)) return false;
 
-            ECretureType searchType = _cretureType == ECretureType.Player ? ECretureType.Enemy : ECretureType.Player;
+            ECreatureType searchType = _cretureType == ECreatureType.Player ? ECreatureType.Enemy : ECreatureType.Player;
          
             if (sensor.GetCombatant(TilePosition.GetNextTile(Direction), searchType, out var target))
             {
@@ -209,8 +225,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
             _statusManager.ClearAllStatus();
 
-            OnHitDoneEvent?.Invoke();
-            OnAttackDoneEvent?.Invoke();
+            OnHitSequenceEnd?.Invoke();
+            OnAttackSequenceEnd?.Invoke();
         }
         #endregion
 
@@ -226,11 +242,11 @@ namespace JW.DungeonSliding.GamePlay.Entities
         }
         public virtual void EndHittedAnimation()
         {
-            OnHitDoneEvent?.Invoke();
+            OnHitSequenceEnd?.Invoke();
         }
         public virtual void EndAttackAnimation()
         {
-            OnAttackDoneEvent?.Invoke();
+            OnAttackSequenceEnd?.Invoke();
         }
         private void BindAnimEvent()
         {
@@ -300,6 +316,11 @@ namespace JW.DungeonSliding.GamePlay.Entities
         {
             damageContext.StatusEffect = effectType;
             damageContext.StatusAmount = amount;
+        }
+
+        public void ExcuteAttack()
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

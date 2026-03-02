@@ -3,10 +3,24 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Combat
 {
-    public class FieldCombatantManager : ICombatantSensor
+    public interface IRequesterRegistry
+    {
+        public void RegisterEnemyAttackRequester(IAttackRequester requester);
+        public void UnRegisterEnemyAttackRequester(IAttackRequester requester);
+        public void RegisterPlayerAttackRequester(IAttackRequester requester);
+        public void UnRegisterPlayerAttackRequester();
+    }
+
+    public class FieldCombatantManager : ICombatantSensor, IRequesterRegistry
     {
         private ICombatant _playerCombatant;
         private ICombatProvider _enemyCombatProvider;
+
+        private IAttackRequester _playerRequester;
+        private List<IAttackRequester> _enemyRequesters = new ();
+
+        public IAttackRequester PlayerRequester => _playerRequester;
+        public IReadOnlyList<IAttackRequester> EnemyRequesters => _enemyRequesters;
 
         public FieldCombatantManager(ICombatProvider combatProvider, ICombatant player)
         {
@@ -16,18 +30,18 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
         public ICombatant PlayerCombatant { get => _playerCombatant;}
         public List<ICombatant> AllEnemyCombatants => _enemyCombatProvider.GetAllActiveCombatant();
-        public bool GetCombatant(Tile tile, ECretureType targetType, out ICombatant combatant)
+        public bool GetCombatant(Tile tile, ECreatureType targetType, out ICombatant combatant)
         {
             switch (targetType)
             {
-                case ECretureType.Player:
+                case ECreatureType.Player:
                     if (_playerCombatant.TilePosition == tile)
                     {
                         combatant = _playerCombatant;
                         return true;
                     }
                     break;
-                case ECretureType.Enemy:
+                case ECreatureType.Enemy:
                     if (_enemyCombatProvider.TryGetCombatant(tile, out ICombatant combat))
                     {
                         combatant = combat;
@@ -58,6 +72,25 @@ namespace JW.DungeonSliding.GamePlay.Combat
             }
 
             return count;
+        }
+
+        public void RegisterPlayerAttackRequester(IAttackRequester requester)
+        {
+            _playerRequester = requester;
+        }
+        public void UnRegisterPlayerAttackRequester()
+        {
+            _playerRequester = null;
+        }
+        public void RegisterEnemyAttackRequester(IAttackRequester requester)
+        {
+            if (!_enemyRequesters.Contains(requester))
+                _enemyRequesters.Add(requester);
+        }
+        public void UnRegisterEnemyAttackRequester(IAttackRequester requester)
+        {
+            if (_enemyRequesters.Contains(requester))
+                _enemyRequesters.Remove(requester);
         }
     }
 }

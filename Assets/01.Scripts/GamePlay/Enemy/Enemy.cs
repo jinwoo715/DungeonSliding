@@ -83,7 +83,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             ExcuteCreatureAbility(ECreatureTrigger.OnReceivedAttack);
             return base.TakeDamage(damageInfo);
         }
-        public override void Init(ICombatEventListener combatEventListener, ECretureType cretureType)
+        public override void Init(ICombatEventListener combatEventListener, ECreatureType cretureType)
         {
             base.Init(combatEventListener, cretureType);
          

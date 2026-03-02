@@ -8,6 +8,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
 {
     public class BattleManager : MonoBehaviour, IAttackRequestListener
     {
+        //TODO BattleManager
         private ICombatantSensor _combatSensor;
 
         private Queue<ActPair> _actPairs = new Queue<ActPair>();
@@ -68,9 +69,9 @@ namespace JW.DungeonSliding.GamePlay.Combat
                 void OnAttackEnd() => isAttackDone = true;
                 void OnHitEnd() => isHitDone = true;
 
-                act.Attacker.OnAttackDoneEvent += OnAttackEnd;
-                act.Target.OnHitDoneEvent += OnHitEnd;
-                act.Target.OnCounterEvent += EnqueueCounterActPair;
+                act.Attacker.OnAttackSequenceEnd += OnAttackEnd;
+                act.Target.OnHitSequenceEnd += OnHitEnd;
+                act.Target.OnCounterAttackTriggered += EnqueueCounterActPair;
 
                 act.Attacker.StartAttackAnimation();
 
@@ -95,8 +96,8 @@ namespace JW.DungeonSliding.GamePlay.Combat
                     Debug.LogError($"Time Out Battle, Attack : {isAttackDone}, Hit : {isHitDone}");
                 }
 
-                act.Attacker.OnAttackDoneEvent -= OnAttackEnd;
-                act.Target.OnHitDoneEvent -= OnHitEnd;
+                act.Attacker.OnAttackSequenceEnd -= OnAttackEnd;
+                act.Target.OnHitSequenceEnd -= OnHitEnd;
             }
 
             GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnBattleEnd);

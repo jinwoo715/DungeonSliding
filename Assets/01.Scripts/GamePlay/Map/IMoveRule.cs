@@ -118,6 +118,7 @@ namespace JW.DungeonSliding
     }
     public interface ICreatureRotator
     {
+        public EDirectionType Direction { get; }
         public IEnumerator CoRotateToDirection(EDirectionType directionType);
         public void SetRotation(EDirectionType directionType);
         public IEnumerator CoRotateToTarget(ITileObject combatant, Action DoneCallback = null);
