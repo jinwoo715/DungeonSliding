@@ -73,7 +73,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
                 
                 boss.SetData(data, floor);
 
-                boss.SetPosition(tile);
+                boss.Tile.SetPosition(tile);
 
                 boss.SetAbility(EnemyAbilityFactory.Instance.GetAbility(data.AbilityList, boss, 1));
 
@@ -91,7 +91,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
                 boss.SetData(_enemyBossDataByUID["ENEMY_BOSS_EREBOS"], 1);
 
                 //boss.SetData(new EnemyData(), floor);
-                boss.SetPosition(tile);
+                boss.Tile.SetPosition(tile);
 
                 boss.SetAbility(EnemyAbilityFactory.Instance.GetAbility(_enemyBossDataByUID["ENEMY_BOSS_EREBOS"].AbilityList, boss, 1));
 
@@ -119,7 +119,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         private Enemy SpawnEnemy()
         {
             Enemy enemy = Instantiate(_enemyPrefabList, this.transform);
-            enemy.OnDeathEvent += OnEnemyDeath;
+            //enemy.OnDeathEvent += OnEnemyDeath;
             enemy.Init(_combatEventListener, ECreatureType.Enemy);
 
             return enemy;
@@ -135,10 +135,12 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
             Debug.Log("DeathEvent");
 
-            _activeEnemyByTile.Remove(enemy.TilePosition);
-            _obstacleRequest.SpawnObstacle(enemy.TilePosition, EObstacleObjectType.Rubble);
+            Tile tile = enemy.Tile.TilePosition;
+
+            _activeEnemyByTile.Remove(tile);
+            _obstacleRequest.SpawnObstacle(tile, EObstacleObjectType.Rubble);
             _enemyStatUIService.Detach(enemy);
-            _board.UnRegisterEnemyTile(enemy.TilePosition);
+            _board.UnRegisterEnemyTile(tile);
 
             if (_activeEnemyByTile.Count == 0)
             {

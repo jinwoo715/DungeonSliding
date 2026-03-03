@@ -38,7 +38,7 @@ namespace JW.DungeonSliding.UI
 
                 var obj = objectPool.GetObject();
 
-                Vector3 spawnPosition = damageEvent.Target.TilePosition.GetPosition;
+                Vector3 spawnPosition = damageEvent.Target.Tile.TilePosition.GetPosition;
                 spawnPosition += Vector3.up;
 
                 obj.transform.position = Camera.main.WorldToScreenPoint(spawnPosition);

@@ -10,14 +10,16 @@ namespace JW.DungeonSliding.GamePlay.Combat
     {
         //TODO BattleManager
         private ICombatantSensor _combatSensor;
+        private IRequesterProvider _requesterProvider;
 
         private Queue<ActPair> _actPairs = new Queue<ActPair>();
         private Queue<ActPair> _counterActPairs = new Queue<ActPair>();
         private HashSet<(ICombatant, ICombatant)> _counterActs = new ();
 
-        public void Init(ICombatantSensor combatantSensor)
+        public void Init(ICombatantSensor combatantSensor, IRequesterProvider requesterProvider)
         {
             _combatSensor = combatantSensor;
+            _requesterProvider = requesterProvider;
 
             GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.OnMoveEnd, StartBattleSequence);
         }
@@ -31,13 +33,14 @@ namespace JW.DungeonSliding.GamePlay.Combat
         {
             GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnBattleStart);
 
-            _combatSensor.PlayerCombatant.TrySubmitAttackRequest(_combatSensor, this);
+            List<IAttackRequester> requesters = new List<IAttackRequester>();
 
-            List<ICombatant> enemies = _combatSensor.AllEnemyCombatants;
+            requesters.Add(_requesterProvider.PlayerRequester);
+            requesters.AddRange(_requesterProvider.EnemyRequesters);
 
-            for (int i = 0; i < enemies.Count; i++)
+            for (int i = 0; i < requesters.Count; i++)
             {
-                enemies[i].TrySubmitAttackRequest(_combatSensor, this);
+                requesters[i].TrySubmitAttackRequest(_combatSensor, this);
             }
 
             StartCoroutine(CoStartSequence());
@@ -71,9 +74,8 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
                 act.Attacker.OnAttackSequenceEnd += OnAttackEnd;
                 act.Target.OnHitSequenceEnd += OnHitEnd;
-                act.Target.OnCounterAttackTriggered += EnqueueCounterActPair;
 
-                act.Attacker.StartAttackAnimation();
+                act.Attacker.ExcuteAttack(act);
 
                 float timer = 0;
                 const float timeOut = 3.0f;

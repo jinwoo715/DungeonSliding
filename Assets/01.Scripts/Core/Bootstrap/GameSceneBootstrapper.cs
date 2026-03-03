@@ -21,6 +21,7 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
         private CombatEventBus _combatEventBus = new();
         private AbilitySystem _abilitySystem;
         private FieldCombatantManager _fieldCombatantManager;
+        private FieldAttackRequesterManager _fieldAttackRequesterManager;
         private RouteBuilder _routeBuilder;
         private BossAbilityManager _bossAbilityManager;
         private MoveRule _moveRule = new MoveRule();
@@ -73,9 +74,9 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
             _enemyManager.WireInterfaces(_mapManager, _obstacleController, _gameSceneUIManager.EnemyStatUIService, _combatEventBus);
             _enemyManager.LoadData();
 
-            _mapManager.Init(_player);
+            _mapManager.Init(_player.Tile);
             
-            _battleManager.Init(_fieldCombatantManager);
+            _battleManager.Init(_fieldCombatantManager, _fieldAttackRequesterManager);
 
             _rewardManager.Init(_combatEventBus);
 

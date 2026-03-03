@@ -16,11 +16,11 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         public override void ExcuteAbility()
         {
-            if (!_bindEenmies.Contains(_combatant.AttackTarget))
-            {
-                _bindEenmies.Add(_combatant.AttackTarget);
-                //_combatant.AttackTarget.ApplyStatus(ECreatureStatus.Bind, 1);
-            }
+            //if (!_bindEenmies.Contains(_combatant.AttackTarget))
+            //{
+            //    _bindEenmies.Add(_combatant.AttackTarget);
+            //    //_combatant.AttackTarget.ApplyStatus(ECreatureStatus.Bind, 1);
+            //}
         }
 
         public override void ProcTrigger(EGameTriggerType triggerType)

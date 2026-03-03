@@ -18,13 +18,13 @@ namespace JW.DungeonSliding.UI
             UnBind();
 
             _statReadOnly = statReadOnly;
-            _statReadOnly.OnStatChanged += ChangePlayerStat;
+            //_statReadOnly.OnStatChanged += ChangePlayerStat;
         }
         private void UnBind()
         {
             if(_statReadOnly != null)
             {
-                _statReadOnly.OnStatChanged -= ChangePlayerStat;
+                //_statReadOnly.OnStatChanged -= ChangePlayerStat;
                 _statReadOnly = null;
             }
         }

@@ -11,7 +11,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             //_copyAbility = new CopyAbility(bossAbilityGetter, this);
         }
 
-        public override void StartAttackAnimation()
+        public void ExcuteAttack()
         {
             _animatorController.SetAnimationTrigger(ConstString.ONE_HAND_ATTACK_ANIM);
         }

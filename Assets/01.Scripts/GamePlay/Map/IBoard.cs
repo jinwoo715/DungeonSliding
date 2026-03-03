@@ -14,6 +14,11 @@ namespace JW.DungeonSliding.Map
         public void ClearEnemyBoard();
     }
 
+    public interface IBoardCreatureRegister
+    {
+
+    }
+
     public interface ITileCheckService
     {
         public bool IsRouteTile(Tile point);

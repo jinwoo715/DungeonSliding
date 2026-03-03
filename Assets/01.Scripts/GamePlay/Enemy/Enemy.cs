@@ -15,7 +15,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
         [SerializeField] private EnemyData _enemyData;
 
-        public event Action<Enemy> OnDeathEvent;
         public event Action<EEnemyStatType> OnStatChangedEvent;
         private float _backAttackMultiplier = 2f;
 
@@ -78,11 +77,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         }
 
         #endregion
-        public override bool TakeDamage(DamageContext damageInfo)
-        {
-            ExcuteCreatureAbility(ECreatureTrigger.OnReceivedAttack);
-            return base.TakeDamage(damageInfo);
-        }
+
         public override void Init(ICombatEventListener combatEventListener, ECreatureType cretureType)
         {
             base.Init(combatEventListener, cretureType);
@@ -96,7 +91,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             _enemyData = data;
 
             int RandomDir = UnityEngine.Random.Range(0, 4);
-            SetRotation((EDirectionType)RandomDir);
+            Rotate.SetRotation((EDirectionType)RandomDir);
 
             int hp = CalculateHP(_enemyData.BaseHP, floor);
             int dmg = CalculateDamage(_enemyData.BaseDamage, floor);
@@ -107,32 +102,16 @@ namespace JW.DungeonSliding.GamePlay.Entities
             OnStatChangedEvent?.Invoke(EEnemyStatType.HP);
             OnStatChangedEvent?.Invoke(EEnemyStatType.Damage);
         }
-        protected override DamageContext CalculateRealAppliedDamage(DamageContext damageInfo)
+        protected DamageContext CalculateRealAppliedDamage(DamageContext damageInfo)
         {
             int damage = damageInfo.Damage;
             bool critical = damageInfo.IsCritical;
-
-            if(IsBackAttack(damageInfo.Attacker))
-            {
-                GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnBackAttack);
-                damage = (int)(damage * _backAttackMultiplier);
-                critical = true;
-            }
 
             DamageContext info = new DamageContext(damageInfo.Attacker, damage, critical);
 
             return info;
         }
-        bool IsBackAttack(ICombatant attacker)
-        {
-            var behindTile = TilePosition.GetNextTile(ReverseDirection(Direction));
-            return behindTile != null && attacker.TilePosition == behindTile;
-        }
-        public override void AddDamageDealtMultiplier(float value)
-        {
-            base.AddDamageDealtMultiplier(value);
-            OnStatChangedEvent?.Invoke(EEnemyStatType.Damage);
-        }
+
         public void SetEnemyStat(EEnemyStatType stat, int value)
         {
             switch (stat)
@@ -187,7 +166,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
             return returnValue;
         }
-        protected override void ReduceHP(int damage)
+        protected void ReduceHP(int damage)
         {
             ModifyEnemyStat(new EnemyApplyStatContext(EEnemyStatType.HP, EApplyStatType.Add, -damage, EEnemyStatType.None));
         }
@@ -195,18 +174,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         {
             base.OnDeath();
             GameTriggerEventBus.Instance?.ExcuteAbilityEvent(EGameTriggerType.OnKillEnemy);
-            OnDeathEvent?.Invoke(this);
-        }
-        public override void StartAttackAnimation() { }
-
-        protected override DamageContext CreateDamageContext()
-        {
-            ExcuteCreatureAbility(ECreatureTrigger.OnAttack);
-
-            damageContext.Attacker = this;
-            damageContext.Damage = Get(EEnemyStatType.Damage);
-
-            return damageContext;
+            //OnDeathEvent?.Invoke(this);
         }
 
         #region Calculate Stat

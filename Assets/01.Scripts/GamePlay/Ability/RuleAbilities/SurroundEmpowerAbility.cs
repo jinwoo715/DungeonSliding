@@ -21,7 +21,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         public override void ExcuteAbility()
         {
-            int count = _sensor.GetNearEnemyCount(_combatant.TilePosition);
+            int count = _sensor.GetNearEnemyCount(_combatant.Tile.TilePosition);
 
             _applyStatContext.AddValue(-_data.P1 * count);
             

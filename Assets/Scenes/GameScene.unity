@@ -3345,8 +3345,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _animatorController: {fileID: 726333317}
-  _isAttacked: 0
-  _isHitted: 0
   _moveController: {fileID: 726333319}
   _barrierObj: {fileID: 700459559}
 --- !u!114 &726333317

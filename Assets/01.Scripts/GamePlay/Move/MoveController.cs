@@ -32,7 +32,7 @@ namespace JW.DungeonSliding
         {
             IsMoving = true;
 
-            Queue<MoveContext> moveQueue = _routeService.BuildRoute(_moveable.TilePosition, inputDirection, 100);
+            Queue<MoveContext> moveQueue = _routeService.BuildRoute(_moveable.Tile.TilePosition, inputDirection, 100);
 
             if (moveQueue.Count == 1)
             {
@@ -73,7 +73,7 @@ namespace JW.DungeonSliding
                     case ESlideResultType.EnemyStop:
                         break;
                     case ESlideResultType.Teleport:
-                        _moveable.SetPosition(moveContext.DestTile);
+                        _moveable.Tile.SetPosition(moveContext.DestTile);
                         break;
                 }
 
@@ -101,7 +101,7 @@ namespace JW.DungeonSliding
                 yield return null;
             }
 
-            _moveable.SetPosition(moveContext.DestTile);
+            _moveable.Tile.SetPosition(moveContext.DestTile);
         }
         private void FinishMove()
         {
@@ -117,7 +117,7 @@ namespace JW.DungeonSliding
 
         public IEnumerator CoKnockBack(EDirectionType dir)
         {
-            Queue<MoveContext> moveQueue = _routeService.BuildRoute(_moveable.TilePosition, dir, 2);
+            Queue<MoveContext> moveQueue = _routeService.BuildRoute(_moveable.Tile.TilePosition, dir, 2);
 
             if (moveQueue.Count > 1)
             {
@@ -129,7 +129,7 @@ namespace JW.DungeonSliding
                 yield return StartCoroutine(CoPushed(first.DestTile));
 
                 if (second.ResultType == ESlideResultType.Teleport)
-                    _moveable.SetPosition(second.DestTile);
+                    _moveable.Tile.SetPosition(second.DestTile);
 
                 FinishMove();
             }
@@ -139,7 +139,7 @@ namespace JW.DungeonSliding
             float elapsed = 0f;
             float duration = 0.45f;
 
-            Vector3 startPosition = _moveable.TilePosition.GetPosition;
+            Vector3 startPosition = _moveable.Tile.TilePosition.GetPosition;
             Vector3 endPosition = backTile.GetPosition;
 
             while (elapsed < duration)
@@ -155,7 +155,7 @@ namespace JW.DungeonSliding
                 yield return null;
             }
 
-            _moveable.SetPosition(backTile);
+            _moveable.Tile.SetPosition(backTile);
 
             IsMoving = false;
             OnPushedEnd?.Invoke();

@@ -14,7 +14,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         public override void ExcuteAbility()
         {
-            EDirectionType bounceDir = GameUtil.ReverseDirection(_combatant.Direction);
+            EDirectionType bounceDir = GameUtil.ReverseDirection(_combatant.Rotate.Direction);
             _moveable.KnockBack(bounceDir);
         }
 

@@ -10,7 +10,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             //_heavyGravityAbility = new HeavyGravityAbility(bossAbilityGetter, this);
             StartCoroutine(_heavyGravityAbility.Excute());
         }
-        public override void StartAttackAnimation()
+        public void ExcuteAttack()
         {
             _animatorController.SetAnimationTrigger(ConstString.ONE_HAND_ATTACK_ANIM);
         }

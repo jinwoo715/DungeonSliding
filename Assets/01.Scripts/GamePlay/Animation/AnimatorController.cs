@@ -25,7 +25,14 @@ namespace JW.DungeonSliding
 
         public void SetAnimationTrigger(string triggerKey)
         {
-            _animator.SetTrigger(triggerKey);
+            try
+            {
+                _animator.SetTrigger(triggerKey);
+            }
+            catch
+            {
+                Debug.LogError("Not Find Animation Key");
+            }
         }
         public void SetInt(string key, int value)
         {

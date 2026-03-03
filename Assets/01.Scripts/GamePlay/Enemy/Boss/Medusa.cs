@@ -26,7 +26,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         {
             StartCoroutine(_facingMoveBanAbility.Excute());
         }
-        public override void StartAttackAnimation()
+        public void ExcuteAttack()
         {
             _animatorController.SetAnimationTrigger(ConstString.ONE_HAND_ATTACK_ANIM);
         }

@@ -67,7 +67,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             _leveling.OnChangedXp += HandleXpChanged;
 
             _moveController.Initialize(_routeService, this);
-            _moveController.OnDirectionChanged += SetRotation;
+            _moveController.OnDirectionChanged += Rotate.SetRotation;
             _moveController.OnSlideStart += HandleSlideStart;
             _moveController.OnSlideEnd += HandleSlideEnd;
             _moveController.OnSlideBlocked += HandleSlideBlocked;
@@ -131,7 +131,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         {
             if (Input.GetKeyDown(KeyCode.C))
             {
-                KnockBack(ReverseDirection(Direction));
+                KnockBack(GridUtility.GetReverseDirection(Rotate.Direction));
             }
         }
 
@@ -147,20 +147,18 @@ namespace JW.DungeonSliding.GamePlay.Entities
         {
             base.OnDeath();
         }
-        public override bool TakeDamage(DamageContext damageInfo)
+        public override void TakeDamage(DamageContext damageInfo)
         {
-            if (base.TakeDamage(damageInfo))
-            {
-                GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnDamaged);
-            }
+            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnDamaged);
 
-            SetRotation(DirectionToTile(damageInfo.Attacker.TilePosition));
+            EDirectionType dir = GridUtility.GetDirFromTileToTile(Tile.TilePosition, damageInfo.Attacker.Tile.TilePosition);
+            Rotate.SetRotation(dir);
 
-            if(damageInfo.StatusEffect == EStatusEffectType.KnockBack)
+            if(damageInfo.Status.ContainsKey(EStatusEffectType.KnockBack))
             {
-                EDirectionType toAttackDir = DirectionToTile(damageInfo.Attacker.TilePosition);
-                EDirectionType backDirection = ReverseDirection(toAttackDir);
-                Tile backTile = TilePosition.GetNextTile(backDirection);
+                EDirectionType toAttackDir = GridUtility.GetDirFromTileToTile(Tile.TilePosition, damageInfo.Attacker.Tile.TilePosition);
+                EDirectionType backDirection = GridUtility.GetReverseDirection(toAttackDir);
+                Tile backTile = Tile.TilePosition.GetNextTileByDir(backDirection);
 
                 if (_tileCheckService.IsRouteTile(backTile))
                 {
@@ -169,15 +167,13 @@ namespace JW.DungeonSliding.GamePlay.Entities
             }
 
             _animatorController.SetAnimationTrigger(ConstString.HIT_ANIM);
-
-            return true;
         }
         public override void EndHittedAnimation()
         {
             if (!_moveController.IsMoving)
                 base.EndHittedAnimation();
         }
-        public override void StartAttackAnimation()
+        public void ExcuteAttack()
         {
             _animatorController.SetAnimationTrigger(ConstString.ONE_HAND_ATTACK_ANIM);
         }
@@ -192,7 +188,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
             ClearEnhance();
         }
-        protected override void ReduceHP(int damage)
+        protected void ReduceHP(int damage)
         {
             ModifyStat(new PlayerApplyStatContext(EPlayerStatType.CurrentHP, EApplyStatType.Add, EPlayerStatType.None, -damage));
         }
@@ -213,16 +209,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
             //    OnDeath();
         }
 
-        protected override DamageContext CreateDamageContext()
-        {
-            DamageContext damageInfo = new DamageContext(this, Get(EPlayerStatType.Damage), false);
-            return damageInfo;
-        }
-        protected override int CalculateRealAppliedDamage(int takeDamage)
-        {
-            int damage = (int)(takeDamage * DamageTakenMultiplier);
-            return damage;
-        }
         #endregion
 
         #region Stat
@@ -387,9 +373,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
             OnStatChanged?.Invoke(EPlayerStatType.Damage);
         }
 
-        public override void AddDamageDealtMultiplier(float value)
+        public void AddDamageDealtMultiplier(float value)
         {
-            base.AddDamageDealtMultiplier(value);
             OnStatChanged?.Invoke(EPlayerStatType.Damage);
         }
         public void ClearEnhance()
@@ -399,16 +384,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
         }
         #endregion
 
-        public override void GainBarrier()
-        {
-            base.GainBarrier();
-            _barrierObj.SetActive(IsBarrierActive);
-        }
-        public override void ReleaseBarrier()
-        {
-            base.ReleaseBarrier();
-            _barrierObj.SetActive(IsBarrierActive);
-        }
 
         public void SetMoveResult(ESlideResultType result)
         {

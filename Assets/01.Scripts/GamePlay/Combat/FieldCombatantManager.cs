@@ -11,6 +11,40 @@ namespace JW.DungeonSliding.GamePlay.Combat
         public void UnRegisterPlayerAttackRequester();
     }
 
+    public interface IRequesterProvider
+    {
+        public IAttackRequester PlayerRequester { get; }
+        public IReadOnlyList<IAttackRequester> EnemyRequesters { get; }
+    }
+    public class FieldAttackRequesterManager : IRequesterProvider, IRequesterRegistry
+    {
+        private IAttackRequester _playerRequester;
+        private List<IAttackRequester> _enemyRequesters = new();
+
+        public IAttackRequester PlayerRequester => _playerRequester;
+        public IReadOnlyList<IAttackRequester> EnemyRequesters => _enemyRequesters;
+
+
+        public void RegisterPlayerAttackRequester(IAttackRequester requester)
+        {
+            _playerRequester = requester;
+        }
+        public void UnRegisterPlayerAttackRequester()
+        {
+            _playerRequester = null;
+        }
+        public void RegisterEnemyAttackRequester(IAttackRequester requester)
+        {
+            if (!_enemyRequesters.Contains(requester))
+                _enemyRequesters.Add(requester);
+        }
+        public void UnRegisterEnemyAttackRequester(IAttackRequester requester)
+        {
+            if (_enemyRequesters.Contains(requester))
+                _enemyRequesters.Remove(requester);
+        }
+    }
+
     public class FieldCombatantManager : ICombatantSensor, IRequesterRegistry
     {
         private ICombatant _playerCombatant;
@@ -35,7 +69,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
             switch (targetType)
             {
                 case ECreatureType.Player:
-                    if (_playerCombatant.TilePosition == tile)
+                    if (_playerCombatant.Tile.TilePosition == tile)
                     {
                         combatant = _playerCombatant;
                         return true;

@@ -19,7 +19,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
             ECreatureType searchType = _myType == ECreatureType.Player ? ECreatureType.Enemy : ECreatureType.Player;
 
-            if (sensor.GetCombatant(_owner.TilePosition.GetNextTile(_owner.Direction), searchType, out var target))
+            if (sensor.GetCombatant(_owner.Tile.TilePosition.GetNextTileByDir(_owner.Rotate.Direction), searchType, out var target))
             {
                 attackRequestListener.EnqueueActPair(new ActPair(_owner, target));
                 return true;

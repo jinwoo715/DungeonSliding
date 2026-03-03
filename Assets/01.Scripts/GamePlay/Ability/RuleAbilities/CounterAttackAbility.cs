@@ -14,7 +14,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         public override void ExcuteAbility()
         {
-            _counterAttackable.RequestCounterAttack(_damageable.LastAttacker);
+            //_counterAttackable.RequestCounterAttack(_damageable.LastAttacker);
         }
 
         public override void ProcTrigger(EGameTriggerType triggerType)

@@ -2,6 +2,7 @@ using JW.DungeonSliding.GamePlay;
 using JW.DungeonSliding.GamePlay.Combat;
 using JW.DungeonSliding.GamePlay.Entities;
 using JW.DungeonSliding.GamePlay.Stats;
+using JW.DungeonSliding.Map;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -116,12 +117,12 @@ namespace JW.DungeonSliding
         IStatReadOnly PlayerStatReader { get; }
         IVisualController VisualController { get; }
     }
-    public interface ICreatureRotator
+    public interface IRotateObject
     {
         public EDirectionType Direction { get; }
+        public EDirectionType ReverseDirection(EDirectionType directionType);
         public IEnumerator CoRotateToDirection(EDirectionType directionType);
         public void SetRotation(EDirectionType directionType);
-        public IEnumerator CoRotateToTarget(ITileObject combatant, Action DoneCallback = null);
     }
     public interface IEnemyAbility
     {
@@ -167,14 +168,14 @@ namespace JW.DungeonSliding
 
     public class AutoRotateAbility : EnemyAbilityBase
     {
-        ICreatureRotator _creatureRotator;
+        IRotateObject _creatureRotator;
         IMoveRule _moveRule;
 
         public AutoRotateAbility(EnemyAbilityData data, IEnemyAbilityGetter getter, ICombatant owner, int section) : base(data, getter, owner, section) { }
 
         public override void Bind(IEnemyAbilityGetter bossAbilityGetter)
         {
-            if (_owner.TryGet<ICreatureRotator>(out var service))
+            if (_owner.TryGet<IRotateObject>(out var service))
                 _creatureRotator = service;
 
             _moveRule = bossAbilityGetter.MoveRule;
@@ -182,10 +183,10 @@ namespace JW.DungeonSliding
 
         public override IEnumerator Excute()
         {
-            if (!_owner.IsCombat)
+            //if (!_owner.IsCombat)
             {
                 _moveRule.SetIsMoveable(false);
-                EDirectionType nextDirection = (EDirectionType)(((int)_owner.Direction + 1) % 4);
+                EDirectionType nextDirection = (EDirectionType)(((int)_owner.Rotate.Direction + 1) % 4);
                 yield return _creatureRotator.CoRotateToDirection(nextDirection);
                 _moveRule.SetIsMoveable(true);
             }
@@ -199,7 +200,7 @@ namespace JW.DungeonSliding
 
         public override IEnumerator Excute()
         {
-            _moveRule.SetMoveBanDirection(_owner.Direction);
+            _moveRule.SetMoveBanDirection(_owner.Rotate.Direction);
             yield return null;
         }
 
@@ -373,7 +374,9 @@ namespace JW.DungeonSliding
             foreach (var enemy in enemies)
             {
                 remain++;
-                enemy.CoRotateToTarget(playerTile, () => remain--);
+
+                EDirectionType dir = GridUtility.GetDirFromTileToTile(enemy.Tile.TilePosition, playerTile.Tile.TilePosition);
+                enemy.Rotate.CoRotateToDirection(dir);
             }
 
             while (remain > 0)
@@ -411,7 +414,7 @@ namespace JW.DungeonSliding
 
                 if (chanceValue <= _data.BaseP1)
                 {
-                    _counterAttackable.RequestCounterAttack(_damageable.LastAttacker);
+                    //_counterAttackable.RequestCounterAttack(_damageable.LastAttacker);
                 }
             }
 
@@ -450,7 +453,7 @@ namespace JW.DungeonSliding
 
         public override IEnumerator Excute()
         {
-            _attackable.AddDamageContextStatue(EStatusEffectType.KnockBack, (int)_data.BaseP1);
+            //_attackable.AddDamageContextStatue(EStatusEffectType.KnockBack, (int)_data.BaseP1);
             yield return null;
         }
     }
@@ -472,7 +475,8 @@ namespace JW.DungeonSliding
 
             var playerTile = _sensor.PlayerCombatant;
 
-            yield return _owner.CoRotateToTarget(playerTile);
+            EDirectionType dir = GridUtility.GetDirFromTileToTile(_owner.Tile.TilePosition, playerTile.Tile.TilePosition);
+            yield return _owner.Rotate.CoRotateToDirection(dir);
 
             _moveRule.SetIsMoveable(true);
         }
