@@ -6,14 +6,21 @@ namespace JW.DungeonSliding.GamePlay.Combat
     {
         private ICombatant _owner;
         private ECreatureType _myType;
+        private IAttackRequestListener _attackRequestListener;
 
-        public AttackRequester(ICombatant owner, ECreatureType myType)
+        public AttackRequester(ICombatant owner, ECreatureType myType, IAttackRequestListener attackRequestListener)
         {
             _owner = owner;
             _myType = myType;
+            _attackRequestListener = attackRequestListener;
         }
 
-        public bool TrySubmitAttackRequest(ICombatantSensor sensor, IAttackRequestListener attackRequestListener)
+        public void RequestCounterAttack(ICombatant target)
+        {
+            _attackRequestListener.EnqueueCounterActPair(new ActPair(_owner, target));
+        }
+
+        public bool TrySubmitAttackRequest(ICombatantSensor sensor)
         {
             if (_owner.StatusReadOnly.HasStatus(ECreatureStatus.Stun)) return false;
 
@@ -21,7 +28,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
             if (sensor.GetCombatant(_owner.Tile.TilePosition.GetNextTileByDir(_owner.Rotate.Direction), searchType, out var target))
             {
-                attackRequestListener.EnqueueActPair(new ActPair(_owner, target));
+                _attackRequestListener.EnqueueActPair(new ActPair(_owner, target));
                 return true;
             }
             else
@@ -29,5 +36,6 @@ namespace JW.DungeonSliding.GamePlay.Combat
                 return false;
             }
         }
+
     }
 }

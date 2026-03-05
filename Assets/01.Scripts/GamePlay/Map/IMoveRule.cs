@@ -119,29 +119,45 @@ namespace JW.DungeonSliding
     }
     public interface IRotateObject
     {
+        public event Action OnRotateEnd;
         public EDirectionType Direction { get; }
         public EDirectionType ReverseDirection(EDirectionType directionType);
         public IEnumerator CoRotateToDirection(EDirectionType directionType);
         public void SetRotation(EDirectionType directionType);
     }
-    public interface IEnemyAbility
+    public interface IAbility
     {
         public EGameTriggerType GameTrigger { get; }
         public ECreatureTrigger CreatureTrigger { get; }
         public IEnumerator Excute();
         public void ReleaseAbility();
     }
+
+    public interface IAbilityPayloadReceiver<T>
+    {
+        void ReceivePayload(T payload);
+    }
+
     public enum ECreatureTrigger
     {
         None,
         OnRotate,
-        OnAttack,
-        OnReceivedAttack,
-        OnHitted,
+
+        // 공격 시퀀스
+        OnAttackPrepared,   // 공격 직전 (버프 주입, 데미지 계산 전)
+        OnAttackPerformed,  // 공격 실행 완료 (흡혈, 처치 시 효과) - OnAttacked 대신 더 명확한 표현
+
+        // 피격 시퀀스
+        OnBeforeHitted,     // 데미지 계산 전 (방어 버프, 회피 판정) - OnReceivedAttack 대응
+        OnAfterHitted,      // 데미지 계산 및 체력 감소 후 (반격, 피격 시 연출) - OnHitted 대응
+
+        OnDeathByHp,
+        OnDeathByMoveCount,
+
         OnDeath
     }
 
-    public abstract class EnemyAbilityBase : IEnemyAbility
+    public abstract class EnemyAbilityBase : IAbility
     {
         public EnemyAbilityData _data;
         protected ICombatant _owner;

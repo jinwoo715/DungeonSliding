@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace JW.DungeonSliding
 {
-    public class StatAbility : IAbility
+    public class StatAbility : IAbilityBase
     {
         private StatAbilityData _data;
         private AbilityHost _host;
@@ -53,7 +53,7 @@ namespace JW.DungeonSliding
                     break;
                 case EAbilityApplyStatType.NextAttack:
 
-                    _nextAttackEnhancer.AddEnhance(_data.NextAttackType, _data.NextAttackValue);
+                    _nextAttackEnhancer.AddAttackCount(Mathf.RoundToInt(_data.NextAttackValue));
 
                     break;
             }

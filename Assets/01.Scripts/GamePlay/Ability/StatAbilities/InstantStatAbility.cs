@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Ability
 {
-    public class InstantStatAbility : IAbility
+    public class InstantStatAbility : IAbilityBase
     {
         public readonly InstantStatAbiltyData _data;
         public IAbilityHost Host { get; private set; }

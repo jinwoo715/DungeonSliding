@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -7,6 +8,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
     {
         private Transform _owner;
 
+        public event Action OnRotateEnd;
         public ObjectRotator(Transform owner)
         {
             _owner = owner;
@@ -47,8 +49,9 @@ namespace JW.DungeonSliding.GamePlay.Entities
                     yield return null;
                 }
 
-                SetRotation(directionType);
             }
+            SetRotation(directionType);
+            OnRotateEnd?.Invoke();
         }
         public void SetRotation(EDirectionType directionType)
         {

@@ -1,10 +1,17 @@
 namespace JW.DungeonSliding.GamePlay.Combat
 {
-    public struct NextAttackBuff
+    public interface INextAttackEnhancer
     {
-        public int NextExtraAttackAcount;
-        public int NextExtraDamage;
-        public float NextExtraDamageMultiplier;
+        void AddDamage(int damage);
+        void AddDamageMulti(float multi);
+        void AddAttackCount(int count);
+    }
+
+    public class NextAttackEnhanceContext
+    {
+        public int NextExtraAttackAcount = 0;
+        public int NextExtraDamage = 0;
+        public float NextExtraDamageMultiplier = 1;
 
         public void AddDamage(int damage)
         {

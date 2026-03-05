@@ -57,7 +57,7 @@ namespace JW.DungeonSliding.GamePlay.Statues
             }
         }
 
-        public void ClearAllStatus()
+        public void Reset()
         {
             _statusDurations.Clear();
             _statusFlags = ECreatureStatus.None;

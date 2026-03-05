@@ -40,7 +40,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
             for (int i = 0; i < requesters.Count; i++)
             {
-                requesters[i].TrySubmitAttackRequest(_combatSensor, this);
+                requesters[i].TrySubmitAttackRequest(_combatSensor);
             }
 
             StartCoroutine(CoStartSequence());

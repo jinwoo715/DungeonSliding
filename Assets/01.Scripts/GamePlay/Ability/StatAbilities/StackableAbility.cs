@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Ability
 {
-    public class StackableAbility : IAbility
+    public class StackableAbility : IAbilityBase
     {
         public readonly StackableStatAbilityData _data;
         
@@ -51,28 +51,28 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
                     if (Host.TryGet<INextAttackEnhancer>(out var service))
                     {
-                        switch (_data.ApplyType)
-                        {
-                            case EApplyStatType.Add:
-                                service.AddEnhance(ENextAttackType.Add, _data.Value);
-                                break;
-                            case EApplyStatType.Multiple:
-                                service.AddEnhance(ENextAttackType.Multiple, _data.Value);
-                                break;
-                        }
+                        //switch (_data.ApplyType)
+                        //{
+                        //    case EApplyStatType.Add:
+                        //        service.AddDamage(Mathf.C _data.Value);
+                        //        break;
+                        //    case EApplyStatType.Multiple:
+                        //        service.AddEnhance(ENextAttackType.Multiple, _data.Value);
+                        //        break;
+                        //}
 
                         switch (_data.nextAttackEnhanceType)
                         {
                             case ENextAttackType.Add:
-                                service.AddEnhance(ENextAttackType.Add, _data.AddNextAttackDamage);
+                                service.AddDamage(_data.AddNextAttackDamage);
 
                                 break;
                             case ENextAttackType.Multiple:
-                                service.AddEnhance(ENextAttackType.Multiple, _data.MultiNextAttackDamage);
+                                service.AddDamageMulti(_data.MultiNextAttackDamage);
 
                                 break;
                             case ENextAttackType.ExtraAttack:
-                                service.AddEnhance(ENextAttackType.ExtraAttack, _data.ExtraAttackCount);
+                                service.AddAttackCount(_data.ExtraAttackCount);
 
                                 break;
                         }

@@ -1,6 +1,6 @@
 namespace JW.DungeonSliding.GamePlay.Ability
 {
-    public abstract class AbilityBase : IAbility
+    public abstract class AbilityBase : IAbilityBase
     {
         public readonly RuleAbilityData _data;
         private AbilityHost _host;

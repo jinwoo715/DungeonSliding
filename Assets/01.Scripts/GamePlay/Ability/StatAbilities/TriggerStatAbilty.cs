@@ -3,17 +3,13 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Ability
 {
-    public class TriggerStatAbilty : IAbility
+    public class TriggerStatAbilty : IAbilityBase
     {
         public readonly TriggerStatAbiltyData _data;
 
-        private IPlayerStatModifier _modifier;
         private INextAttackEnhancer _nextAttackEnhancer;
         public TriggerStatAbilty(IAbilityHost host, TriggerStatAbiltyData data)
         {
-            if (host.TryGet<IPlayerStatModifier>(out var modifier))
-                _modifier = modifier;
-
             if (host.TryGet<INextAttackEnhancer>(out var nextAttackEnhancer))
                 _nextAttackEnhancer = nextAttackEnhancer;
 
@@ -39,10 +35,10 @@ namespace JW.DungeonSliding.GamePlay.Ability
                     switch (_data.ApplyType)
                     {
                         case EApplyStatType.Add:
-                            _nextAttackEnhancer.AddEnhance(ENextAttackType.Add, _data.Value);
+                            _nextAttackEnhancer.AddDamage(Mathf.RoundToInt(_data.Value));
                             break;
                         case EApplyStatType.Multiple:
-                            _nextAttackEnhancer.AddEnhance(ENextAttackType.Multiple, _data.Value);
+                            _nextAttackEnhancer.AddDamageMulti(_data.Value);
                             break;
                     }
 

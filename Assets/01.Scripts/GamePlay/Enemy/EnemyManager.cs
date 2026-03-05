@@ -32,14 +32,18 @@ namespace JW.DungeonSliding.GamePlay.Entities
         private IObstacleRequest _obstacleRequest;
         private IEnemyStatUIService _enemyStatUIService;
         private ICombatEventListener _combatEventListener;
-        
+        private IRequesterRegistry _requesterRegistry;
+        private IAttackRequestListener _attackRequestListener;
+
         public void WireInterfaces(IBoard board, IObstacleRequest obstacleRequest, IEnemyStatUIService enemyStatUIService,
-            ICombatEventListener combatEventListener)
+            ICombatEventListener combatEventListener, IRequesterRegistry requesterRegistry, IAttackRequestListener attackRequestListener)
         {
             _board = board;
             _obstacleRequest = obstacleRequest;
             _enemyStatUIService = enemyStatUIService;
             _combatEventListener = combatEventListener;
+            _requesterRegistry = requesterRegistry;
+            _attackRequestListener = attackRequestListener;
         }
         public void LoadData()
         {
@@ -70,8 +74,12 @@ namespace JW.DungeonSliding.GamePlay.Entities
                 EnemyData data = _nomalEnemyDatas[ranNum];
 
                 Enemy boss = GetEnemy();
-                
+
+                CreatureBaseStat baseStat = new CreatureBaseStat(data.BaseHP, data.BaseDamage, 100);
+
                 boss.SetData(data, floor);
+                boss.SetData(baseStat);
+                boss.RegisterRequester(_requesterRegistry.RegisterEnemyAttackRequester, _requesterRegistry.UnRegisterEnemyAttackRequester);
 
                 boss.Tile.SetPosition(tile);
 
@@ -88,8 +96,12 @@ namespace JW.DungeonSliding.GamePlay.Entities
                 Tile tile = BossEnemyPos[i];
 
                 Enemy boss = GetEnemy();
-                boss.SetData(_enemyBossDataByUID["ENEMY_BOSS_EREBOS"], 1);
+                var data = _enemyBossDataByUID["ENEMY_BOSS_EREBOS"];
+                boss.SetData(data, 1);
 
+                CreatureBaseStat baseStat = new CreatureBaseStat(data.BaseHP, data.BaseDamage, 100);
+                boss.SetData(baseStat);
+                boss.RegisterRequester(_requesterRegistry.RegisterEnemyAttackRequester, _requesterRegistry.UnRegisterEnemyAttackRequester);
                 //boss.SetData(new EnemyData(), floor);
                 boss.Tile.SetPosition(tile);
 
@@ -120,7 +132,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         {
             Enemy enemy = Instantiate(_enemyPrefabList, this.transform);
             //enemy.OnDeathEvent += OnEnemyDeath;
-            enemy.Init(_combatEventListener, ECreatureType.Enemy);
+            enemy.Initialize(ECreatureType.Enemy, _attackRequestListener);
 
             return enemy;
         }

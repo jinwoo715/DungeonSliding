@@ -40,7 +40,7 @@ namespace JW.DungeonSliding.UI
             _abilityUIController.Initialize(abilityService);
             _playerStatPresenter.Init(statReadOnly);
             _enemyStatUIManager.Init();
-            _hitDamageViewer.Init(combatEventPresenter);
+            _hitDamageViewer.Init();
 
             _hasAbilityPresenter.Initialize(_abilityTooltipPresenter, abilityService);
             _actViewer.Initialize(actService);

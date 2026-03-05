@@ -5,8 +5,8 @@ namespace JW.DungeonSliding.GamePlay.Combat
 {
     public interface ICombatEventPresenter
     {
-        public event Action<DamageEvent> DamageEvent;
-        public event Action<DeathEvent> DeathEvent;
+        public event Action<DamageEvent> OnDamageEvent;
+        public event Action<DeathEvent> OnDeathEvent;
     }
     public interface ICombatEventListener
     {
@@ -16,16 +16,43 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
     public class CombatEventBus : ICombatEventPresenter, ICombatEventListener
     {
-        public event Action<DamageEvent> DamageEvent;
-        public event Action<DeathEvent> DeathEvent;
+        private static CombatEventBus _instance;
+        public static ICombatEventListener Excuter
+        {
+            get
+            {
+                if (_instance == null)
+                    throw new NullReferenceException("CombatEvent Not Initialize");
+                return _instance;
+            }
+        }
 
-        public void RaiseDamageEvent(DamageEvent e) => DamageEvent?.Invoke(e);
-        public void RaiseDeathEvent(DeathEvent e) => DeathEvent?.Invoke(e);
+        public static ICombatEventPresenter Register
+        {
+            get
+            {
+                if (_instance == null)
+                    throw new NullReferenceException("CombatEvent Not Initialize");
+                return _instance;
+            }
+        }
+
+        public event Action<DamageEvent> OnDamageEvent;
+        public event Action<DeathEvent> OnDeathEvent;
+
+        public CombatEventBus()
+        {
+            Debug.Log("Init Combat Event Bus");
+            _instance = this;
+        }
+
+        public void RaiseDamageEvent(DamageEvent e) { Debug.Log("DamageEvent"); OnDamageEvent?.Invoke(e); }
+        public void RaiseDeathEvent(DeathEvent e) => OnDeathEvent?.Invoke(e);
 
         public void Clear()
         {
-            DamageEvent = null;
-            DeathEvent = null;
+            OnDamageEvent = null;
+            OnDeathEvent = null;
         }
     }
 

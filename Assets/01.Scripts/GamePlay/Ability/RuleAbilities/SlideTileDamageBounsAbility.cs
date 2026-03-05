@@ -1,5 +1,6 @@
 using JW.DungeonSliding.GamePlay.Combat;
 using JW.DungeonSliding.Map;
+using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Ability
 {
@@ -15,7 +16,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
         public override void ExcuteAbility()
         {
             int moveTileCount = _moveable.SlideTileCount();
-            _nextAttackEnhancer.AddEnhance(ENextAttackType.Add, moveTileCount * _data.P1);
+            _nextAttackEnhancer.AddDamage(Mathf.RoundToInt(moveTileCount * _data.P1));
         }
 
         public override void ProcTrigger(EGameTriggerType triggerType)

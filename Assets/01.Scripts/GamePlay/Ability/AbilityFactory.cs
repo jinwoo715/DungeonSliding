@@ -4,7 +4,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
 {
     public class AbilityFactory
     {
-        public IAbility CreateAbility(AbilityDataBase data, AbilityHost host)
+        public IAbilityBase CreateAbility(AbilityDataBase data, AbilityHost host)
         {
             string abilityType = data.UID.Substring(0, 2);
 
@@ -24,12 +24,12 @@ namespace JW.DungeonSliding.GamePlay.Ability
             }
         }
 
-        public IAbility CreateStatAbility(StatAbilityData data, AbilityHost host)
+        public IAbilityBase CreateStatAbility(StatAbilityData data, AbilityHost host)
         {
             return new StatAbility(data, host);
         }
 
-        public IAbility CreateRuleAbility(RuleAbilityData data, AbilityHost host)
+        public IAbilityBase CreateRuleAbility(RuleAbilityData data, AbilityHost host)
         {
             switch (data.RuleType)
             {

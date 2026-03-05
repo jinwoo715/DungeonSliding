@@ -27,13 +27,13 @@ namespace JW.DungeonSliding.GamePlay.Ability
                 _enemyAbilityByType.Add(ability.Name, ability);
             }
         }
-        public List<IEnemyAbility> GetAbility(string enemyAbilities, ICombatant host, int section)
+        public List<IAbility> GetAbility(string enemyAbilities, ICombatant host, int section)
         {
             if (string.IsNullOrEmpty(enemyAbilities)) return null;
 
             string[] abilities = enemyAbilities.Split('|');
 
-            List<IEnemyAbility> abilityList = new List<IEnemyAbility>();
+            List<IAbility> abilityList = new List<IAbility>();
 
             for (int i = 0; i < abilities.Length; i++)
             {
@@ -45,7 +45,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
             return abilityList;
         }
-        private IEnemyAbility CreateAbility(EnemyAbilityData data, ICombatant host, int section)
+        private IAbility CreateAbility(EnemyAbilityData data, ICombatant host, int section)
         {
             switch (data.EnemyAbilityType)
             {

@@ -28,7 +28,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
             PlayerApplyStatContext applyStatContext = new PlayerApplyStatContext(EPlayerStatType.Damage, EApplyStatType.Add, EPlayerStatType.None, _data.P1 * count);
             _modifier.ModifyStat(applyStatContext);
 
-            _nextAttackEnhancer.AddEnhance(ENextAttackType.Add, count);
+            //_nextAttackEnhancer.AddEnhance(count);
         }
 
         public override void ProcTrigger(EGameTriggerType triggerType)

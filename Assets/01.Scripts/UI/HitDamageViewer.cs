@@ -15,15 +15,15 @@ namespace JW.DungeonSliding.UI
         private Queue<DamageEvent> _showDamageUIStack = new Queue<DamageEvent>();
         private Coroutine _showUICoroutine;
 
-        public void Init(ICombatEventPresenter combatEventPresenter)
+        public void Init()
         {
             objectPool = new ObjectPool<HitDamageItem>(_hitDamageItem, 5, this.transform);
-
-            combatEventPresenter.DamageEvent += ShowDamage;
+            CombatEventBus.Register.OnDamageEvent += ShowDamage;
         }
 
         public void ShowDamage(DamageEvent damageEvent)
         {
+            Debug.Log("Show Damage");
             _showDamageUIStack.Enqueue(damageEvent);
 
             if(_showUICoroutine == null)

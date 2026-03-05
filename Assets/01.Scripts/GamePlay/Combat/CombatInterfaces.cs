@@ -19,12 +19,12 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
     public interface IAttackRequester
     {
-        bool TrySubmitAttackRequest(ICombatantSensor sensor, IAttackRequestListener attackRequestListener);
+        bool TrySubmitAttackRequest(ICombatantSensor sensor);
+        void RequestCounterAttack(ICombatant target);
     }
 
     public interface IAttackable
     {
-        event Action<ActPair> OnCounterAttackTriggered;
         event Action OnAttackSequenceEnd;
         void AddStatusEffect(EStatusEffectType effectType, int amount);
         void ExcuteAttack(ActPair actPair);
@@ -41,12 +41,6 @@ namespace JW.DungeonSliding.GamePlay.Combat
         public void GainBarrier();
         public void ReleaseBarrier();
     }
-
-    public interface INextAttackEnhancer
-    {
-        public void AddEnhance(ENextAttackType nextAttackEnhanceType, float value);
-        public void ClearEnhance();
-    }
     
     public enum ENextAttackType
     {
@@ -61,7 +55,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
         void ApplyStatus(ECreatureStatus status, int durationTurnCount);
         void RemoveStatus(ECreatureStatus status);
         void TimePassStatueUpdate();
-        void ClearAllStatus();
+        void Reset();
     }
     public interface IStatusReadOnly
     {

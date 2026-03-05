@@ -21,7 +21,7 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
         private CombatEventBus _combatEventBus = new();
         private AbilitySystem _abilitySystem;
         private FieldCombatantManager _fieldCombatantManager;
-        private FieldAttackRequesterManager _fieldAttackRequesterManager;
+        private FieldAttackRequesterManager _fieldAttackRequesterManager = new FieldAttackRequesterManager();
         private RouteBuilder _routeBuilder;
         private BossAbilityManager _bossAbilityManager;
         private MoveRule _moveRule = new MoveRule();
@@ -61,17 +61,16 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
             _routeBuilder = new RouteBuilder(_mapManager);
             _abilitySystem = new AbilitySystem(_fieldCombatantManager, _player);
             
-            _gameSceneUIManager.Init(_player, _combatEventBus, _abilitySystem, _gameSceneManager);
+            _gameSceneUIManager.Init(_player.StatReadOnly, _combatEventBus, _abilitySystem, _gameSceneManager);
 
-            _player.Init(_combatEventBus, ECreatureType.Player);
-
-            PlayerData player = new PlayerData(GameManager.Config.Player.HP, GameManager.Config.Player.DMG, GameManager.Config.Player.MVCount);
-
-            _player.SetData(player, _routeBuilder, _mapManager, _moveRule);
+            _player.Initialize(ECreatureType.Player, _battleManager);
+            _player.SetData(_routeBuilder, _mapManager, _moveRule);
+            _player.SetData(new Stats.CreatureBaseStat(GameManager.Config.Player.HP, GameManager.Config.Player.DMG, GameManager.Config.Player.MVCount));
+            _player.RegisterRequester(_fieldAttackRequesterManager.RegisterPlayerAttackRequester, _fieldAttackRequesterManager.UnRegisterPlayerAttackRequester);
 
             _inputCoordinator.Init(_player);
 
-            _enemyManager.WireInterfaces(_mapManager, _obstacleController, _gameSceneUIManager.EnemyStatUIService, _combatEventBus);
+            _enemyManager.WireInterfaces(_mapManager, _obstacleController, _gameSceneUIManager.EnemyStatUIService, _combatEventBus, _fieldAttackRequesterManager);
             _enemyManager.LoadData();
 
             _mapManager.Init(_player.Tile);
@@ -82,11 +81,10 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
 
             _modeController.Init();
 
-
             _enemyTooltipClicker.Initialize(_gameSceneUIManager.EnemyTooltipService);
 
             _visualContoller = new GameVisualController(cam, dirLight, playerLight, _gameSceneUIManager.EnemyStatUIService);
-            _bossAbilityManager = new BossAbilityManager(_fieldCombatantManager, _moveRule, _player, _visualContoller);
+            _bossAbilityManager = new BossAbilityManager(_fieldCombatantManager, _moveRule, _player.StatReadOnly, _visualContoller);
             _enemyAbilityFactory = new EnemyAbilityFactory(_bossAbilityManager);
         }
 

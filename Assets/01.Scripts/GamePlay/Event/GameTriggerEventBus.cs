@@ -16,7 +16,6 @@ namespace JW.DungeonSliding.GamePlay
         {
             Instance = this;
         }
-
         public void ClearInstance()
         {
             if (Instance == this) Instance = null;

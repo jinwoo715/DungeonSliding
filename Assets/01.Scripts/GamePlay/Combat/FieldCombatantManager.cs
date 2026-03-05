@@ -8,7 +8,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
         public void RegisterEnemyAttackRequester(IAttackRequester requester);
         public void UnRegisterEnemyAttackRequester(IAttackRequester requester);
         public void RegisterPlayerAttackRequester(IAttackRequester requester);
-        public void UnRegisterPlayerAttackRequester();
+        public void UnRegisterPlayerAttackRequester(IAttackRequester requester);
     }
 
     public interface IRequesterProvider
@@ -29,7 +29,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
         {
             _playerRequester = requester;
         }
-        public void UnRegisterPlayerAttackRequester()
+        public void UnRegisterPlayerAttackRequester(IAttackRequester requester)
         {
             _playerRequester = null;
         }
@@ -45,16 +45,10 @@ namespace JW.DungeonSliding.GamePlay.Combat
         }
     }
 
-    public class FieldCombatantManager : ICombatantSensor, IRequesterRegistry
+    public class FieldCombatantManager : ICombatantSensor
     {
         private ICombatant _playerCombatant;
         private ICombatProvider _enemyCombatProvider;
-
-        private IAttackRequester _playerRequester;
-        private List<IAttackRequester> _enemyRequesters = new ();
-
-        public IAttackRequester PlayerRequester => _playerRequester;
-        public IReadOnlyList<IAttackRequester> EnemyRequesters => _enemyRequesters;
 
         public FieldCombatantManager(ICombatProvider combatProvider, ICombatant player)
         {
@@ -106,25 +100,6 @@ namespace JW.DungeonSliding.GamePlay.Combat
             }
 
             return count;
-        }
-
-        public void RegisterPlayerAttackRequester(IAttackRequester requester)
-        {
-            _playerRequester = requester;
-        }
-        public void UnRegisterPlayerAttackRequester()
-        {
-            _playerRequester = null;
-        }
-        public void RegisterEnemyAttackRequester(IAttackRequester requester)
-        {
-            if (!_enemyRequesters.Contains(requester))
-                _enemyRequesters.Add(requester);
-        }
-        public void UnRegisterEnemyAttackRequester(IAttackRequester requester)
-        {
-            if (_enemyRequesters.Contains(requester))
-                _enemyRequesters.Remove(requester);
         }
     }
 }

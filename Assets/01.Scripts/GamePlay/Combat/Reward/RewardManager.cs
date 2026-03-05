@@ -12,7 +12,7 @@ namespace JW.DungeonSliding.GamePlay
         public void Init(ICombatEventPresenter combatEventPresenter)
         {
             _combatEventPresenter = combatEventPresenter;
-            _combatEventPresenter.DeathEvent += RequestReward;
+            _combatEventPresenter.OnDeathEvent += RequestReward;
         }
 
         public void RequestReward(DeathEvent deathEvent)

@@ -4,6 +4,21 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Stats
 {
+    public struct CreatureBaseStat
+    {
+        public readonly int HP;
+        public readonly int Damage;
+        public readonly int Move;
+
+        public CreatureBaseStat(int hp, int damage, int move)
+        {
+            HP = hp;
+            Damage = damage;
+            Move = move;
+        }
+    }
+
+
     public class CreatureStat : IStatReadOnly, IStatModifier
     {
         Dictionary<ECreatureStatType, StatValue> _stats = new();
@@ -17,14 +32,14 @@ namespace JW.DungeonSliding.GamePlay.Stats
 
         public event Action<ECreatureStatType> OnStatChanged;
        
-        public CreatureStat(int hp, int damage, int moveCount)
+        public CreatureStat(CreatureBaseStat baseStat)
         {
-            _stats.Add(ECreatureStatType.MaxHp, new StatValue(hp));
-            _stats.Add(ECreatureStatType.Damage, new StatValue(damage));
-            _stats.Add(ECreatureStatType.MaxMoveCount, new StatValue(moveCount));
+            _stats.Add(ECreatureStatType.MaxHp, new StatValue(baseStat.HP));
+            _stats.Add(ECreatureStatType.Damage, new StatValue(baseStat.Damage));
+            _stats.Add(ECreatureStatType.MaxMoveCount, new StatValue(baseStat.Move));
 
-            _currentHP = hp;
-            _currentMove = moveCount;
+            _currentHP = baseStat.HP;
+            _currentMove = baseStat.Move;
 
             _damageDealMultiplier = 1;
             _damageTakeMultiplier = 1;
@@ -102,6 +117,11 @@ namespace JW.DungeonSliding.GamePlay.Stats
             }
 
             OnStatChanged?.Invoke(modifierContext.TargetStat);
+        }
+
+        internal void Reset()
+        {
+            throw new NotImplementedException();
         }
     }
 }

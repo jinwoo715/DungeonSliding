@@ -52,8 +52,8 @@ namespace JW.DungeonSliding.GamePlay.Ability
         private ShuffleBag<AbilityDataBase> _abilityBag;
         private Dictionary<string, AbilityDataBase> _abilityDataByUID = new();
         
-        private Dictionary<EGameTriggerType, List<IAbility>> _hasAbilitiesByTrigger = new Dictionary<EGameTriggerType, List<IAbility>>();
-        private Dictionary<IAbility, List<EGameTriggerType>> _hasTriggersByAbility = new Dictionary<IAbility, List<EGameTriggerType>>();
+        private Dictionary<EGameTriggerType, List<IAbilityBase>> _hasAbilitiesByTrigger = new Dictionary<EGameTriggerType, List<IAbilityBase>>();
+        private Dictionary<IAbilityBase, List<EGameTriggerType>> _hasTriggersByAbility = new Dictionary<IAbilityBase, List<EGameTriggerType>>();
 
         public AbilityFactory _abilityFactory = new AbilityFactory();
 
@@ -108,7 +108,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
         public void GrantAbility(string _abilityUID)
         {
             AbilityDataBase data = _abilityDataByUID[_abilityUID];
-            IAbility ability = _abilityFactory.CreateAbility(data, _abilityHost);
+            IAbilityBase ability = _abilityFactory.CreateAbility(data, _abilityHost);
 
             EnrollAbility(ability.ProgTriggers, ability);
 
@@ -117,7 +117,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
             GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnHideAbility);
         }
 
-        private void EnrollAbility(EGameTriggerType types, IAbility ability)
+        private void EnrollAbility(EGameTriggerType types, IAbilityBase ability)
         {
             var triggers = SplitTriggers(types);
 
@@ -125,7 +125,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
             {
                 if (!_hasAbilitiesByTrigger.ContainsKey(trigger))
                 {
-                    _hasAbilitiesByTrigger.Add(trigger, new List<IAbility>());
+                    _hasAbilitiesByTrigger.Add(trigger, new List<IAbilityBase>());
 
                     GameTriggerEventBus.Instance.SubscribeTriggerEvent(trigger, () => { ExcuteAbility(trigger); });
                 }

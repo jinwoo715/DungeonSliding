@@ -15,8 +15,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         public override void ExcuteAbility()
         {
-            Debug.Log("Extra Attack");
-            _service.AddEnhance(ENextAttackType.ExtraAttack, _data.P2);
+            _service.AddAttackCount(Mathf.RoundToInt(_data.P2));
         }
 
         public override void ProcTrigger(EGameTriggerType triggerType)

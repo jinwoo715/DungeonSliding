@@ -32,6 +32,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
             if (IsActive == false)
                 return;
 
+            base.TakeDamage(damageInfo);
+
             Vector3 punchScale = new Vector3(0.02f, 0f, 0.02f);
             _avatar.transform.DOPunchPosition(punchScale, 0.3f, 20);
 
@@ -43,10 +45,12 @@ namespace JW.DungeonSliding.GamePlay.Entities
             float targetRotation = GetEulerYByDirection(toDir);
             particle.transform.rotation = Quaternion.Euler(-20, targetRotation, 0);
 
-            if (IsCanRotate())
+            if (IsCanRotate() && toDir != Rotate.Direction)
             {
                 var rotateDustParticle = ParticlePool.Instance.GetParticle("RotationDust");
                 rotateDustParticle.SetParticle(this.transform.position + Vector3.up * 0.15f, 2.0f);
+
+                Rotate.OnRotateEnd += EndHittedAnimation;
 
                 StartCoroutine(Rotate.CoRotateToDirection(toDir));
             }
