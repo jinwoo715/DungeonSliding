@@ -8,7 +8,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public void SetAbilityGetter(IEnemyAbilityGetter bossAbilityGetter)
         {
             //_heavyGravityAbility = new HeavyGravityAbility(bossAbilityGetter, this);
-            StartCoroutine(_heavyGravityAbility.Excute());
+            StartCoroutine(_heavyGravityAbility.Execute());
         }
         public void ExcuteAttack()
         {

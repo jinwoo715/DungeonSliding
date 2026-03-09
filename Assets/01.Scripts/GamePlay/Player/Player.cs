@@ -9,17 +9,20 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Entities
 {
-    public class Player : Creature, IMoveable, IAbilityHost, IRewardReceiver
+    public class Player : Creature, IMoveable, IRewardReceiver
     {
         [SerializeField] private MoveController _moveController;
-        private LevelSystem _leveling = new LevelSystem();
         
         private ECharacterStateType _characterState = ECharacterStateType.Idle;
         public ESlideResultType SlideResultType { get; private set; }
 
-        private ITileCheckService _tileCheckService;
         private IRouteService _routeService;
         private IMoveRule _moveRule;
+
+        public event Action OnMoveEnd;
+        public event Action OnSlideEnd;
+
+        public ILevelProgress _leveling;
 
         private void ChangeCharacterState(ECharacterStateType stateType)
         {
@@ -31,36 +34,40 @@ namespace JW.DungeonSliding.GamePlay.Entities
                 _animatorController.SetInt(ConstString.PLAYER_STATE_KEY, (int)_characterState);
             }
         }
-        public override void Initialize(ECreatureType cretureType, IAttackRequestListener attackRequestListener)
+        public override void Initialize(ECreatureType cretureType)
         {
-            base.Initialize(cretureType, attackRequestListener);
-            _leveling.Initialize(1, 0);
+            base.Initialize(cretureType);
         }
-        public void SetData(IRouteService routeService, ITileCheckService tileCheckService, IMoveRule moveRule)
+        public void Wire(IRouteService routeService, IMoveRule moveRule, ILevelProgress levelProgress)
         {
-            _tileCheckService = tileCheckService;
             _routeService = routeService;
             _moveRule = moveRule;
+            _leveling = levelProgress;
 
-            _leveling.OnLevelUp += HandleLevelUp;
-            _leveling.OnChangedXp += HandleXpChanged;
-
-            _moveController.Initialize(_routeService, this);
+            _moveController.Wire(_routeService, this);
+            Bind();
+        }
+        private void Bind() 
+        {
             _moveController.OnDirectionChanged += Rotate.SetRotation;
             _moveController.OnSlideStart += HandleSlideStart;
             _moveController.OnSlideEnd += HandleSlideEnd;
             _moveController.OnSlideBlocked += HandleSlideBlocked;
             _moveController.OnPushedEnd += HandleKnockBackEnd;
+            _moveController.OnMoveEnd += () => OnMoveEnd?.Invoke();
+
+            _leveling.OnLevelUp += HandleLevelUp;
+            _leveling.OnChangedXp += HandleXpChanged;
         }
         public void AddReward(RewardData rewardData)
         {
             _leveling.AddXp(rewardData.Xp);
         }
-        private void HandleLevelUp(int level)
+        private void HandleLevelUp()
         {
-            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnLevelUp);
+            
         }
-        private void HandleXpChanged(int curXp, int requXp)
+        private void HandleXpChanged()
         {
         }
 
@@ -78,21 +85,18 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
         private void HandleSlideStart()
         {
-            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnSlideStart);
             ChangeCharacterState(ECharacterStateType.Run);
         }
         private void HandleSlideEnd()
         {
-            StatModifier.ModifyStat(new StatModifierContext(ECreatureStatType.CurrentMoveCount, StatModifyType.Add, -_moveRule.MoveCost));
-            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnSlideEnd);
-            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnMoveEnd);
+            StatModifier.ModifyStat(new StatModifierContext(ECreatureStatType.CurrentMoveCount, EApplyStatType.Add, -_moveRule.MoveCost));
             ChangeCharacterState(ECharacterStateType.Idle);
             SlideResultType = ESlideResultType.None;
         }
         private void HandleSlideBlocked()
         {
-            if (SlideResultType == ESlideResultType.Stop)
-                GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnSlideBlocked);
+            //if (SlideResultType == ESlideResultType.Stop)
+                //GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTriggerType.OnSlideBlocked);
         }
         private void HandleKnockBackEnd()
         {
@@ -102,14 +106,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public int SlideTileCount()
         {
             return _routeService.LastMoveTileCount;
-        }
-
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.C))
-            {
-                KnockBack(GridUtility.GetReverseDirection(Rotate.Direction));
-            }
         }
 
         public void KnockBack(EDirectionType dir)
@@ -122,8 +118,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
         #region Combat
         public override void TakeDamage(DamageContext damageInfo)
         {
-            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnDamaged);
-
             EDirectionType dir = GridUtility.GetDirFromTileToTile(Tile.TilePosition, damageInfo.Attacker.Tile.TilePosition);
             Rotate.SetRotation(dir);
 
@@ -131,12 +125,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
             {
                 EDirectionType toAttackDir = GridUtility.GetDirFromTileToTile(Tile.TilePosition, damageInfo.Attacker.Tile.TilePosition);
                 EDirectionType backDirection = GridUtility.GetReverseDirection(toAttackDir);
-                Tile backTile = Tile.TilePosition.GetNextTileByDir(backDirection);
 
-                if (_tileCheckService.IsRouteTile(backTile))
-                {
-                    KnockBack(backDirection);
-                }
+                KnockBack(backDirection);
             }
 
             _animatorController.SetAnimationTrigger(ConstString.HIT_ANIM);

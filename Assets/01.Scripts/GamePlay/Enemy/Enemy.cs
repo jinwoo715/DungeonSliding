@@ -25,7 +25,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
         //TODO Enemy Skill ±¸Çö
         #region Enemy Skill
-        private Dictionary<EGameTriggerType, List<IAbility>> gameTriggerAbilities = new();
+        private Dictionary<EGameEventTrigger, List<IAbility>> gameTriggerAbilities = new();
         private Dictionary<ECreatureTrigger, List<IAbility>> creatureTriggerAbilities = new ();
 
         public void SetAbility(List<IAbility> abilities)
@@ -34,7 +34,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
             foreach (var ability in abilities)
             {
-                if(ability.GameTrigger != EGameTriggerType.None)
+                if(ability.GameTrigger != EGameEventTrigger.None)
                 {
                     if (!gameTriggerAbilities.ContainsKey(ability.GameTrigger))
                     {
@@ -56,22 +56,22 @@ namespace JW.DungeonSliding.GamePlay.Entities
             }
         }
 
-        private void ExcuteGameTriggerAbility(EGameTriggerType trigger)
+        private void ExcuteGameTriggerAbility(EGameEventTrigger trigger)
         {
             if (gameTriggerAbilities.TryGetValue(trigger, out var list))
             {
                 foreach (var ability in list)
                 {
-                    StartCoroutine(ability.Excute());
+                    StartCoroutine(ability.Execute());
                 }
             }
         }
 
         #endregion
 
-        public override void Initialize(ECreatureType cretureType, IAttackRequestListener attackRequestListener)
+        public override void Initialize(ECreatureType cretureType)
         {
-            base.Initialize(cretureType, attackRequestListener);
+            base.Initialize(cretureType);
          
             _backAttackMultiplier = GameManager.Config.Combat.BackAttackDMGMultiple;
         }
@@ -155,7 +155,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public override void OnDeath()
         {
             base.OnDeath();
-            GameTriggerEventBus.Instance?.ExcuteAbilityEvent(EGameTriggerType.OnKillEnemy);
+            //GameTriggerEventBus.Instance?.ExcuteAbilityEvent(EGameEventTriggerType.OnKillEnemy);
             //OnDeathEvent?.Invoke(this);
         }
 

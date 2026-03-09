@@ -10,7 +10,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
         IStatReadOnly _statReadOnly;
         IPlayerStatModifier _statModifier;
         IMoveable _moveable;
-        public ConvertHpToMoveCount(RuleAbilityData data, AbilityHost host) : base(data, host)
+        public ConvertHpToMoveCount(RuleAbilityData data, IAbilityContextService host) : base(data, host)
         {
             
         }
@@ -23,12 +23,12 @@ namespace JW.DungeonSliding.GamePlay.Ability
             //    _statModifier.ModifyStat(new PlayerApplyStatContext(EPlayerStatType.CurrentMoveCount, EApplyStatType.Add, EPlayerStatType.None, _data.P2));
             //}
         }
-        public override void ProcTrigger(EGameTriggerType triggerType)
+        public override void ProcTrigger(EGameEventTrigger triggerType)
         {
-            if (triggerType == EGameTriggerType.OnDeathByMoveCount)
-            {
-                ExcuteAbility();
-            }
+            //if (triggerType == EGameEventTriggerType.OnDeathByMoveCount)
+            //{
+            //    ExcuteAbility();
+            //}
         }
 
         protected override void BindService()

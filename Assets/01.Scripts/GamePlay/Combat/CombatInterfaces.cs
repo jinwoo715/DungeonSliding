@@ -19,6 +19,8 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
     public interface IAttackRequester
     {
+        public event Action<ActPair> OnRequestAttack;
+        public event Action<ActPair> OnRequestCounterAttack;
         bool TrySubmitAttackRequest(ICombatantSensor sensor);
         void RequestCounterAttack(ICombatant target);
     }
@@ -64,9 +66,9 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
     public interface IPlayerStatModifier
     {
-        public void ModifyStat(PlayerApplyStatContext context);
-        public void SetCurrentHP(PlayerApplyStatContext context);
-        public void SetCurrentMoveCount(PlayerApplyStatContext context);
+        public void ModifyStat(ApplyStatContext context);
+        public void SetCurrentHP(ApplyStatContext context);
+        public void SetCurrentMoveCount(ApplyStatContext context);
     }
 
     public interface ICombatant : IAttackable, IDamageable
@@ -82,6 +84,8 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
         ITileObject Tile { get; }
         IRotateObject Rotate { get; }
+
+        IAbilityExcuter Ability {get;}
     }
 
     public interface ICombatProvider

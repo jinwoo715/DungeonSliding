@@ -6,37 +6,35 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Combat 
 {
-    public class BattleManager : MonoBehaviour, IAttackRequestListener
+    public class BattleManager : MonoBehaviour, IAttackRequestListener, IRequesterRegistry
     {
         //TODO BattleManager
         private ICombatantSensor _combatSensor;
-        private IRequesterProvider _requesterProvider;
+
+        private IAttackRequester _playerRequester;
+        private List<IAttackRequester> _enemyRequesters = new();
 
         private Queue<ActPair> _actPairs = new Queue<ActPair>();
         private Queue<ActPair> _counterActPairs = new Queue<ActPair>();
-        private HashSet<(ICombatant, ICombatant)> _counterActs = new ();
 
-        public void Init(ICombatantSensor combatantSensor, IRequesterProvider requesterProvider)
+        public void Init(ICombatantSensor combatantSensor)
         {
             _combatSensor = combatantSensor;
-            _requesterProvider = requesterProvider;
-
-            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.OnMoveEnd, StartBattleSequence);
         }
 
         private void OnDisable()
         {
-            GameTriggerEventBus.Instance?.UnSubscribeTriggerEvent(EGameTriggerType.OnMoveEnd, StartBattleSequence);
+            //GameTriggerEventBus.Instance?.UnSubscribeTriggerEvent(EGameEventTriggerType.OnMoveEnd, StartBattleSequence);
         }
 
         public void StartBattleSequence()
         {
-            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnBattleStart);
+            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTrigger.OnBattleStart);
 
             List<IAttackRequester> requesters = new List<IAttackRequester>();
 
-            requesters.Add(_requesterProvider.PlayerRequester);
-            requesters.AddRange(_requesterProvider.EnemyRequesters);
+            requesters.Add(_playerRequester);
+            requesters.AddRange(_enemyRequesters);
 
             for (int i = 0; i < requesters.Count; i++)
             {
@@ -53,9 +51,6 @@ namespace JW.DungeonSliding.GamePlay.Combat
                 if (_counterActPairs.Count > 0)
                 {
                     act = _counterActPairs.Dequeue();
-
-                    if (!_counterActs.Add((act.Attacker, act.Target)))
-                        continue;
                 }
                 else
                 {
@@ -102,23 +97,48 @@ namespace JW.DungeonSliding.GamePlay.Combat
                 act.Target.OnHitSequenceEnd -= OnHitEnd;
             }
 
-            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnBattleEnd);
+            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTrigger.OnBattleEnd);
 
             _actPairs.Clear();
             _counterActPairs.Clear();
-            _counterActs.Clear();
 
-            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnTurnEnd);
+            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTrigger.OnTurnEnd);
         }
-
         public void EnqueueActPair(ActPair pair)
         {
             _actPairs.Enqueue(pair);
         }
-
         public void EnqueueCounterActPair(ActPair pair)
         {
             _counterActPairs.Enqueue(pair);
+        }
+
+        public void RegisterEnemyAttackRequester(IAttackRequester requester)
+        {
+            _enemyRequesters.Add(requester);
+            requester.OnRequestAttack += EnqueueActPair;
+            requester.OnRequestCounterAttack += EnqueueCounterActPair;
+        }
+
+        public void UnRegisterEnemyAttackRequester(IAttackRequester requester)
+        {
+            _enemyRequesters.Remove(requester);
+            requester.OnRequestAttack -= EnqueueActPair;
+            requester.OnRequestCounterAttack -= EnqueueCounterActPair;
+        }
+
+        public void RegisterPlayerAttackRequester(IAttackRequester requester)
+        {
+            _playerRequester = requester;
+            requester.OnRequestAttack += EnqueueActPair;
+            requester.OnRequestCounterAttack += EnqueueCounterActPair;
+        }
+
+        public void UnRegisterPlayerAttackRequester(IAttackRequester requester)
+        {
+            _playerRequester = null;
+            requester.OnRequestAttack -= EnqueueActPair;
+            requester.OnRequestCounterAttack -= EnqueueCounterActPair;
         }
     }
 }

@@ -1,4 +1,5 @@
 using JW.DungeonSliding.GamePlay;
+using JW.DungeonSliding.GamePlay.Ability;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,15 +16,11 @@ namespace JW.DungeonSliding.Core.Flow
 
         public void Init()
         {
-            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.OnSlideStart, EnterSlideMode);
-            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.OnSlideEnd, ExitSlideMode);
-            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.OnMoveEnd, ExitSlideMode);
+            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameEventTrigger.OnBattleStart, EnterStartBattle);
+            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameEventTrigger.OnBattleEnd, ExitStartBattle);
 
-            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.OnBattleStart, EnterStartBattle);
-            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.OnBattleEnd, ExitStartBattle);
-
-            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.OnShowAbility, EnterAbilityUI);
-            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.OnHideAbility, ExitAbilityUI);
+            AbilityBusyCounter.OnWorkingAbility += () => EnterGameMode(EGameModeType.WorkingAbility);
+            AbilityBusyCounter.OnWorkingAbility += () => ExitGameMode(EGameModeType.WorkingAbility);
         }
 
         public void SubscribeModeEvent(EGameModeType mode, Action action)
@@ -53,14 +50,11 @@ namespace JW.DungeonSliding.Core.Flow
         }
         public void Clear()
         {
-            GameTriggerEventBus.Instance.UnSubscribeTriggerEvent(EGameTriggerType.OnSlideStart, EnterSlideMode);
-            GameTriggerEventBus.Instance.UnSubscribeTriggerEvent(EGameTriggerType.OnSlideEnd, ExitSlideMode);
+            GameTriggerEventBus.Instance.UnSubscribeTriggerEvent(EGameEventTrigger.OnBattleStart, EnterStartBattle);
+            GameTriggerEventBus.Instance.UnSubscribeTriggerEvent(EGameEventTrigger.OnBattleEnd, ExitStartBattle);
 
-            GameTriggerEventBus.Instance.UnSubscribeTriggerEvent(EGameTriggerType.OnBattleStart, EnterStartBattle);
-            GameTriggerEventBus.Instance.UnSubscribeTriggerEvent(EGameTriggerType.OnBattleEnd, ExitStartBattle);
-
-            GameTriggerEventBus.Instance.UnSubscribeTriggerEvent(EGameTriggerType.OnShowAbility, EnterAbilityUI);
-            GameTriggerEventBus.Instance.UnSubscribeTriggerEvent(EGameTriggerType.OnHideAbility, ExitAbilityUI);
+            AbilityBusyCounter.OnWorkingAbility -= () => EnterGameMode(EGameModeType.WorkingAbility);
+            AbilityBusyCounter.OnWorkingAbility -= () => ExitGameMode(EGameModeType.WorkingAbility);
         }
     }
 }

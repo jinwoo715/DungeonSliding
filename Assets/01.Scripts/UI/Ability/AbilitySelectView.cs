@@ -13,7 +13,7 @@ namespace JW.DungeonSliding.UI
 
         [SerializeField] private AbilitySelectCard[] _abilityCards;
 
-        private Action<string> SelectCardEvent;
+        private Action<AbilityDataBase> SelectCardEvent;
         private Action RerollEvent;
 
         public void Init()
@@ -27,7 +27,7 @@ namespace JW.DungeonSliding.UI
             }
         }
 
-        internal void Bind(Action<string> selectAbility, Action reroll)
+        internal void Bind(Action<AbilityDataBase> selectAbility, Action reroll)
         {
             SelectCardEvent = selectAbility;
             RerollEvent = reroll;
@@ -47,9 +47,9 @@ namespace JW.DungeonSliding.UI
 
             _rerollButtonText.text = rerollCount.ToString();
         }
-        public void OnClickAbilityCard(string abilityUid)
+        public void OnClickAbilityCard(AbilityDataBase abilityData)
         {
-            SelectCardEvent?.Invoke(abilityUid);
+            SelectCardEvent?.Invoke(abilityData);
         }
         public void OnClickRerollButton()
         {

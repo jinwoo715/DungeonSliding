@@ -4,20 +4,35 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay
 {
-    public class LevelSystem
+    public interface ILevelProgress
     {
-        public int Level { get; private set; } = 1;
+        int CurrentLevel { get; }
+        int CurrentXp { get; }
+        int RequiredXp { get; } // 현재 레벨에서 다음 레벨로 가기 위한 총 경험치
+        float ExpRatio => (float)CurrentXp / RequiredXp; // UI 바(Bar) 용도
+
+        event Action OnChangedXp; // (level, currentExp, maxExp)
+        event Action OnLevelUp; // (newLevel)
+
+        void AddXp(int xp);
+    }
+
+    public class LevelSystem : ILevelProgress
+    {
+        public int CurrentLevel { get; private set; } = 1;
         public int CurrentXp { get; private set; }
         public int RequiredXp { get; private set; }
 
-        public event Action<int> OnLevelUp;
-        public event Action<int, int> OnChangedXp;
+        public event Action OnLevelUp;
+        public event Action OnChangedXp;
 
-        public void Initialize(int level, int curXp)
+        public void Initialize()
         {
-            Level = level;
-            CurrentXp = curXp;
-            RequiredXp = MathUtil.GetFib(Level + ConstData.LEVELUP_XP_OFFSET);
+            CurrentLevel = 1;
+            CurrentXp = 0;
+            RequiredXp = MathUtil.GetFib(CurrentLevel + ConstData.LEVELUP_XP_OFFSET);
+            OnChangedXp?.Invoke();
+            OnLevelUp?.Invoke();
         }
 
         public void AddXp(int amount)
@@ -30,15 +45,15 @@ namespace JW.DungeonSliding.GamePlay
                 LevelUp();
             }
 
-            OnChangedXp?.Invoke(CurrentXp, RequiredXp);
+            OnChangedXp?.Invoke();
         }
 
-        private void LevelUp()
+        public void LevelUp()
         {
-            Level++;
-            RequiredXp = MathUtil.GetFib(Level + ConstData.LEVELUP_XP_OFFSET);
+            CurrentLevel++;
+            RequiredXp = MathUtil.GetFib(CurrentLevel + ConstData.LEVELUP_XP_OFFSET);
 
-            OnLevelUp?.Invoke(Level);
+            OnLevelUp?.Invoke();
         }
     }
 }

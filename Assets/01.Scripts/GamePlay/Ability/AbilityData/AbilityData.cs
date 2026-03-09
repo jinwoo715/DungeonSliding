@@ -14,8 +14,8 @@ namespace JW.DungeonSliding.GamePlay.Ability
         public EAbilityRank AbilityRank;
         public EAbilityEffectKind EAbilityEffectType;
 
-        public List<EGameTriggerType> AbilityTriggerTypes;
+        public List<EGameEventTrigger> AbilityTriggerTypes;
 
-        public virtual List<EGameTriggerType> GetEnrollTriggers => AbilityTriggerTypes;
+        public virtual List<EGameEventTrigger> GetEnrollTriggers => AbilityTriggerTypes;
     }
 }

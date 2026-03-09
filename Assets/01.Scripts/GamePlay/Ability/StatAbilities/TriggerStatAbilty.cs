@@ -8,7 +8,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
         public readonly TriggerStatAbiltyData _data;
 
         private INextAttackEnhancer _nextAttackEnhancer;
-        public TriggerStatAbilty(IAbilityHost host, TriggerStatAbiltyData data)
+        public TriggerStatAbilty(IAbilityContextService host, TriggerStatAbiltyData data)
         {
             if (host.TryGet<INextAttackEnhancer>(out var nextAttackEnhancer))
                 _nextAttackEnhancer = nextAttackEnhancer;
@@ -16,7 +16,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
             _data = data;
         }
 
-        public EGameTriggerType ProgTriggers => throw new System.NotImplementedException();
+        public EGameEventTrigger ProgTriggers => throw new System.NotImplementedException();
 
         public void ExcuteAbility()
         {
@@ -35,10 +35,10 @@ namespace JW.DungeonSliding.GamePlay.Ability
                     switch (_data.ApplyType)
                     {
                         case EApplyStatType.Add:
-                            _nextAttackEnhancer.AddDamage(Mathf.RoundToInt(_data.Value));
+                            _nextAttackEnhancer.AddNextAttackDamage(Mathf.RoundToInt(_data.Value));
                             break;
                         case EApplyStatType.Multiple:
-                            _nextAttackEnhancer.AddDamageMulti(_data.Value);
+                            _nextAttackEnhancer.AddNextAttackDamageMulti(_data.Value);
                             break;
                     }
 
@@ -47,7 +47,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
            
         }
 
-        public void ProcTrigger(EGameTriggerType triggerType)
+        public void ProcTrigger(EGameEventTrigger triggerType)
         {
             ExcuteAbility();
         }

@@ -42,12 +42,15 @@ namespace JW.DungeonSliding.GamePlay
         }
 
         [System.Serializable]
-        public class AbilityProbabilityConfig
+        public class AbilityConfig
         {
+            [SerializeField] private int _GainAbilityPerLevel;
             [SerializeField] private float _nomalCardRatio;
             [SerializeField] private float _rareCardRatio;
             [SerializeField] private float _epicCardRatio;
             [SerializeField] private float _legendaryCardRatio;
+
+            public int AbilityLevel => _GainAbilityPerLevel;
         }
 
         [System.Serializable]
@@ -79,7 +82,7 @@ namespace JW.DungeonSliding.GamePlay
         public CombatConfig Combat;
         public PlayerConfig Player;
         public EnemyConfig Enemy;
-        public AbilityProbabilityConfig Ability;
+        public AbilityConfig Ability;
         public UIConfig UI;
         public ActConfig Act;
     }

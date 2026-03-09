@@ -7,7 +7,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
     {
         IDamageable _damageable;
         ICounterAttackable _counterAttackable;
-        public CounterAttackAbility(RuleAbilityData data, AbilityHost host) : base(data, host) 
+        public CounterAttackAbility(RuleAbilityData data, IAbilityContextService host) : base(data, host) 
         {
             
         }
@@ -17,19 +17,19 @@ namespace JW.DungeonSliding.GamePlay.Ability
             //_counterAttackable.RequestCounterAttack(_damageable.LastAttacker);
         }
 
-        public override void ProcTrigger(EGameTriggerType triggerType)
+        public override void ProcTrigger(EGameEventTrigger triggerType)
         {
-            if (triggerType == EGameTriggerType.OnDamaged)
-            {
-                int chanceValue = Random.Range(0, 101);
+            //if (triggerType == EGameEventTriggerType.OnDamaged)
+            //{
+            //    int chanceValue = Random.Range(0, 101);
 
-                Debug.Log(chanceValue);
+            //    Debug.Log(chanceValue);
 
-                if (chanceValue <= _data.P1)
-                {
-                    ExcuteAbility();
-                }
-            }
+            //    if (chanceValue <= _data.P1)
+            //    {
+            //        ExcuteAbility();
+            //    }
+            //}
         }
 
         protected override void BindService()

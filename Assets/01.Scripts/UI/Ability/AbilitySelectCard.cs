@@ -22,7 +22,7 @@ namespace JW.DungeonSliding.UI
 
         private AbilityDataBase _data;
 
-        public event Action<string> SelectAbilityEvent;
+        public event Action<AbilityDataBase> SelectAbilityEvent;
 
         public void Init()
         {
@@ -85,7 +85,7 @@ namespace JW.DungeonSliding.UI
 
         public void OnClickSelectButton()
         {
-            SelectAbilityEvent?.Invoke(_data.UID);
+            SelectAbilityEvent?.Invoke(_data);
         }
     }
 }

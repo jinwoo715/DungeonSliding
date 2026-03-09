@@ -7,7 +7,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
     {
         public IMoveable _moveable;
         public ICombatant _combatant;
-        public WallBounceAbility(RuleAbilityData data, AbilityHost host) : base(data, host)
+        public WallBounceAbility(RuleAbilityData data, IAbilityContextService host) : base(data, host)
         {
             
         }
@@ -18,7 +18,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
             _moveable.KnockBack(bounceDir);
         }
 
-        public override void ProcTrigger(EGameTriggerType triggerType)
+        public override void ProcTrigger(EGameEventTrigger triggerType)
         {
             if (_moveable.SlideTileCount() == 1 && _moveable.SlideResultType == ESlideResultType.Stop)
             {

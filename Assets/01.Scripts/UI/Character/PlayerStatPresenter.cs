@@ -1,3 +1,4 @@
+using JW.DungeonSliding.GamePlay;
 using JW.DungeonSliding.GamePlay.Stats;
 using UnityEngine;
 
@@ -8,64 +9,67 @@ namespace JW.DungeonSliding.UI
         [SerializeField] private PlayerStatViewer _viewer;
 
         private IStatReadOnly _statReadOnly;
-        
-        public void Init(IStatReadOnly statReadOnly)
+        private IStatModifier _statModifier;
+        private ILevelProgress _levelProgress;
+        public void Init(IStatReadOnly statReadOnly, IStatModifier statModifier, ILevelProgress levelProgress)
         {
-            Bind(statReadOnly);
+            Bind(statReadOnly, statModifier, levelProgress);
         }
-        private void Bind(IStatReadOnly statReadOnly)
+        private void Bind(IStatReadOnly statReadOnly, IStatModifier statModifier, ILevelProgress levelProgress)
         {
             UnBind();
 
             _statReadOnly = statReadOnly;
-            //_statReadOnly.OnStatChanged += ChangePlayerStat;
+            _statModifier = statModifier;
+            _levelProgress = levelProgress;
+
+            _levelProgress.OnLevelUp += ChangePlayerLevel;
+            _levelProgress.OnChangedXp += ChangePlayerLevelProgress;
+
+            _statModifier.OnStatChanged += ChangePlayerStat;
         }
         private void UnBind()
         {
             if(_statReadOnly != null)
             {
-                //_statReadOnly.OnStatChanged -= ChangePlayerStat;
+                _statModifier.OnStatChanged -= ChangePlayerStat;
                 _statReadOnly = null;
+                _statModifier = null;
             }
         }
 
         public void ChangePlayerStat(ECreatureStatType changedStat)
         {
-            Debug.Log(changedStat);
-
-            //switch (changedStat)
-            //{
-            //    case EPlayerStatType.CurrentHP:
-
-            //        _viewer.UpdateHP(_statReadOnly.Get(EPlayerStatType.CurrentHP), _statReadOnly.Get(EPlayerStatType.MaxHp));
-
-            //        break;
-            //    case EPlayerStatType.MaxHp:
-            //        _viewer.UpdateHP(_statReadOnly.Get(EPlayerStatType.CurrentHP), _statReadOnly.Get(EPlayerStatType.MaxHp));
-
-            //        break;
-            //    case EPlayerStatType.Damage:
-            //        _viewer.UpdateDamage(_statReadOnly.Get(EPlayerStatType.Damage));
-
-            //        break;
-            //    case EPlayerStatType.CurrentMoveCount:
-            //        _viewer.UpdateMoveCount(_statReadOnly.Get(EPlayerStatType.CurrentMoveCount), _statReadOnly.Get(EPlayerStatType.MaxMoveCount));
-
-            //        break;
-            //    case EPlayerStatType.MaxMoveCount:
-            //        _viewer.UpdateMoveCount(_statReadOnly.Get(EPlayerStatType.CurrentMoveCount), _statReadOnly.Get(EPlayerStatType.MaxMoveCount));
-
-            //        break;
-
-            //        //TODO ¼öÁ¤
-            //    //case EPlayerStatType.Level:
-            //    //    _viewer.UpdateLevelText(_statReadOnly.Get(EPlayerStatType.Level));
-            //    //    break;
-
-            //    //case EPlayerStatType.CurrentXp:
-            //    //    _viewer.UpdateLevelProgress(_statReadOnly.Get(EPlayerStatType.CurrentXp), _statReadOnly.Get(EPlayerStatType.RequiredXp));
-            //    //    break;
-            //}
+            switch (changedStat)
+            {
+                case ECreatureStatType.CurrentHP:
+                case ECreatureStatType.MaxHp:
+                    int currentHP = _statReadOnly.Get(ECreatureStatType.CurrentHP);
+                    int maxHP = _statReadOnly.Get(ECreatureStatType.MaxHp);
+                    _viewer.UpdateHP(currentHP, maxHP);
+                    break;
+                case ECreatureStatType.Damage:
+                    int damage = _statReadOnly.Get(ECreatureStatType.Damage);
+                    _viewer.UpdateDamage(damage);
+                    break;
+                case ECreatureStatType.CurrentMoveCount:
+                case ECreatureStatType.MaxMoveCount:
+                    int currentMove = _statReadOnly.Get(ECreatureStatType.CurrentMoveCount);
+                    int maxMove = _statReadOnly.Get(ECreatureStatType.MaxMoveCount);
+                    _viewer.UpdateMoveCount(currentMove, maxMove);
+                    break;
+            }
+        }
+        public void ChangePlayerLevel()
+        {
+            int level = _levelProgress.CurrentLevel;
+            _viewer.UpdateLevelText(level);
+        }
+        public void ChangePlayerLevelProgress()
+        {
+            int currentXP = _levelProgress.CurrentXp;
+            int requireXp = _levelProgress.RequiredXp;
+            _viewer.UpdateLevelProgress(currentXP, requireXp);
         }
     }
 }

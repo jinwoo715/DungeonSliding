@@ -8,7 +8,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
     {
         INextAttackEnhancer _nextAttackEnhancer;
         IMoveable _moveable;
-        public SlideTileDamageBounsAbility(RuleAbilityData data, AbilityHost host) : base(data, host) 
+        public SlideTileDamageBounsAbility(RuleAbilityData data, IAbilityContextService host) : base(data, host) 
         {
             
         }
@@ -16,10 +16,10 @@ namespace JW.DungeonSliding.GamePlay.Ability
         public override void ExcuteAbility()
         {
             int moveTileCount = _moveable.SlideTileCount();
-            _nextAttackEnhancer.AddDamage(Mathf.RoundToInt(moveTileCount * _data.P1));
+            _nextAttackEnhancer.AddNextAttackDamage(Mathf.RoundToInt(moveTileCount * _data.P1));
         }
 
-        public override void ProcTrigger(EGameTriggerType triggerType)
+        public override void ProcTrigger(EGameEventTrigger triggerType)
         {
             if(_moveable.SlideResultType == ESlideResultType.EnemyStop)
                 ExcuteAbility();

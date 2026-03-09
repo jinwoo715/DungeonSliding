@@ -17,9 +17,6 @@ namespace JW.DungeonSliding.GamePlay
 
         public void RequestReward(DeathEvent deathEvent)
         {
-            Debug.Log(deathEvent.Killer);
-            Debug.Log(deathEvent.Victim);
-
             if (TryGetSender(deathEvent.Victim, out var sender) && TryGetReceiver(deathEvent.Killer, out var receiver))
             {
                 receiver.AddReward(sender.CreateReward());
@@ -28,8 +25,6 @@ namespace JW.DungeonSliding.GamePlay
 
         private bool TryGetSender(ICombatant combatant, out IRewardSender rewardSender)
         {
-            Debug.Log(combatant is IRewardSender s);
-
             if (combatant is IRewardSender sender)
             {
                 rewardSender = sender;
@@ -43,8 +38,6 @@ namespace JW.DungeonSliding.GamePlay
         }
         private bool TryGetReceiver(ICombatant combatant, out IRewardReceiver rewardReceiver)
         {
-            Debug.Log(combatant is IRewardReceiver r);
-
             if (combatant is IRewardReceiver receiver)
             {
                 rewardReceiver = receiver;

@@ -2,9 +2,9 @@ namespace JW.DungeonSliding.GamePlay.Combat
 {
     public interface INextAttackEnhancer
     {
-        void AddDamage(int damage);
-        void AddDamageMulti(float multi);
-        void AddAttackCount(int count);
+        void AddNextAttackDamage(int damage);
+        void AddNextAttackDamageMulti(float multi);
+        void AddNextAttackCount(int count);
     }
 
     public class NextAttackEnhanceContext

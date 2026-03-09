@@ -23,13 +23,13 @@ namespace JW.DungeonSliding.GamePlay.Stats
         {
             switch (modifierContext.ModifyType)
             {
-                case StatModifyType.Add:
+                case EApplyStatType.Add:
                     AddAdd(Mathf.RoundToInt(modifierContext.Value));
                     break;
-                case StatModifyType.Multiple:
+                case EApplyStatType.Multiple:
                     AddMultiple(modifierContext.Value);
                     break;
-                case StatModifyType.Ratio:
+                case EApplyStatType.Ratio:
                     AddRatio(modifierContext.RatioBaseStat, modifierContext.Value);
                     break;
             }
@@ -63,7 +63,7 @@ namespace JW.DungeonSliding.GamePlay.Stats
 
             return Mathf.FloorToInt((Base + Add + addRatioValue) * Mul);
         }
-        public void Reset()
+        public void Clear()
         {
             Add = 0;
             Mul = 1f;

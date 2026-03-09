@@ -1,3 +1,4 @@
+using JW.DungeonSliding.GamePlay;
 using JW.DungeonSliding.GamePlay.Ability;
 using JW.DungeonSliding.GamePlay.Combat;
 using JW.DungeonSliding.GamePlay.Context;
@@ -19,15 +20,15 @@ namespace JW.DungeonSliding.UI
     {
         [SerializeField] private FadeController _fadeController;
         [SerializeField] private AbilityUIController _abilityUIController;
-        [SerializeField] private EnemyStatUIManager _enemyStatUIManager;
         [SerializeField] private HitDamageViewer _hitDamageViewer;
 
         [Header("Presenter")]
         [SerializeField] private GameTooltipPresenter _abilityTooltipPresenter;
         [SerializeField] private GameTooltipPresenter _enemyTooltipPresenter;
 
-        [SerializeField] private HasAbilityPresenter _hasAbilityPresenter;
+        [SerializeField] private EnemyStatPresenter _enemyStatUIManager;
         [SerializeField] private PlayerStatPresenter _playerStatPresenter;
+        [SerializeField] private HasAbilityPresenter _hasAbilityPresenter;
 
         [Header("Viewer")]
         [SerializeField] private ActViewer _actViewer;
@@ -35,10 +36,10 @@ namespace JW.DungeonSliding.UI
         public IEnemyStatUIService EnemyStatUIService => _enemyStatUIManager;
         public ITooltipService EnemyTooltipService => _enemyTooltipPresenter;
 
-        public void Init(IStatReadOnly statReadOnly, ICombatEventPresenter combatEventPresenter, IAbilityService abilityService, IActService actService)
+        public void Init(ICombatant _player, ILevelProgress levelProgress, ICombatEventPresenter combatEventPresenter, IAbilityEventService abilityService, IActService actService)
         {
             _abilityUIController.Initialize(abilityService);
-            _playerStatPresenter.Init(statReadOnly);
+            _playerStatPresenter.Init(_player.StatReadOnly, _player.StatModifier, levelProgress);
             _enemyStatUIManager.Init();
             _hitDamageViewer.Init();
 

@@ -30,7 +30,6 @@ namespace JW.DungeonSliding.UI
         }
         public void UpdateLevelProgress(int current, int max)
         {
-            Debug.Log($"{current} / {max}");
             _levelProgressImage.fillAmount = (float)current / (float)max;
         }
     }

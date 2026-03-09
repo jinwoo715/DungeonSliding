@@ -11,9 +11,9 @@ namespace JW.DungeonSliding.GamePlay.Ability
     {
         public static EnemyAbilityFactory Instance { get; private set; }
 
-        public IEnemyAbilityGetter _getter;
+        private IEnemyAbilityGetter _getter;
 
-        Dictionary<string, EnemyAbilityData> _enemyAbilityByType = new Dictionary<string, EnemyAbilityData>();
+        private Dictionary<string, EnemyAbilityData> _enemyAbilityDataByType = new();
         public EnemyAbilityFactory(IEnemyAbilityGetter getter)
         {
             Instance = this;
@@ -24,7 +24,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
             foreach (var ability in datas)
             {
-                _enemyAbilityByType.Add(ability.Name, ability);
+                _enemyAbilityDataByType.Add(ability.Name, ability);
             }
         }
         public List<IAbility> GetAbility(string enemyAbilities, ICombatant host, int section)
@@ -37,8 +37,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
             for (int i = 0; i < abilities.Length; i++)
             {
-                Debug.Log(abilities[i]);
-                EnemyAbilityData data = _enemyAbilityByType[abilities[i]];
+                EnemyAbilityData data = _enemyAbilityDataByType[abilities[i]];
 
                 abilityList.Add(CreateAbility(data, host, section));
             }

@@ -12,6 +12,8 @@ using UnityEngine;
    
 namespace JW.DungeonSliding.GamePlay.Bootstrap 
 {
+    
+    
     public class GameSceneBootstrapper : MonoBehaviour
     {
         private RewardManager _rewardManager = new RewardManager();
@@ -21,12 +23,14 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
         private CombatEventBus _combatEventBus = new();
         private AbilitySystem _abilitySystem;
         private FieldCombatantManager _fieldCombatantManager;
-        private FieldAttackRequesterManager _fieldAttackRequesterManager = new FieldAttackRequesterManager();
         private RouteBuilder _routeBuilder;
-        private BossAbilityManager _bossAbilityManager;
+        private EnemyAbilityManager _enemyAbilityManager;
         private MoveRule _moveRule = new MoveRule();
         private GameVisualController _visualContoller;
         private EnemyAbilityFactory _enemyAbilityFactory;
+        private LevelSystem _leveling = new LevelSystem();
+
+        private PlayerAbilityContext _playerAbilityContext = new PlayerAbilityContext();
 
         [Header("Camera Controller")]
         [SerializeField] private CameraController cameraController;
@@ -38,7 +42,7 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
         [SerializeField] private GameSceneManager _gameSceneManager;
         [SerializeField] private GameSceneUIManager _gameSceneUIManager;
         [SerializeField] private MapManager _mapManager;
-        [SerializeField] private Player _player;
+        [SerializeField] private PlayerController _playerController;
         [SerializeField] private EnemyManager _enemyManager;
         [SerializeField] private BattleManager _battleManager;
         [SerializeField] private InputSystem _inputSystem;
@@ -48,8 +52,10 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
 
         private void Start()
         {
-            _gameSceneManager.Init(_rewardManager, _mapManager, _player, _enemyManager, _battleManager, _inputSystem, _modeController, _gameSceneUIManager, _obstacleController);
-            _fieldCombatantManager = new FieldCombatantManager(_enemyManager, _player);
+            AbilityBusyCounter.Clear();
+
+            _gameSceneManager.Init(_rewardManager, _mapManager, _playerController.Player, _enemyManager, _battleManager, _inputSystem, _modeController, _gameSceneUIManager, _obstacleController);
+            _fieldCombatantManager = new FieldCombatantManager(_enemyManager, _playerController.Player);
             BindEvent();
             ChildInit();
 
@@ -58,24 +64,28 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
 
         private void ChildInit()
         {
+            _leveling.Initialize();
+
+            _playerAbilityContext.SetOwner(_playerController.Player);
+            _playerAbilityContext.Register<IMoveable>(_playerController.Moveable);
+            _playerAbilityContext.Register<ICombatantSensor>(_fieldCombatantManager);
+
+            _abilitySystem.Init(_playerAbilityContext, _leveling, _playerController.AbilityRegister);
+
             _routeBuilder = new RouteBuilder(_mapManager);
-            _abilitySystem = new AbilitySystem(_fieldCombatantManager, _player);
-            
-            _gameSceneUIManager.Init(_player.StatReadOnly, _combatEventBus, _abilitySystem, _gameSceneManager);
 
-            _player.Initialize(ECreatureType.Player, _battleManager);
-            _player.SetData(_routeBuilder, _mapManager, _moveRule);
-            _player.SetData(new Stats.CreatureBaseStat(GameManager.Config.Player.HP, GameManager.Config.Player.DMG, GameManager.Config.Player.MVCount));
-            _player.RegisterRequester(_fieldAttackRequesterManager.RegisterPlayerAttackRequester, _fieldAttackRequesterManager.UnRegisterPlayerAttackRequester);
+            _gameSceneUIManager.Init(_playerController.Player, _leveling, _combatEventBus, _abilitySystem, _gameSceneManager);
 
-            _inputCoordinator.Init(_player);
+            _playerController.InitializePlayer(_routeBuilder, _moveRule, _battleManager, _leveling);
 
-            _enemyManager.WireInterfaces(_mapManager, _obstacleController, _gameSceneUIManager.EnemyStatUIService, _combatEventBus, _fieldAttackRequesterManager);
+            _inputCoordinator.Init(_playerController.Moveable);
+
+            _enemyManager.WireInterfaces(_mapManager, _obstacleController, _gameSceneUIManager.EnemyStatUIService, _combatEventBus, _battleManager);
             _enemyManager.LoadData();
 
-            _mapManager.Init(_player.Tile);
+            _mapManager.Init(_playerController.Tile);
             
-            _battleManager.Init(_fieldCombatantManager, _fieldAttackRequesterManager);
+            _battleManager.Init(_fieldCombatantManager);
 
             _rewardManager.Init(_combatEventBus);
 
@@ -84,8 +94,8 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
             _enemyTooltipClicker.Initialize(_gameSceneUIManager.EnemyTooltipService);
 
             _visualContoller = new GameVisualController(cam, dirLight, playerLight, _gameSceneUIManager.EnemyStatUIService);
-            _bossAbilityManager = new BossAbilityManager(_fieldCombatantManager, _moveRule, _player.StatReadOnly, _visualContoller);
-            _enemyAbilityFactory = new EnemyAbilityFactory(_bossAbilityManager);
+            _enemyAbilityManager = new EnemyAbilityManager(_fieldCombatantManager, _moveRule, _playerController.StatReadOnly, _visualContoller);
+            _enemyAbilityFactory = new EnemyAbilityFactory(_enemyAbilityManager);
         }
 
         private void BindEvent()
@@ -97,6 +107,8 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
             _inputCoordinator.IsMoveableFlowFunc += () => _modeController.IsCanMove;
             
             _mapManager.RequestSpawnEnemyEvent += _enemyManager.SpawnEnemy;
+
+            _playerController.Moveable.OnMoveEnd += _battleManager.StartBattleSequence;
         }
 
         private void OnDestroy()

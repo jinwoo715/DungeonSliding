@@ -74,44 +74,22 @@ namespace JW.DungeonSliding
         Epic,
         Legend
     }
-    public enum EGameTriggerType
+    public enum EGameEventTrigger
     {
         None                = 0,
 
-        Instant             = 1 << 0,
-
         OnEnterRoom         = 1 << 1,
 
-        OnBackAttack        = 1 << 2,
-        OnAttack            = 1 << 3,
-        OnDamaged           = 1 << 4, 
-        OnKillEnemy         = 1 << 5,
-
-        OnSlideStart        = 1 << 6,
-        OnSlideEnd          = 1 << 7,
-
-        OnSlideBlocked      = 1 << 8,
-
-        OnShowAbility       = 1 << 9,
-        OnHideAbility       = 1 << 10,
-
-        OnMoveEnd           = 1 << 11,
-
-        OnLevelUp           = 1 << 12,
+        OnEnemyDeath        = 1 << 13,
 
         OnBattleStart       = 1 << 13,
         OnBattleEnd         = 1 << 14,
 
-        OnStepEffectTile    = 1 << 15,
-
-        OnDeathByHP         = 1 << 16,
-        OnDeathByMoveCount  = 1 << 17,
-        OnDeath             = 1 << 18,
+        OnTurnStart         = 1 << 20,
+        OnTurnEnd           = 1 << 21,
 
         OnClearStage        = 1 << 19,
 
-        OnTurnStart         = 1 << 20,
-        OnTurnEnd           = 1 << 21,
     }
 
     public enum EAbilityEffectKind

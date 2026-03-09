@@ -16,11 +16,11 @@ namespace JW.DungeonSliding
 
         private void OnEnable()
         {
-            GameTriggerEventBus.Instance?.SubscribeTriggerEvent(EGameTriggerType.OnTurnEnd, TurnOnTile);
+            GameTriggerEventBus.Instance?.SubscribeTriggerEvent(EGameEventTrigger.OnTurnEnd, TurnOnTile);
         }
         private void OnDisable()
         {
-            GameTriggerEventBus.Instance?.UnSubscribeTriggerEvent(EGameTriggerType.OnTurnEnd, TurnOnTile);
+            GameTriggerEventBus.Instance?.UnSubscribeTriggerEvent(EGameEventTrigger.OnTurnEnd, TurnOnTile);
         }
 
         public void Init(EffectObjectData effectObjectData)

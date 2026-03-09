@@ -6,17 +6,32 @@ namespace JW.DungeonSliding.GamePlay.Ability
     [System.Serializable]
     public class StatAbilityData : AbilityDataBase
     {
-        public EGameTriggerType TriggerType = EGameTriggerType.None;
+        #region Trigger
+        public EGameEventTrigger GameTriggerType = EGameEventTrigger.None;
+        public ECreatureTrigger CreatureTrigger = ECreatureTrigger.None;
+        #endregion
+
         public EAbilityApplyStatType StatType = EAbilityApplyStatType.None;
-        public EPlayerStatType PlayerStatType = EPlayerStatType.None;
+
+        #region Stat
+        public ECreatureStatType PlayerStatType = ECreatureStatType.None;
         public EApplyStatType ApplyType = EApplyStatType.None;
-        public EPlayerStatType RatioType = EPlayerStatType.None;
+        public ECreatureStatType RatioType = ECreatureStatType.None;
         public float StatValue = 0;
+        #endregion
+
+        #region NextAttack
         public ENextAttackType NextAttackType = ENextAttackType.None;
         public float NextAttackValue = 0;
+        #endregion
+
         public int NeedStackCount = 0;
+
+        #region Reset Trigger
         public bool IsResetEnabled = false;
-        public EGameTriggerType ResetOnTrigger = EGameTriggerType.None;
+        public EGameEventTrigger ResetGameTrigger = EGameEventTrigger.None;
+        public ECreatureTrigger ResetCreatureTrigger = ECreatureTrigger.None;
         public int ResetThreshold = 0;
+        #endregion
     }
 }

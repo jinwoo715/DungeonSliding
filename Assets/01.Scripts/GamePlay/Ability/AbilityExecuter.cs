@@ -6,9 +6,21 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Ability
 {
+    public struct AbilityArgs
+    {
+        public readonly EGameEventTrigger GameTrigger;
+        public readonly ECreatureTrigger CreatureTrigger;
+
+        public AbilityArgs(EGameEventTrigger gameTrigger, ECreatureTrigger creatureTrigger)
+        {
+            GameTrigger = gameTrigger;
+            CreatureTrigger = creatureTrigger;
+        }
+    }
+
     public class AbilityExecuter : MonoBehaviour, IAbilityExcuter, IAbilityRegister
     {
-        private Dictionary<EGameTriggerType, List<IAbility>> _gameTriggerAbilities = new();
+        private Dictionary<EGameEventTrigger, List<IAbility>> _gameTriggerAbilities = new();
         private Dictionary<ECreatureTrigger, List<IAbility>> _creatureTriggerAbilities = new();
 
         public event Action OnEndCreatureAbility;
@@ -17,21 +29,24 @@ namespace JW.DungeonSliding.GamePlay.Ability
         #region Excute
         public void ExecuteCreatureTrigger(ECreatureTrigger trigger)
         {
+            
             if (_creatureTriggerAbilities.TryGetValue(trigger, out var abilities))
             {
+                AbilityArgs args = new AbilityArgs(EGameEventTrigger.None, trigger);
                 foreach (var ability in abilities)
                 {
-                    StartCoroutine(ability.Excute());
+                    StartCoroutine(ability.Execute(args));
                 }
             }
 
             OnEndCreatureAbility?.Invoke();
         }
-
         public void ExecuteCreatureTrigger<T>(ECreatureTrigger trigger, T data)
         {
             if (_creatureTriggerAbilities.TryGetValue(trigger, out var abilities))
             {
+                AbilityArgs args = new AbilityArgs(EGameEventTrigger.None, trigger);
+
                 foreach (var ability in abilities)
                 {
                     if(ability is IAbilityPayloadReceiver<T> receiver)
@@ -39,27 +54,29 @@ namespace JW.DungeonSliding.GamePlay.Ability
                         receiver.ReceivePayload(data);
                     }
 
-                    StartCoroutine(ability.Excute());
+                    StartCoroutine(ability.Execute(args));
                 }
             }
 
             OnEndCreatureAbility?.Invoke();
         }
-
-        public void ExecuteGameEventAbility(EGameTriggerType trigger)
+        public void ExecuteGameEventAbility(EGameEventTrigger trigger)
         {
             if (_gameTriggerAbilities.TryGetValue(trigger, out var abilities))
             {
+                AbilityArgs args = new AbilityArgs(trigger, ECreatureTrigger.None);
+
                 foreach (var ability in abilities)
                 {
-                    StartCoroutine(ability.Excute());
+                    StartCoroutine(ability.Execute(args));
                 }
             }
         }
-        public void ExecuteGameEventAbility<T>(EGameTriggerType trigger, T data)
+        public void ExecuteGameEventAbility<T>(EGameEventTrigger trigger, T data)
         {
             if (_gameTriggerAbilities.TryGetValue(trigger, out var abilities))
             {
+                AbilityArgs args = new AbilityArgs(trigger, ECreatureTrigger.None);
                 foreach (var ability in abilities)
                 {
                     if(ability is IAbilityPayloadReceiver<T> receiver)
@@ -67,17 +84,34 @@ namespace JW.DungeonSliding.GamePlay.Ability
                         receiver.ReceivePayload(data);
                     }
 
-                    StartCoroutine(ability.Excute());
+                    StartCoroutine(ability.Execute(args));
                 }
             }
         }
-
         #endregion
 
 
         #region Registration
+        public void RegisterAbility(IAbility ability)
+        {
+            if (ability.CreatureTrigger != ECreatureTrigger.None)
+            {
+                RegisterCreatureEventAbility(ability.CreatureTrigger, ability);
+            }
+
+            if (ability.GameTrigger != EGameEventTrigger.None)
+                RegisterGameEventAbility(ability.GameTrigger, ability);
+        }
         public void RegisterCreatureEventAbility(ECreatureTrigger trigger, IAbility ability)
         {
+            if (trigger == ECreatureTrigger.OnAdded)
+            {
+                AbilityArgs args = new AbilityArgs(EGameEventTrigger.None, trigger);
+
+                ability.Execute(args);
+                return;
+            }
+
             if (!_creatureTriggerAbilities.ContainsKey(trigger))
             {
                 _creatureTriggerAbilities.Add(trigger, new List<IAbility>());
@@ -85,7 +119,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
             _creatureTriggerAbilities[trigger].Add(ability);
         }
-        public void RegisterGameEventAbility(EGameTriggerType trigger, IAbility ability)
+        public void RegisterGameEventAbility(EGameEventTrigger trigger, IAbility ability)
         {
             if (!_gameTriggerAbilities.ContainsKey(trigger))
             {
@@ -95,6 +129,17 @@ namespace JW.DungeonSliding.GamePlay.Ability
             }
 
             _gameTriggerAbilities[trigger].Add(ability);
+        }
+        public void RegisterAutoAllAbility(List<IAbility> abilities)
+        {
+            foreach (var ability in abilities)
+            {
+                if(ability.CreatureTrigger != ECreatureTrigger.None)
+                    RegisterCreatureEventAbility(ability.CreatureTrigger, ability);
+
+                if (ability.GameTrigger != EGameEventTrigger.None)
+                    RegisterGameEventAbility(ability.GameTrigger, ability);
+            }
         }
         #endregion
 
@@ -106,10 +151,27 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
             foreach (var key in keys)
             {
+                foreach (var ability in _gameTriggerAbilities[key])
+                {
+                    ability.ReleaseAbility();
+                }
+
                 GameTriggerEventBus.Instance.SubscribeTriggerEvent(key, () => ExecuteGameEventAbility(key));
             }
 
             _gameTriggerAbilities.Clear();
+
+            foreach (var abilities in _creatureTriggerAbilities)
+            {
+                foreach (var ability in abilities.Value)
+                {
+                    ability.ReleaseAbility();
+                }
+            }
+
+            _creatureTriggerAbilities.Clear();
         }
+
+        
     }
 }

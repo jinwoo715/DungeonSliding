@@ -1,7 +1,12 @@
+using System;
+
 namespace JW.DungeonSliding.Map
 {
     public interface IMoveable
     {
+        event Action OnMoveEnd;
+        event Action OnSlideEnd;
+
         public ITileObject Tile { get; }
         public int SlideTileCount();
         public ESlideResultType SlideResultType { get; }

@@ -28,10 +28,11 @@ MonoBehaviour:
     _floorUpHpValue: 0
     _floorUpDMGValue: 0
   Ability:
+    _GainAbilityPerLevel: 0
     _nomalCardRatio: 0
     _rareCardRatio: 0
     _epicCardRatio: 0
-    _legendaryCardRatio: 0
+    _legendaryCardRatio: 1
   UI:
     _fadeOutTime: 0
     _fadeInTime: 0

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace JW.DungeonSliding
 {
-    public class EnemyStatUIManager : MonoBehaviour, IEnemyStatUIService
+    public class EnemyStatPresenter : MonoBehaviour, IEnemyStatUIService
     {
         [SerializeField] private EnemyStatViewItem _enemyStatViewItem;
         

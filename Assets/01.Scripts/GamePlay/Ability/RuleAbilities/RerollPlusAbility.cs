@@ -6,7 +6,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
     {
         IRerollService _rerollService;
 
-        public RerollPlusAbility(RuleAbilityData data, AbilityHost host) : base(data, host)
+        public RerollPlusAbility(RuleAbilityData data, IAbilityContextService host) : base(data, host)
         {
             
         }
@@ -16,7 +16,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
             _rerollService.AddReroll();
         }
 
-        public override void ProcTrigger(EGameTriggerType triggerType)
+        public override void ProcTrigger(EGameEventTrigger triggerType)
         {
         }
 

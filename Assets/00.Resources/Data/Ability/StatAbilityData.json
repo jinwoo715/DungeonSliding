@@ -5,7 +5,8 @@
     "Description": "데미지 {StatValue}만큼 증가",
     "IconName": "Fire",
     "Rank": "Nomal",
-    "TriggerType": "Instant",
+    "GameTriggerType": "None",
+    "CreatureTriggerType": "OnAdded",
     "StatType": "PlayerStat",
     "PlayerStatType": "Damage",
     "ApplyType": "Add",
@@ -15,7 +16,8 @@
     "NextAttackValue": "",
     "NeedStackCount": 1,
     "IsResetEnabled": "FALSE",
-    "ResetOnTrigger": "None",
+    "ResetGameTrigger": "None",
+    "ResetCreatureTrigger": "None",
     "ResetThreshold": ""
   },
   {
@@ -24,7 +26,8 @@
     "Description": "데미지 {StatValue}%만큼 증가",
     "IconName": "Fire",
     "Rank": "Rare",
-    "TriggerType": "Instant",
+    "GameTriggerType": "None",
+    "CreatureTriggerType": "OnAdded",
     "StatType": "PlayerStat",
     "PlayerStatType": "Damage",
     "ApplyType": "Multiple",
@@ -34,7 +37,8 @@
     "NextAttackValue": "",
     "NeedStackCount": 1,
     "IsResetEnabled": "FALSE",
-    "ResetOnTrigger": "None",
+    "ResetGameTrigger": "None",
+    "ResetCreatureTrigger": "None",
     "ResetThreshold": ""
   },
   {
@@ -43,7 +47,8 @@
     "Description": "{ResetThreshold}턴 안에 연속 공격에 성공할 때 마다 일시적으로 공격력{StatValue} 만큼 상승",
     "IconName": "Fire",
     "Rank": "Epic",
-    "TriggerType": "OnAttack",
+    "GameTriggerType": "None",
+    "CreatureTriggerType": "OnAttackPerformed",
     "StatType": "PlayerStat",
     "PlayerStatType": "Damage",
     "ApplyType": "Add",
@@ -53,7 +58,8 @@
     "NextAttackValue": "",
     "NeedStackCount": 1,
     "IsResetEnabled": "TRUE",
-    "ResetOnTrigger": "OnSlideEnd",
+    "ResetGameTrigger": "OnTurnEnd",
+    "ResetCreatureTrigger": "None",
     "ResetThreshold": 2
   },
   {
@@ -62,7 +68,8 @@
     "Description": "{NeedStackCount}번째 공격마다 추가 {NextAttackValue}회 타격",
     "IconName": "Fire",
     "Rank": "Epic",
-    "TriggerType": "OnAttack",
+    "GameTriggerType": "None",
+    "CreatureTriggerType": "OnAttackPrepared",
     "StatType": "NextAttack",
     "PlayerStatType": "None",
     "ApplyType": "None",
@@ -72,7 +79,8 @@
     "NextAttackValue": 1,
     "NeedStackCount": 3,
     "IsResetEnabled": "FALSE",
-    "ResetOnTrigger": "None",
+    "ResetGameTrigger": "None",
+    "ResetCreatureTrigger": "None",
     "ResetThreshold": ""
   },
   {
@@ -81,7 +89,8 @@
     "Description": "적을 {NeedStackCount}마리 처치할 때 마다 {StatValue}만큼 체력 회복",
     "IconName": "Fire",
     "Rank": "Nomal",
-    "TriggerType": "OnKillEnemy",
+    "GameTriggerType": "None",
+    "CreatureTriggerType": "OnKilled",
     "StatType": "PlayerStat",
     "PlayerStatType": "CurrentHP",
     "ApplyType": "Add",
@@ -91,7 +100,8 @@
     "NextAttackValue": "",
     "NeedStackCount": 3,
     "IsResetEnabled": "FALSE",
-    "ResetOnTrigger": "None",
+    "ResetGameTrigger": "None",
+    "ResetCreatureTrigger": "None",
     "ResetThreshold": ""
   },
   {
@@ -100,7 +110,8 @@
     "Description": "레벨업 시 공격력{StatValue} 증가",
     "IconName": "Fire",
     "Rank": "Rare",
-    "TriggerType": "OnLevelUp",
+    "GameTriggerType": "None",
+    "CreatureTriggerType": "OnLevelUp",
     "StatType": "PlayerStat",
     "PlayerStatType": "Damage",
     "ApplyType": "Add",
@@ -110,7 +121,8 @@
     "NextAttackValue": "",
     "NeedStackCount": 1,
     "IsResetEnabled": "FALSE",
-    "ResetOnTrigger": "None",
+    "ResetGameTrigger": "None",
+    "ResetCreatureTrigger": "None",
     "ResetThreshold": ""
   },
   {
@@ -119,7 +131,8 @@
     "Description": "최대 체력 {StatValue}만큼 증가",
     "IconName": "Healing",
     "Rank": "Nomal",
-    "TriggerType": "Instant",
+    "GameTriggerType": "None",
+    "CreatureTriggerType": "OnAdded",
     "StatType": "PlayerStat",
     "PlayerStatType": "MaxHP",
     "ApplyType": "Add",
@@ -129,7 +142,8 @@
     "NextAttackValue": "",
     "NeedStackCount": 1,
     "IsResetEnabled": "FALSE",
-    "ResetOnTrigger": "None",
+    "ResetGameTrigger": "None",
+    "ResetCreatureTrigger": "None",
     "ResetThreshold": ""
   },
   {
@@ -138,7 +152,8 @@
     "Description": "체력 전체 회복",
     "IconName": "Healing",
     "Rank": "Rare",
-    "TriggerType": "Instant",
+    "GameTriggerType": "None",
+    "CreatureTriggerType": "OnAdded",
     "StatType": "PlayerStat",
     "PlayerStatType": "CurrentHP",
     "ApplyType": "Ratio",
@@ -148,7 +163,8 @@
     "NextAttackValue": "",
     "NeedStackCount": 1,
     "IsResetEnabled": "FALSE",
-    "ResetOnTrigger": "None",
+    "ResetGameTrigger": "None",
+    "ResetCreatureTrigger": "None",
     "ResetThreshold": ""
   },
   {
@@ -157,7 +173,8 @@
     "Description": "백 어택 공격 시 체력 {StatValue}만큼 회복",
     "IconName": "Healing",
     "Rank": "Rare",
-    "TriggerType": "OnBackAttack",
+    "GameTriggerType": "None",
+    "CreatureTriggerType": "OnBackAttacked",
     "StatType": "PlayerStat",
     "PlayerStatType": "CurrentHP",
     "ApplyType": "Add",
@@ -167,7 +184,8 @@
     "NextAttackValue": "",
     "NeedStackCount": 1,
     "IsResetEnabled": "FALSE",
-    "ResetOnTrigger": "None",
+    "ResetGameTrigger": "None",
+    "ResetCreatureTrigger": "None",
     "ResetThreshold": ""
   },
   {
@@ -176,7 +194,8 @@
     "Description": "효과 타일을 밟으면 {StatValue}만큼 HP회복",
     "IconName": "Healing",
     "Rank": "Nomal",
-    "TriggerType": "OnStepEffectTile",
+    "GameTriggerType": "None",
+    "CreatureTriggerType": "OnSteppedEffectTile",
     "StatType": "PlayerStat",
     "PlayerStatType": "CurrentHP",
     "ApplyType": "Add",
@@ -186,7 +205,8 @@
     "NextAttackValue": "",
     "NeedStackCount": 1,
     "IsResetEnabled": "FALSE",
-    "ResetOnTrigger": "None",
+    "ResetGameTrigger": "None",
+    "ResetCreatureTrigger": "None",
     "ResetThreshold": ""
   },
   {
@@ -195,7 +215,8 @@
     "Description": "최대 이동 횟수 {StatValue}만큼 증가",
     "IconName": "Speed",
     "Rank": "Nomal",
-    "TriggerType": "Instant",
+    "GameTriggerType": "None",
+    "CreatureTriggerType": "OnAdded",
     "StatType": "PlayerStat",
     "PlayerStatType": "MaxMoveCount",
     "ApplyType": "Add",
@@ -205,7 +226,8 @@
     "NextAttackValue": "",
     "NeedStackCount": 1,
     "IsResetEnabled": "FALSE",
-    "ResetOnTrigger": "None",
+    "ResetGameTrigger": "None",
+    "ResetCreatureTrigger": "None",
     "ResetThreshold": ""
   },
   {
@@ -214,7 +236,8 @@
     "Description": "이동 횟수 전체 회복",
     "IconName": "Speed",
     "Rank": "Rare",
-    "TriggerType": "Instant",
+    "GameTriggerType": "None",
+    "CreatureTriggerType": "OnAdded",
     "StatType": "PlayerStat",
     "PlayerStatType": "CurrentMoveCount",
     "ApplyType": "Ratio",
@@ -224,7 +247,8 @@
     "NextAttackValue": "",
     "NeedStackCount": 1,
     "IsResetEnabled": "FALSE",
-    "ResetOnTrigger": "None",
+    "ResetGameTrigger": "None",
+    "ResetCreatureTrigger": "None",
     "ResetThreshold": ""
   },
   {
@@ -233,7 +257,8 @@
     "Description": "방을 {NeedStackCount}개 통과할 때 마다 최대 이동 횟수 {StatValue}증가",
     "IconName": "Speed",
     "Rank": "Epic",
-    "TriggerType": "OnClearStage",
+    "GameTriggerType": "OnEnterRoom",
+    "CreatureTriggerType": "None",
     "StatType": "PlayerStat",
     "PlayerStatType": "MaxMoveCount",
     "ApplyType": "Multiple",
@@ -243,7 +268,8 @@
     "NextAttackValue": "",
     "NeedStackCount": 3,
     "IsResetEnabled": "FALSE",
-    "ResetOnTrigger": "None",
+    "ResetGameTrigger": "OnEnterRoom",
+    "ResetCreatureTrigger": "None",
     "ResetThreshold": ""
   },
   {
@@ -252,7 +278,8 @@
     "Description": "방 입장시 이동 횟수 {StatValue}만큼 회복",
     "IconName": "Speed",
     "Rank": "Nomal",
-    "TriggerType": "OnEnterRoom",
+    "GameTriggerType": "OnEnterRoom",
+    "CreatureTriggerType": "None",
     "StatType": "PlayerStat",
     "PlayerStatType": "CurrentMoveCount",
     "ApplyType": "Add",
@@ -262,7 +289,8 @@
     "NextAttackValue": "",
     "NeedStackCount": 1,
     "IsResetEnabled": "FALSE",
-    "ResetOnTrigger": "None",
+    "ResetGameTrigger": "OnEnterRoom",
+    "ResetCreatureTrigger": "None",
     "ResetThreshold": ""
   },
   {
@@ -271,7 +299,8 @@
     "Description": "{NeedStackCount}번 슬라이딩 할 때 마다 {StatValue}만큼 이동 횟수 회복",
     "IconName": "Speed",
     "Rank": "Rare",
-    "TriggerType": "OnSlideEnd",
+    "GameTriggerType": "None",
+    "CreatureTriggerType": "OnSlided",
     "StatType": "PlayerStat",
     "PlayerStatType": "CurrentMoveCount",
     "ApplyType": "Add",
@@ -281,7 +310,8 @@
     "NextAttackValue": "",
     "NeedStackCount": 5,
     "IsResetEnabled": "FALSE",
-    "ResetOnTrigger": "None",
+    "ResetGameTrigger": "None",
+    "ResetCreatureTrigger": "None",
     "ResetThreshold": ""
   },
   {
@@ -290,7 +320,8 @@
     "Description": "이동 시 다음 공격 {NextAttackValue}만큼 추가 데미지",
     "IconName": "Fire",
     "Rank": "Rare",
-    "TriggerType": "OnSlideEnd",
+    "GameTriggerType": "None",
+    "CreatureTriggerType": "OnSlided",
     "StatType": "NextAttack",
     "PlayerStatType": "None",
     "ApplyType": "None",
@@ -300,7 +331,8 @@
     "NextAttackValue": 1,
     "NeedStackCount": 1,
     "IsResetEnabled": "FALSE",
-    "ResetOnTrigger": "None",
+    "ResetGameTrigger": "None",
+    "ResetCreatureTrigger": "None",
     "ResetThreshold": ""
   }
 ]

@@ -24,7 +24,7 @@ namespace JW.DungeonSliding.GamePlay.Context
     {
         private RewardManager PlayerReward { get; set; }
         private MapManager _mapManager;
-        private Player _player;
+        private ICombatant _player;
         private EnemyManager _enemyManager;
         private BattleManager _battleManager;
         private InputSystem _inputSystem;
@@ -41,8 +41,8 @@ namespace JW.DungeonSliding.GamePlay.Context
         private int _floorPerAct;
         private int _actCount;
 
-        public void Init(RewardManager reward, MapManager map, 
-            Player player, EnemyManager enemyManager, BattleManager battleManager, 
+        public void Init(RewardManager reward, MapManager map,
+            ICombatant player, EnemyManager enemyManager, BattleManager battleManager, 
             InputSystem input, GameModeController gameModeController, IUIFader uiFader
             , IObstacleRequest obstacleRequest)
         {
@@ -59,16 +59,8 @@ namespace JW.DungeonSliding.GamePlay.Context
             _floorPerAct = GameManager.Config.Act.ActPerFloor;
             _actCount = GameManager.Config.Act.ActCount;
 
-            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.OnClearStage, ClearFloor);
-            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.OnTurnEnd, CheckGameOver);
-        }
-
-        public void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.A))
-            {
-                GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnLevelUp);
-            }
+            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameEventTrigger.OnClearStage, ClearFloor);
+            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameEventTrigger.OnTurnEnd, CheckGameOver);
         }
 
         public void PrepareStage() 
@@ -113,7 +105,7 @@ namespace JW.DungeonSliding.GamePlay.Context
             yield return _uiFader.FadeIn();
 
             _gameModeController.ExitGameMode(EGameModeType.PrepareStage);
-            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnEnterRoom);
+            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTrigger.OnEnterRoom);
 
         }
         public void CheckGameOver()

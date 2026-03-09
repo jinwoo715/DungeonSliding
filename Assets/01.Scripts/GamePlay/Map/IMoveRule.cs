@@ -1,4 +1,5 @@
 using JW.DungeonSliding.GamePlay;
+using JW.DungeonSliding.GamePlay.Ability;
 using JW.DungeonSliding.GamePlay.Combat;
 using JW.DungeonSliding.GamePlay.Entities;
 using JW.DungeonSliding.GamePlay.Stats;
@@ -14,7 +15,6 @@ namespace JW.DungeonSliding
     {
         public int MoveCost { get; }
         public bool IsCanMove(EDirectionType directionType);
-        
         public void SetIsMoveable(bool value);
         public void SetMoveBanDirection(EDirectionType directionType);
         public void SetMoveCost(int cost);
@@ -47,14 +47,14 @@ namespace JW.DungeonSliding
             MoveCost += cost;
         }
     }
-    public class BossAbilityManager : IEnemyAbilityGetter
+    public class EnemyAbilityManager : IEnemyAbilityGetter
     {
         public ICombatantSensor CombatantSensor { get; private set; }
         public IMoveRule MoveRule { get; private set; }
         public IStatReadOnly PlayerStatReader { get; private set; }
         public IVisualController VisualController { get; private set; }
 
-        public BossAbilityManager(ICombatantSensor sensor, IMoveRule rule, IStatReadOnly reader, IVisualController visualController)
+        public EnemyAbilityManager(ICombatantSensor sensor, IMoveRule rule, IStatReadOnly reader, IVisualController visualController)
         {
             CombatantSensor = sensor;
             MoveRule = rule;
@@ -77,13 +77,13 @@ namespace JW.DungeonSliding
         public string Name;
         public string Description;
         public EEnemyAbilityType EnemyAbilityType;
-        public EGameTriggerType GameTriggerType;
+        public EGameEventTrigger GameTriggerType;
         public ECreatureTrigger CretureTriggerType;
         public bool IsReleaseOnDeath;
         public float BaseP1;
-        public float GrowthP1Ratio;
+        public float GrowthP1;
         public float BaseP2;
-        public float GrowthP2Ratio;
+        public float GrowthP2;
     }
 
     public enum EEnemyAbilityType
@@ -127,9 +127,9 @@ namespace JW.DungeonSliding
     }
     public interface IAbility
     {
-        public EGameTriggerType GameTrigger { get; }
+        public EGameEventTrigger GameTrigger { get; }
         public ECreatureTrigger CreatureTrigger { get; }
-        public IEnumerator Excute();
+        public IEnumerator Execute(AbilityArgs args);
         public void ReleaseAbility();
     }
 
@@ -141,15 +141,27 @@ namespace JW.DungeonSliding
     public enum ECreatureTrigger
     {
         None,
+
+        OnAdded,
+
         OnRotate,
 
         // 공격 시퀀스
         OnAttackPrepared,   // 공격 직전 (버프 주입, 데미지 계산 전)
         OnAttackPerformed,  // 공격 실행 완료 (흡혈, 처치 시 효과) - OnAttacked 대신 더 명확한 표현
+        OnBackAttacked,
+        OnKilled,
 
         // 피격 시퀀스
         OnBeforeHitted,     // 데미지 계산 전 (방어 버프, 회피 판정) - OnReceivedAttack 대응
         OnAfterHitted,      // 데미지 계산 및 체력 감소 후 (반격, 피격 시 연출) - OnHitted 대응
+        OnHittedBackAttack,
+
+        OnSlided,
+
+        OnSteppedEffectTile,
+        OnBlockedByWall,
+        OnLevelUp,
 
         OnDeathByHp,
         OnDeathByMoveCount,
@@ -161,27 +173,47 @@ namespace JW.DungeonSliding
     {
         public EnemyAbilityData _data;
         protected ICombatant _owner;
+        public int P1 { get; private set; }
+        public int P2 { get; private set; }
 
-        public EGameTriggerType GameTrigger => _data.GameTriggerType;
+        public EGameEventTrigger GameTrigger => _data.GameTriggerType;
         public ECreatureTrigger CreatureTrigger => _data.CretureTriggerType;
 
-        public EnemyAbilityBase(EnemyAbilityData data, IEnemyAbilityGetter bossAbilityGetter, ICombatant boss, int section)
+        public EnemyAbilityBase(EnemyAbilityData data, IEnemyAbilityGetter bossAbilityGetter, ICombatant owner, int section)
         {
-            _owner = boss;
+            _owner = owner;
             _data = data;
             Bind(bossAbilityGetter);
             CalculateParam(section);
         }
-        public abstract IEnumerator Excute();
         public abstract void Bind(IEnemyAbilityGetter bossAbilityGetter);
         private void CalculateParam(int section)
         {
-            _data.BaseP1 = _data.BaseP1 + _data.GrowthP1Ratio * section;
-            _data.BaseP2 = _data.BaseP2 + _data.GrowthP2Ratio * section;
+            P1 = Mathf.RoundToInt(_data.BaseP1 + _data.GrowthP1 * section);
+            P2 = Mathf.RoundToInt(_data.BaseP2 + _data.GrowthP2 * section);
         }
+        public abstract IEnumerator Execute(AbilityArgs args);
         public virtual void ReleaseAbility() { }
     }
+    public class HeavyGravityAbility : EnemyAbilityBase
+    {
+        IMoveRule _moveRule;
+        public HeavyGravityAbility(EnemyAbilityData data, IEnemyAbilityGetter getter, ICombatant owner, int section) : base(data, getter, owner, section) { }
+        public override void Bind(IEnemyAbilityGetter bossAbilityGetter)
+        {
+            _moveRule = bossAbilityGetter.MoveRule;
+        }
+        public override IEnumerator Execute()
+        {
+            yield return null;
 
+            _moveRule.AddMoveCost(P1);
+        }
+        public override void ReleaseAbility()
+        {
+            _moveRule.AddMoveCost(-P1);
+        }
+    }
     public class AutoRotateAbility : EnemyAbilityBase
     {
         IRotateObject _creatureRotator;
@@ -197,7 +229,7 @@ namespace JW.DungeonSliding
             _moveRule = bossAbilityGetter.MoveRule;
         }
 
-        public override IEnumerator Excute()
+        public override IEnumerator Execute()
         {
             //if (!_owner.IsCombat)
             {
@@ -214,7 +246,7 @@ namespace JW.DungeonSliding
         
         public FacingMoveBanAbility(EnemyAbilityData data, IEnemyAbilityGetter getter, ICombatant owner, int section) : base(data, getter, owner, section) { }
 
-        public override IEnumerator Excute()
+        public override IEnumerator Execute()
         {
             _moveRule.SetMoveBanDirection(_owner.Rotate.Direction);
             yield return null;
@@ -223,28 +255,6 @@ namespace JW.DungeonSliding
         public override void Bind(IEnemyAbilityGetter bossAbilityGetter)
         {
             _moveRule = bossAbilityGetter.MoveRule;
-        }
-    }
-    public class HeavyGravityAbility : EnemyAbilityBase
-    {
-        IMoveRule _moveRule;
-        private int _addMoveCost = 0;
-        public HeavyGravityAbility(EnemyAbilityData data, IEnemyAbilityGetter getter, ICombatant owner, int section) : base(data, getter, owner, section) { }
-        public override void Bind(IEnemyAbilityGetter bossAbilityGetter)
-        {
-            _moveRule = bossAbilityGetter.MoveRule;
-        }
-        public override IEnumerator Excute()
-        {
-            yield return null;
-
-            _addMoveCost += (int)_data.BaseP1;
-
-            _moveRule.AddMoveCost(_addMoveCost);
-        }
-        public override void ReleaseAbility()
-        {
-            _moveRule.AddMoveCost(-_addMoveCost);
         }
     }
     public class CopyAbility : EnemyAbilityBase
@@ -262,7 +272,7 @@ namespace JW.DungeonSliding
             }
         }
 
-        public override IEnumerator Excute()
+        public override IEnumerator Execute()
         {
             //_enemyStatModifier.SetEnemyStat(EEnemyStatType.HP, _playerStatReader.Get(EPlayerStatType.CurrentHP));
             //_enemyStatModifier.SetEnemyStat(EEnemyStatType.Damage, _playerStatReader.Get(EPlayerStatType.Damage));
@@ -283,7 +293,7 @@ namespace JW.DungeonSliding
             _visualController = getter.VisualController;
         }
 
-        public override IEnumerator Excute()
+        public override IEnumerator Execute()
         {
             Debug.Log("Excute");
             if(isBlined == true)
@@ -318,7 +328,7 @@ namespace JW.DungeonSliding
             }
         }
 
-        public override IEnumerator Excute()
+        public override IEnumerator Execute()
         {
             _statModifier.ModifyEnemyStat(new EnemyApplyStatContext(EEnemyStatType.HP, EApplyStatType.Add, _data.BaseP1, EEnemyStatType.None));
             _statModifier.ModifyEnemyStat(new EnemyApplyStatContext(EEnemyStatType.Damage, EApplyStatType.Add, _data.BaseP2, EEnemyStatType.None));
@@ -334,7 +344,7 @@ namespace JW.DungeonSliding
             _sensor = getter.CombatantSensor;
         }
 
-        public override IEnumerator Excute()
+        public override IEnumerator Execute()
         {
             var enemies = _sensor.AllEnemyCombatants;
 
@@ -379,7 +389,7 @@ namespace JW.DungeonSliding
             _moveRule = getter.MoveRule;
         }
 
-        public override IEnumerator Excute()
+        public override IEnumerator Execute()
         {
             _moveRule.SetIsMoveable(false);
             var enemies = _sensor.AllEnemyCombatants;
@@ -422,7 +432,7 @@ namespace JW.DungeonSliding
             }
         }
 
-        public override IEnumerator Excute()
+        public override IEnumerator Execute()
         {
             if (_counterAttackable != null)
             {
@@ -449,7 +459,7 @@ namespace JW.DungeonSliding
             }
         }
 
-        public override IEnumerator Excute()
+        public override IEnumerator Execute()
         {
             _barrierable.GainBarrier();
             yield return null;
@@ -467,7 +477,7 @@ namespace JW.DungeonSliding
             }
         }
 
-        public override IEnumerator Excute()
+        public override IEnumerator Execute()
         {
             //_attackable.AddDamageContextStatue(EStatusEffectType.KnockBack, (int)_data.BaseP1);
             yield return null;
@@ -485,7 +495,7 @@ namespace JW.DungeonSliding
             _moveRule = bossAbilityGetter.MoveRule;
         }
 
-        public override IEnumerator Excute()
+        public override IEnumerator Execute()
         {
             _moveRule.SetIsMoveable(false);
 

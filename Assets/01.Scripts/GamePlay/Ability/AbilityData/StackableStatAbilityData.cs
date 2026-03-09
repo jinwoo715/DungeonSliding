@@ -14,16 +14,16 @@ namespace JW.DungeonSliding.GamePlay.Ability
         public bool IsResetEnabled;
  
         [ShowIf("IsResetEnabled")]
-        public List<EGameTriggerType> ResetOnTriggerTypes;
+        public List<EGameEventTrigger> ResetOnTriggerTypes;
 
         [ShowIf("IsResetEnabled")]
         public int ResetOnOtherTriggerCount;
 
-        public override List<EGameTriggerType> GetEnrollTriggers
+        public override List<EGameEventTrigger> GetEnrollTriggers
         {
             get 
             {
-                List<EGameTriggerType> enrollTriggers = new List<EGameTriggerType>();
+                List<EGameEventTrigger> enrollTriggers = new List<EGameEventTrigger>();
 
                 for (int i = 0; i < ResetOnTriggerTypes.Count; i++)
                 {

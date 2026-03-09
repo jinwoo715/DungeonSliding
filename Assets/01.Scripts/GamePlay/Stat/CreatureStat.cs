@@ -32,7 +32,7 @@ namespace JW.DungeonSliding.GamePlay.Stats
 
         public event Action<ECreatureStatType> OnStatChanged;
        
-        public CreatureStat(CreatureBaseStat baseStat)
+        public void Init(CreatureBaseStat baseStat)
         {
             _stats.Add(ECreatureStatType.MaxHp, new StatValue(baseStat.HP));
             _stats.Add(ECreatureStatType.Damage, new StatValue(baseStat.Damage));
@@ -43,6 +43,12 @@ namespace JW.DungeonSliding.GamePlay.Stats
 
             _damageDealMultiplier = 1;
             _damageTakeMultiplier = 1;
+
+            OnStatChanged?.Invoke(ECreatureStatType.CurrentHP);
+            OnStatChanged?.Invoke(ECreatureStatType.MaxHp);
+            OnStatChanged?.Invoke(ECreatureStatType.Damage);
+            OnStatChanged?.Invoke(ECreatureStatType.CurrentMoveCount);
+            OnStatChanged?.Invoke(ECreatureStatType.MaxMoveCount);
         }
 
         public int Get(ECreatureStatType stat)
@@ -72,8 +78,11 @@ namespace JW.DungeonSliding.GamePlay.Stats
             return 0;
         }
 
+        //TODO 메서드 나눠야함
         public void ModifyStat(StatModifierContext modifierContext)
         {
+            Debug.Log(modifierContext.ModifyType);
+            Debug.Log(modifierContext.TargetStat);
             if (modifierContext.TargetStat == ECreatureStatType.CurrentHP)
             {
                 _currentHP += Mathf.RoundToInt(modifierContext.Value);
@@ -119,9 +128,18 @@ namespace JW.DungeonSliding.GamePlay.Stats
             OnStatChanged?.Invoke(modifierContext.TargetStat);
         }
 
-        internal void Reset()
+        public void Clear()
         {
-            throw new NotImplementedException();
+            foreach (var stat in _stats)
+            {
+                stat.Value.Clear();
+            }
+
+            _currentHP = 0;
+            _currentMove = 0;
+
+            _damageDealMultiplier = 1;
+            _damageTakeMultiplier = 1;
         }
     }
 }

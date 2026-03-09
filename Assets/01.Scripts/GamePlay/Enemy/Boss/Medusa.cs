@@ -10,11 +10,11 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
         public void OnEnable()
         {
-            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameTriggerType.OnTurnEnd, ExcuteAbility);
+            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameEventTrigger.OnTurnEnd, ExcuteAbility);
         }
         private void OnDisable()
         {
-            GameTriggerEventBus.Instance.UnSubscribeTriggerEvent(EGameTriggerType.OnTurnEnd, ExcuteAbility);
+            GameTriggerEventBus.Instance.UnSubscribeTriggerEvent(EGameEventTrigger.OnTurnEnd, ExcuteAbility);
         }
 
         public void SetAbilityGetter(IEnemyAbilityGetter bossAbilityGetter)
@@ -24,7 +24,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
         public void ExcuteAbility()
         {
-            StartCoroutine(_facingMoveBanAbility.Excute());
+            StartCoroutine(_facingMoveBanAbility.Execute());
         }
         public void ExcuteAttack()
         {

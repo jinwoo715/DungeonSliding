@@ -13,9 +13,10 @@ namespace JW.DungeonSliding.GamePlay.Entities
     {
         [SerializeField] protected AnimatorController _animatorController;
         [SerializeField] private AbilityExecuter _abilityExcuter;
+        private ECreatureType _creatureType;
         
-        private CreatureStat _stat;
-        private StatusEffectManager _statusManager;
+        private CreatureStat _stat = new CreatureStat();
+        private StatusEffectManager _status;
         private AttackRequester _attackRequester;
         private CombatSystem _combatSystem;
         private GridPositioner _gridTransform;
@@ -28,42 +29,47 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
         public event Action OnDeathEvent;
 
-        private Action<IAttackRequester> _unRegisterRequesterEvent;
+        private event Action<IAttackRequester> _unRegisterRequesterEvent;
 
         public IStatModifier StatModifier => _stat;
         public IStatReadOnly StatReadOnly => _stat;
-        public IStatusModifier StatusModifier => _statusManager;
-        public IStatusReadOnly StatusReadOnly => _statusManager;
+        public IStatusModifier StatusModifier => _status;
+        public IStatusReadOnly StatusReadOnly => _status;
         public ITileObject Tile => _gridTransform;
         public IRotateObject Rotate => _objectRotator;
+        public IAbilityRegister AbilityRegister => _abilityExcuter;
+        public IAbilityExcuter Ability => _abilityExcuter;
 
-        private ECreatureType _creatureType;
+        private void OnDestroy()
+        {
+            UnBindAnimEvent();
+        }
 
-        public virtual void Initialize(ECreatureType cretureType, IAttackRequestListener attackRequestListener)
+        public virtual void Initialize(ECreatureType cretureType)
         {
             IsActive = true;
             _creatureType = cretureType;
 
             _objectRotator = new ObjectRotator(this.transform);
             _gridTransform = new GridPositioner(this.transform);
+            _attackRequester = new AttackRequester(this, _creatureType);
             _combatSystem = new CombatSystem(this);
-            _attackRequester = new AttackRequester(this, _creatureType, attackRequestListener);
-            _statusManager = new StatusEffectManager();
+            _status = new StatusEffectManager();
+
+            _combatSystem.OnPrepareAttack += () => _abilityExcuter.ExecuteCreatureTrigger(ECreatureTrigger.OnAttackPrepared);
 
             BindAnimEvent();
         }
 
-        public void SetData(CreatureBaseStat baseStat)
+        public void InitData(CreatureBaseStat baseStat)
         {
-            _stat = new CreatureStat(baseStat);
+            _stat.Init(baseStat);
         }
-        public void RegisterRequester(Action<IAttackRequester> registerAction, Action<IAttackRequester> unregisterAction)
+        public void RegisterRequester(IRequesterRegistry requesterRegistry)
         {
-            registerAction?.Invoke(_attackRequester);
-            _unRegisterRequesterEvent = unregisterAction;
+            requesterRegistry.RegisterPlayerAttackRequester(_attackRequester);
+            _unRegisterRequesterEvent += requesterRegistry.UnRegisterPlayerAttackRequester;
         }
-
-
         private void BindAnimEvent()
         {
             _animatorController.OnEndAttackAnimationEvent += EndAttackAnimation;
@@ -76,21 +82,9 @@ namespace JW.DungeonSliding.GamePlay.Entities
             _animatorController.OnEndHittedAnimationEvent -= EndHittedAnimation;
             _animatorController.OnHitTimeingEvent -= ApplyAttack;
         }
-        private void OnEnable()
-        {
-            GameTriggerEventBus.Instance?.SubscribeTriggerEvent(EGameTriggerType.OnTurnEnd, OnTurnEnd);
-        }
-        private void OnDisable()
-        {
-            GameTriggerEventBus.Instance?.UnSubscribeTriggerEvent(EGameTriggerType.OnTurnEnd, OnTurnEnd);
-        }
-        private void OnDestroy()
-        {
-            UnBindAnimEvent();
-        }
         public bool IsCanRotate()
         {
-            return !(_statusManager.HasStatus(ECreatureStatus.Bind) || _statusManager.HasStatus(ECreatureStatus.Stun));
+            return !(_status.HasStatus(ECreatureStatus.Bind) || _status.HasStatus(ECreatureStatus.Stun));
         }
 
         #region Combat
@@ -101,7 +95,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         }
         public virtual void ExcuteAttack(ActPair actPair)
         {
-            _combatSystem.SetAttackPayload(actPair.Target);
+            _combatSystem.SetAttackPayload(actPair);
             _animatorController.SetAnimationTrigger(ConstString.ONE_HAND_ATTACK_ANIM);
         }
         public void AddStatusEffect(EStatusEffectType effectType, int amount)
@@ -114,8 +108,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
             _animatorController.SetAnimationTrigger(ConstString.STOP_ALL_TRIGGER_ANIMATION);
             CombatEventBus.Excuter.RaiseDeathEvent(new DeathEvent(_combatSystem.LastAttacker, this));
 
-            _statusManager.Reset();
-            _stat.Reset();
+            _status.Reset();
+            _stat.Clear();
 
             OnHitSequenceEnd?.Invoke();
             OnAttackSequenceEnd?.Invoke();
@@ -156,6 +150,9 @@ namespace JW.DungeonSliding.GamePlay.Entities
             _abilityExcuter.ExecuteCreatureTrigger(type);
         }
 
+        public void AddNextAttackDamage(int damage) => _combatSystem.AddNextAttackDamage(damage);
+        public void AddNextAttackDamageMulti(float multi) => _combatSystem.AddNextAttackDamageMulti(multi);
+        public void AddNextAttackCount(int count) => _combatSystem.AddNextAttackCount(count);
         #endregion
 
         #region Animation CallBack
@@ -177,7 +174,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         #region Sequence Method
         public void OnTurnEnd()
         {
-            _statusManager.TimePassStatueUpdate();
+            _status.TimePassStatueUpdate();
             _combatSystem.OnCombatEnd();
 
             if(IsCheckDie())
@@ -192,9 +189,5 @@ namespace JW.DungeonSliding.GamePlay.Entities
             service = (object)this as T;
             return service != null;
         }
-
-        public void AddDamage(int damage) => _combatSystem.AddNextAttackDamage(damage);
-        public void AddDamageMulti(float multi) => _combatSystem.AddNextAttackDamageMulti(multi);
-        public void AddAttackCount(int count) => _combatSystem.AddNextAttackCount(count);
     }
 }

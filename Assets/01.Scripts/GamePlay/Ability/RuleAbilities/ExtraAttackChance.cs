@@ -8,29 +8,29 @@ namespace JW.DungeonSliding.GamePlay.Ability
     {
         INextAttackEnhancer _service;
         IMoveable _moveable;
-        public ExtraAttackChance(RuleAbilityData data, AbilityHost host) : base(data, host) 
+        public ExtraAttackChance(RuleAbilityData data, IAbilityContextService host) : base(data, host) 
         {
             
         }
 
         public override void ExcuteAbility()
         {
-            _service.AddAttackCount(Mathf.RoundToInt(_data.P2));
+            _service.AddNextAttackCount(Mathf.RoundToInt(_data.P2));
         }
 
-        public override void ProcTrigger(EGameTriggerType triggerType)
+        public override void ProcTrigger(EGameEventTrigger triggerType)
         {
-            if(triggerType == EGameTriggerType.OnMoveEnd && _moveable.SlideResultType == ESlideResultType.EnemyStop)
-            {
-                int chanceValue = Random.Range(0, 101);
+            //if(triggerType == EGameEventTriggerType.OnMoveEnd && _moveable.SlideResultType == ESlideResultType.EnemyStop)
+            //{
+            //    int chanceValue = Random.Range(0, 101);
 
-                Debug.Log(chanceValue);
+            //    Debug.Log(chanceValue);
 
-                if (chanceValue <= _data.P1)
-                {
-                    ExcuteAbility();
-                }
-            }
+            //    if (chanceValue <= _data.P1)
+            //    {
+            //        ExcuteAbility();
+            //    }
+            //}
         }
 
         protected override void BindService()

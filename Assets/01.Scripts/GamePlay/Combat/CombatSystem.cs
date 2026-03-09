@@ -30,6 +30,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
         private NextAttackEnhanceContext _attackEnhanceContext = new NextAttackEnhanceContext();
 
+        public event Action OnPrepareAttack;
         public event Action<AttackResultPayload> OnHitted;
 
         public bool IsCombated => _isAttacked || _isHitted;
@@ -47,6 +48,8 @@ namespace JW.DungeonSliding.GamePlay.Combat
         public void ExcuteAttack()
         {
             if (LastTarget == null || !LastTarget.IsActive) return;
+
+            OnPrepareAttack?.Invoke();
 
             _sendDamageContext = CreateDamageContext();
             LastTarget.TakeDamage(_sendDamageContext);

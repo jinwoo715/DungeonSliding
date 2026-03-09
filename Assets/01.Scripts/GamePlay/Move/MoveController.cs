@@ -16,13 +16,14 @@ namespace JW.DungeonSliding
         public event Action OnSlideStart;
         public event Action OnSlideEnd;
         public event Action OnSlideBlocked;
+        public event Action OnMoveEnd;
         public event Action<EDirectionType> OnDirectionChanged;
 
         public event Action OnPushedStart;
         public event Action OnPushedEnd;
         public bool IsMoving { get; private set; }
 
-        public void Initialize(IRouteService routeService, IMoveable moveable)
+        public void Wire(IRouteService routeService, IMoveable moveable)
         {
             _routeService = routeService;
             _moveable = moveable;
@@ -51,9 +52,6 @@ namespace JW.DungeonSliding
                 StartCoroutine(CoProcessMoveSequence(moveQueue));
             }
         }
-
-       
-
         private IEnumerator CoProcessMoveSequence(Queue<MoveContext> moveContexts)
         {
             while (moveContexts.Count > 0)
@@ -80,13 +78,11 @@ namespace JW.DungeonSliding
                 if (moveContext.OnEnterEffectTile)
                 {
                     moveContext.OnStepEvent?.Invoke();
-                    GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameTriggerType.OnStepEffectTile);
                 }
             }
 
             FinishMove();
         }
-
         private IEnumerator CoMove(MoveContext moveContext)
         {
             float lerpScale = 0;
@@ -105,18 +101,18 @@ namespace JW.DungeonSliding
         }
         private void FinishMove()
         {
+            OnMoveEnd?.Invoke();
             OnSlideEnd?.Invoke();
             IsMoving = false;
         }
-
         public void KnockBack(EDirectionType dir)
         {
-            IsMoving = true;
             StartCoroutine(CoKnockBack(dir));
         }
-
         public IEnumerator CoKnockBack(EDirectionType dir)
         {
+            IsMoving = true;
+
             Queue<MoveContext> moveQueue = _routeService.BuildRoute(_moveable.Tile.TilePosition, dir, 2);
 
             if (moveQueue.Count > 1)
@@ -130,9 +126,8 @@ namespace JW.DungeonSliding
 
                 if (second.ResultType == ESlideResultType.Teleport)
                     _moveable.Tile.SetPosition(second.DestTile);
-
-                FinishMove();
             }
+            IsMoving = false;
         }
         private IEnumerator CoPushed(Tile backTile)
         {

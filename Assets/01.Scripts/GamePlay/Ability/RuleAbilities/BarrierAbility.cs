@@ -5,7 +5,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
     public class BarrierAbility : AbilityBase
     {
         IBarrierable _barrierable;
-        public BarrierAbility(RuleAbilityData data, AbilityHost host) : base(data, host) 
+        public BarrierAbility(RuleAbilityData data, IAbilityContextService host) : base(data, host) 
         {
         }
 
@@ -14,7 +14,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
             _barrierable.GainBarrier();
         }
 
-        public override void ProcTrigger(EGameTriggerType triggerType)
+        public override void ProcTrigger(EGameEventTrigger triggerType)
         {
             if (triggerType == _data.TriggerType)
             {

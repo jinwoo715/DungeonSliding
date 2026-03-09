@@ -7,24 +7,24 @@ namespace JW.DungeonSliding.UI
     public class AbilityUIController : MonoBehaviour
     {
         private AbilitySession _currentSession;
-        private IAbilityService _abilityService;
+        private IAbilityEventService _abilityService;
 
         [SerializeField] private AbilitySelectView _abilitySelectView;
 
-        public void Initialize(IAbilityService abilityService)
+        public void Initialize(IAbilityEventService abilityService)
         {
             _abilitySelectView.Init();
             _abilitySelectView.Bind(SelectAbility, Reroll);
 
             _abilityService = abilityService;
 
-            _abilityService.OnAbilitySelectEvent += OpenSelectAbilityView;
+            _abilityService.OnExcuteAbilitySelection += OpenSelectAbilityView;
         }
 
         public void OpenSelectAbilityView(AbilitySession session)
         {
             _currentSession = session;
-            _abilitySelectView.SetAilityDatas(_currentSession.Abilities, _currentSession.RerollCount);
+            _abilitySelectView.SetAilityDatas(_currentSession.SelectableAbilities, _currentSession.RerollCount);
 
             _abilitySelectView.gameObject.SetActive(true);
         }
@@ -33,20 +33,20 @@ namespace JW.DungeonSliding.UI
         {
             if (_currentSession.TryRerollAbilities())
             {
-                _abilitySelectView.SetAilityDatas(_currentSession.Abilities, _currentSession.RerollCount);
+                _abilitySelectView.SetAilityDatas(_currentSession.SelectableAbilities, _currentSession.RerollCount);
             }
         }
 
-        public void SelectAbility(string abilityUid)
+        public void SelectAbility(AbilityDataBase abilityData)
         {
-            _currentSession.SelectAbiltyUIDEvent(abilityUid);
+            _currentSession.SelectAbiltyUIDEvent(abilityData);
             _abilitySelectView.gameObject.SetActive(false);
             _currentSession = null;
         }
 
         private void OnDisable()
         {
-            _abilityService.OnAbilitySelectEvent -= OpenSelectAbilityView;
+            _abilityService.OnExcuteAbilitySelection -= OpenSelectAbilityView;
         }
     }
 }

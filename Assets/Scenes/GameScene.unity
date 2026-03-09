@@ -3023,12 +3023,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _fadeController: {fileID: 1982418019}
   _abilityUIController: {fileID: 1639111207}
-  _enemyStatUIManager: {fileID: 800245482}
   _hitDamageViewer: {fileID: 1561256670}
   _abilityTooltipPresenter: {fileID: 348984371}
   _enemyTooltipPresenter: {fileID: 1366349925}
-  _hasAbilityPresenter: {fileID: 1209414243}
+  _enemyStatUIManager: {fileID: 800245482}
   _playerStatPresenter: {fileID: 1593137030}
+  _hasAbilityPresenter: {fileID: 1209414243}
   _actViewer: {fileID: 414750042}
 --- !u!1 &657829997
 GameObject:
@@ -5170,7 +5170,7 @@ MonoBehaviour:
   _gameSceneManager: {fileID: 1652757616}
   _gameSceneUIManager: {fileID: 652509845}
   _mapManager: {fileID: 1852003851}
-  _player: {fileID: 726333315}
+  _playerController: {fileID: 1464012585}
   _enemyManager: {fileID: 657829999}
   _battleManager: {fileID: 960454455}
   _inputSystem: {fileID: 608497329}
@@ -5182,7 +5182,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 0}
+    m_TransformParent: {fileID: 1464012586}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 6836de3d369291043832cd011ae12520, type: 3}
       propertyPath: m_LocalScale.x
@@ -5214,15 +5214,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6836de3d369291043832cd011ae12520, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6836de3d369291043832cd011ae12520, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6836de3d369291043832cd011ae12520, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6836de3d369291043832cd011ae12520, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -7103,6 +7103,52 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1463457391}
   m_CullTransparentMesh: 1
+--- !u!1 &1464012584
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1464012586}
+  - component: {fileID: 1464012585}
+  m_Layer: 0
+  m_Name: PlayerController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1464012585
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1464012584}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb885dd9798e9d1418d39b5bc8adc191, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _player: {fileID: 726333315}
+--- !u!4 &1464012586
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1464012584}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 726333318}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1473799835
 GameObject:
   m_ObjectHideFlags: 0
@@ -8375,7 +8421,7 @@ MonoBehaviour:
   - {fileID: 4900000, guid: 6ba6c8480f5f59f48b4610613ad78109, type: 3}
   - {fileID: 4900000, guid: 2c46628783c17744790acd6b47d221be, type: 3}
   - {fileID: 4900000, guid: 6d0a0ff7efb0885468677c933f5349b8, type: 3}
-  - {fileID: 4900000, guid: 02ec6e1fb37a46f4ea4e53a8998045d7, type: 3}
+  - {fileID: 4900000, guid: 6e552dd4bf1fb474a9eea7a0e65f5d85, type: 3}
   _gameConfig: {fileID: 11400000, guid: af371193289e7284aa7e3bc27acbdb07, type: 2}
   _mapBundle: {fileID: 11400000, guid: 0e7655a53bbab524f939b18867f4be2d, type: 2}
 --- !u!1 &1793171371
@@ -9694,6 +9740,6 @@ SceneRoots:
   - {fileID: 968496082}
   - {fileID: 954272915}
   - {fileID: 1595522202}
-  - {fileID: 1162436966}
+  - {fileID: 1464012586}
   - {fileID: 49671491}
   - {fileID: 844265815}

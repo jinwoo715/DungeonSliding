@@ -9,14 +9,14 @@ namespace JW.DungeonSliding.UI
         [SerializeField] private Transform _abilityParentTransform;
 
         ITooltipService _tooltipService;
-        IAbilityService _abilityService;
+        IAbilityEventService _abilityService;
 
-        public void Initialize(ITooltipService tooltipService, IAbilityService abilityService)
+        public void Initialize(ITooltipService tooltipService, IAbilityEventService abilityService)
         {
             _tooltipService = tooltipService;
             _abilityService = abilityService;
 
-            _abilityService.OnAddAbilityEvent += AddAbility;
+            _abilityService.OnAddedAbility += AddAbility;
         }
 
         public void AddAbility(AbilityDataBase data)
@@ -27,7 +27,7 @@ namespace JW.DungeonSliding.UI
 
         private void OnDisable()
         {
-            _abilityService.OnAddAbilityEvent -= AddAbility;
+            _abilityService.OnAddedAbility -= AddAbility;
         }
     }
 }

@@ -6,21 +6,16 @@ using UnityEngine;
 
 namespace JW.DungeonSliding
 {
-    public interface IAbilityHost
-    {
-        bool TryGet<T>(out T service) where T : class;
-    }
-
     //Query
 
-    public struct PlayerApplyStatContext
+    public struct ApplyStatContext
     {
-        public readonly EPlayerStatType PlayerStat;
+        public readonly ECreatureStatType PlayerStat;
         public readonly EApplyStatType ApplyType;
-        public readonly EPlayerStatType RatioStatType;
+        public readonly ECreatureStatType RatioStatType;
         public float Value;
 
-        public PlayerApplyStatContext(EPlayerStatType playerStat, EApplyStatType applyType, EPlayerStatType ratio, float value)
+        public ApplyStatContext(ECreatureStatType playerStat, EApplyStatType applyType, ECreatureStatType ratio, float value)
         {
             PlayerStat = playerStat;
             ApplyType = applyType;

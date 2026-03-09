@@ -8,9 +8,9 @@ namespace JW.DungeonSliding.GamePlay
     {
         public static GameTriggerEventBus Instance { get; private set; }
 
-        public EGameTriggerType Trigger;
+        public EGameEventTrigger Trigger;
 
-        public Dictionary<EGameTriggerType, Action> _triggerEventsByTriggerType = new Dictionary<EGameTriggerType, Action>();
+        public Dictionary<EGameEventTrigger, Action> _triggerEventsByTriggerType = new Dictionary<EGameEventTrigger, Action>();
 
         public GameTriggerEventBus()
         {
@@ -21,7 +21,7 @@ namespace JW.DungeonSliding.GamePlay
             if (Instance == this) Instance = null;
             _triggerEventsByTriggerType.Clear(); // 데이터도 함께 청소
         }
-        public void SubscribeTriggerEvent(EGameTriggerType triggerType, Action bindAction)
+        public void SubscribeTriggerEvent(EGameEventTrigger triggerType, Action bindAction)
         {
             if (!_triggerEventsByTriggerType.ContainsKey(triggerType))
             {
@@ -30,11 +30,11 @@ namespace JW.DungeonSliding.GamePlay
 
             _triggerEventsByTriggerType[triggerType] += bindAction;
         }
-        public void UnSubscribeTriggerEvent(EGameTriggerType triggerType, Action bindAction)
+        public void UnSubscribeTriggerEvent(EGameEventTrigger triggerType, Action bindAction)
         {
             _triggerEventsByTriggerType[triggerType] -= bindAction;
         }
-        public void ExcuteAbilityEvent(EGameTriggerType triggerType)
+        public void ExcuteAbilityEvent(EGameEventTrigger triggerType)
         {
             if(_triggerEventsByTriggerType.TryGetValue(triggerType, out Action action))
             {

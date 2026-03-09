@@ -8,7 +8,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
     {
         IAttackable _attackable;
         IDamageable _damageable;
-        public DoubleEdgedAbility(RuleAbilityData data, AbilityHost host) : base(data, host)
+        public DoubleEdgedAbility(RuleAbilityData data, IAbilityContextService host) : base(data, host)
         {
             
         }
@@ -18,7 +18,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
             //_attackable.AddDamageDealtMultiplier(_data.P1 * 0.01f);
             //_damageable.AddDamageTakenMultiplier(_data.P2 * 0.01f);
         }
-        public override void ProcTrigger(EGameTriggerType triggerType) { }
+        public override void ProcTrigger(EGameEventTrigger triggerType) { }
 
         protected override void BindService()
         {

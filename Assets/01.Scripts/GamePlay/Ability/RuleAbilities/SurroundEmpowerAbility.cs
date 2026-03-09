@@ -12,11 +12,11 @@ namespace JW.DungeonSliding.GamePlay.Ability
         private IMoveable _moveable;
         private IPlayerStatModifier _modifier;
 
-        private PlayerApplyStatContext _applyStatContext;
+        private ApplyStatContext _applyStatContext;
 
-        public SurroundEmpowerAbility(RuleAbilityData data, AbilityHost host) : base(data, host) 
+        public SurroundEmpowerAbility(RuleAbilityData data, IAbilityContextService host) : base(data, host) 
         {
-            _applyStatContext = new PlayerApplyStatContext(EPlayerStatType.Damage, EApplyStatType.Add, EPlayerStatType.None, 0);
+            //_applyStatContext = new PlayerApplyStatContext(EPlayerStatType.Damage, EApplyStatType.Add, EPlayerStatType.None, 0);
         }
 
         public override void ExcuteAbility()
@@ -25,21 +25,21 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
             _applyStatContext.AddValue(-_data.P1 * count);
             
-            PlayerApplyStatContext applyStatContext = new PlayerApplyStatContext(EPlayerStatType.Damage, EApplyStatType.Add, EPlayerStatType.None, _data.P1 * count);
-            _modifier.ModifyStat(applyStatContext);
+            //PlayerApplyStatContext applyStatContext = new PlayerApplyStatContext(EPlayerStatType.Damage, EApplyStatType.Add, EPlayerStatType.None, _data.P1 * count);
+            //_modifier.ModifyStat(applyStatContext);
 
             //_nextAttackEnhancer.AddEnhance(count);
         }
 
-        public override void ProcTrigger(EGameTriggerType triggerType)
+        public override void ProcTrigger(EGameEventTrigger triggerType)
         {
-            if (triggerType == EGameTriggerType.OnMoveEnd)
-            {
-                _modifier.ModifyStat(_applyStatContext);
-                _applyStatContext.Reset();
+            //if (triggerType == EGameEventTriggerType.OnMoveEnd)
+            //{
+            //    _modifier.ModifyStat(_applyStatContext);
+            //    _applyStatContext.Reset();
 
-                ExcuteAbility();
-            }
+            //    ExcuteAbility();
+            //}
         }
 
         protected override void BindService()

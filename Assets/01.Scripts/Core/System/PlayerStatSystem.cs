@@ -13,13 +13,6 @@ namespace JW.DungeonSliding.GamePlay.Stats
         public void ModifyStat(StatModifierContext modifierContext);
     }
 
-    public enum StatModifyType
-    {
-        Add,
-        Multiple,
-        Ratio
-    }
-
 
     public interface IEnemyStatModifier
     {
