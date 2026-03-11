@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Entities
 {
-    public class Medusa : StoneStatueEnemy, IBossAbility
+    public class Medusa : StoneStatueEnemy
     {
         FacingMoveBanAbility _facingMoveBanAbility;
 
@@ -24,7 +24,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
         public void ExcuteAbility()
         {
-            StartCoroutine(_facingMoveBanAbility.Execute());
+            //StartCoroutine(_facingMoveBanAbility.Execute());
         }
         public void ExcuteAttack()
         {

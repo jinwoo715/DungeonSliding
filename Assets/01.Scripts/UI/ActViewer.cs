@@ -21,7 +21,6 @@ namespace JW.DungeonSliding.UI
 
         public void UpdateAct(int act, int totalAct)
         {
-            Debug.Log($"{act} {totalAct}");
             _actText.text = $"Act {act+1} / {totalAct}";
         }
         public void UpdateFloor(int floor, int totalFloor)

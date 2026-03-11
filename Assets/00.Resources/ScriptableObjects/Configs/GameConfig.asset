@@ -16,9 +16,9 @@ MonoBehaviour:
     _backAttackDamageMultiplier: 2
   Player:
     _moveSpeed: 0
-    _baseHP: 5
+    _baseHP: 50
     _baseDamage: 1
-    _baseMoveCount: 10
+    _baseMoveCount: 100
     _levelUpHp: 0
     _levelUpDamage: 0
     _levelUpHpRatio: 0
@@ -28,7 +28,7 @@ MonoBehaviour:
     _floorUpHpValue: 0
     _floorUpDMGValue: 0
   Ability:
-    _GainAbilityPerLevel: 0
+    _GainAbilityPerLevel: 1
     _nomalCardRatio: 0
     _rareCardRatio: 0
     _epicCardRatio: 0

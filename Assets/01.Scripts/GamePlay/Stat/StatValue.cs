@@ -18,7 +18,6 @@ namespace JW.DungeonSliding.GamePlay.Stats
 
             RatioValueByStat = new();
         }
-
         public void ModifiyStat(StatModifierContext modifierContext)
         {
             switch (modifierContext.ModifyType)
@@ -34,7 +33,6 @@ namespace JW.DungeonSliding.GamePlay.Stats
                     break;
             }
         }
-
         public void AddRatio(ECreatureStatType stat, float value)
         {
             if (!RatioValueByStat.ContainsKey(stat))
@@ -42,17 +40,14 @@ namespace JW.DungeonSliding.GamePlay.Stats
 
             RatioValueByStat[stat] += value;
         }
-
         private void AddAdd(int value)
         {
             Add += value;
         }
-
         private void AddMultiple(float multiple)
         {
             Mul += multiple;
         }
-
         public int Final(IStatReadOnly StatReadOnly)
         {
             float addRatioValue = 0;
@@ -63,6 +58,9 @@ namespace JW.DungeonSliding.GamePlay.Stats
 
             return Mathf.FloorToInt((Base + Add + addRatioValue) * Mul);
         }
+        public void SetBase(int value) => Base = value;
+        public void SetAdd(int value) => Add = value;
+        public void SetMul(float value) => Mul = value;
         public void Clear()
         {
             Add = 0;

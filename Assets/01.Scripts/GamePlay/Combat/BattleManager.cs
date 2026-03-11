@@ -11,8 +11,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
         //TODO BattleManager
         private ICombatantSensor _combatSensor;
 
-        private IAttackRequester _playerRequester;
-        private List<IAttackRequester> _enemyRequesters = new();
+        private SortedDictionary<int, List<IAttackRequester>> _requesterByPriority = new();
 
         private Queue<ActPair> _actPairs = new Queue<ActPair>();
         private Queue<ActPair> _counterActPairs = new Queue<ActPair>();
@@ -22,23 +21,18 @@ namespace JW.DungeonSliding.GamePlay.Combat
             _combatSensor = combatantSensor;
         }
 
-        private void OnDisable()
-        {
-            //GameTriggerEventBus.Instance?.UnSubscribeTriggerEvent(EGameEventTriggerType.OnMoveEnd, StartBattleSequence);
-        }
-
         public void StartBattleSequence()
         {
             GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTrigger.OnBattleStart);
 
-            List<IAttackRequester> requesters = new List<IAttackRequester>();
-
-            requesters.Add(_playerRequester);
-            requesters.AddRange(_enemyRequesters);
-
-            for (int i = 0; i < requesters.Count; i++)
+            foreach (var requesters in _requesterByPriority)
             {
-                requesters[i].TrySubmitAttackRequest(_combatSensor);
+                List<IAttackRequester> requestList = requesters.Value;
+
+                for (int i = 0; i < requestList.Count; i++)
+                {
+                    requestList[i].TrySubmitAttackRequest(_combatSensor);
+                }
             }
 
             StartCoroutine(CoStartSequence());
@@ -113,32 +107,27 @@ namespace JW.DungeonSliding.GamePlay.Combat
             _counterActPairs.Enqueue(pair);
         }
 
-        public void RegisterEnemyAttackRequester(IAttackRequester requester)
+        public void RegisterAttackRequester(IAttackRequester requester, int priority)
         {
-            _enemyRequesters.Add(requester);
+            if (!_requesterByPriority.ContainsKey(priority))
+                _requesterByPriority.Add(priority, new List<IAttackRequester>());
+
+            _requesterByPriority[priority].Add(requester);
+
             requester.OnRequestAttack += EnqueueActPair;
             requester.OnRequestCounterAttack += EnqueueCounterActPair;
         }
-
-        public void UnRegisterEnemyAttackRequester(IAttackRequester requester)
+        public void UnRegisterAttackRequester(IAttackRequester requester, int priority)
         {
-            _enemyRequesters.Remove(requester);
-            requester.OnRequestAttack -= EnqueueActPair;
-            requester.OnRequestCounterAttack -= EnqueueCounterActPair;
-        }
-
-        public void RegisterPlayerAttackRequester(IAttackRequester requester)
-        {
-            _playerRequester = requester;
-            requester.OnRequestAttack += EnqueueActPair;
-            requester.OnRequestCounterAttack += EnqueueCounterActPair;
-        }
-
-        public void UnRegisterPlayerAttackRequester(IAttackRequester requester)
-        {
-            _playerRequester = null;
-            requester.OnRequestAttack -= EnqueueActPair;
-            requester.OnRequestCounterAttack -= EnqueueCounterActPair;
+            if (!_requesterByPriority.TryGetValue(priority, out var list))
+            {
+                if (list.Contains(requester))
+                {
+                    list.Remove(requester);
+                    requester.OnRequestAttack -= EnqueueActPair;
+                    requester.OnRequestCounterAttack -= EnqueueCounterActPair;
+                }
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 using JW.DungeonSliding.Core;
+using JW.DungeonSliding.GamePlay.Ability;
 using JW.DungeonSliding.GamePlay.Combat;
 using JW.DungeonSliding.GamePlay.Stats;
 using JW.DungeonSliding.Map;
@@ -18,17 +19,23 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public ITileObject Tile => _player.Tile;
         public IMoveable Moveable => _player;
         public IAbilityRegister AbilityRegister => _player.AbilityRegister;
+        public INextAttackEnhancer NextAttackEnhancer => _player.NextAttackEnhancer;
 
-        public void InitializePlayer(IRouteService routeService, IMoveRule moveRule, IRequesterRegistry requesterRegistry, ILevelProgress levelProgress)
+        public void InitializePlayer(IRouteService routeService, IMoveRule moveRule, IRequesterRegistry requesterRegistry, ILevelProgress levelProgress, IAbilityEventService abilityEventService)
         {
             _player.Initialize(ECreatureType.Player);
 
             CreatureBaseStat baseStat = CreatePlayerBaseStat();
             _player.InitData(baseStat);
 
-            _player.Wire(routeService, moveRule, levelProgress);
+            _player.Wire(routeService, moveRule);
 
             _player.RegisterRequester(requesterRegistry);
+
+            abilityEventService.OnSelectAbility += _player.AbilityRegister.RegisterAbility;
+
+            _player.OnGetXp += levelProgress.AddXp;
+            levelProgress.OnLevelUp += _player.HandleLevelUp;
         }
         private CreatureBaseStat CreatePlayerBaseStat()
         {

@@ -13,13 +13,17 @@ namespace JW.DungeonSliding
 
         private Transform _transform;
 
-        private IEnemyStatModifier _statModifier;
+        private IStatModifier _statModifier;
+        private IStatReadOnly _statReadOnly;
         
-        public void Init(Transform target, IEnemyStatModifier statReadOnly)
+        public void Init(Transform target, ICombatant combatant)
         {
             _transform = target.transform;
-            _statModifier = statReadOnly;
-            _statModifier.OnStatChangedEvent += UpdateStat;
+
+            _statModifier = combatant.StatModifier;
+            _statReadOnly = combatant.StatReadOnly;
+
+            _statModifier.OnStatChanged += UpdateStat;
         }
 
         private void LateUpdate()
@@ -32,22 +36,23 @@ namespace JW.DungeonSliding
             this.transform.position = position;
         }
 
-        public void UpdateStat(EEnemyStatType statType)
+        public void UpdateStat(ECreatureStatType statType)
         {
-            if(statType == EEnemyStatType.HP)
+            if(statType == ECreatureStatType.CurrentHP)
             {
-                _hpUI.UpdateValue(_statModifier.Get(EEnemyStatType.HP));
+                _hpUI.UpdateValue(_statReadOnly.Get(ECreatureStatType.CurrentHP));
             }
             else
             {
-                _damageUI.UpdateValue(_statModifier.Get(EEnemyStatType.Damage));
+                _damageUI.UpdateValue(_statReadOnly.Get(ECreatureStatType.Damage));
             }
         }
 
         public override void OnDespawn()
         {
-            _statModifier.OnStatChangedEvent -= UpdateStat;
+            _statModifier.OnStatChanged -= UpdateStat;
             _statModifier = null;
+            _statReadOnly = null;
         }
 
         public override void OnSpawn()

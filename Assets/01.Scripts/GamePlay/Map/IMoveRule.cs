@@ -47,6 +47,7 @@ namespace JW.DungeonSliding
             MoveCost += cost;
         }
     }
+
     public class EnemyAbilityManager : IEnemyAbilityGetter
     {
         public ICombatantSensor CombatantSensor { get; private set; }
@@ -61,13 +62,6 @@ namespace JW.DungeonSliding
             PlayerStatReader = reader;
             VisualController = visualController;
         }
-    }
-
-    
-
-    public interface IBossAbility
-    {
-        public void SetAbilityGetter(IEnemyAbilityGetter bossAbilityGetter);
     }
 
     [System.Serializable]
@@ -101,10 +95,7 @@ namespace JW.DungeonSliding
         KnockBackAttackAbility,
         AutoRotateToPlayer,
     }
-    //Environment       //change
-    //Direction light   //off
-    //player spot light //on
-    //enemy ui          //off
+
     public interface IVisualController
     {
         void EnterBlind();
@@ -125,18 +116,8 @@ namespace JW.DungeonSliding
         public IEnumerator CoRotateToDirection(EDirectionType directionType);
         public void SetRotation(EDirectionType directionType);
     }
-    public interface IAbility
-    {
-        public EGameEventTrigger GameTrigger { get; }
-        public ECreatureTrigger CreatureTrigger { get; }
-        public IEnumerator Execute(AbilityArgs args);
-        public void ReleaseAbility();
-    }
 
-    public interface IAbilityPayloadReceiver<T>
-    {
-        void ReceivePayload(T payload);
-    }
+ 
 
     public enum ECreatureTrigger
     {
@@ -203,7 +184,7 @@ namespace JW.DungeonSliding
         {
             _moveRule = bossAbilityGetter.MoveRule;
         }
-        public override IEnumerator Execute()
+        public override IEnumerator Execute(AbilityArgs args)
         {
             yield return null;
 
@@ -229,7 +210,7 @@ namespace JW.DungeonSliding
             _moveRule = bossAbilityGetter.MoveRule;
         }
 
-        public override IEnumerator Execute()
+        public override IEnumerator Execute(AbilityArgs args)
         {
             //if (!_owner.IsCombat)
             {
@@ -246,7 +227,7 @@ namespace JW.DungeonSliding
         
         public FacingMoveBanAbility(EnemyAbilityData data, IEnemyAbilityGetter getter, ICombatant owner, int section) : base(data, getter, owner, section) { }
 
-        public override IEnumerator Execute()
+        public override IEnumerator Execute(AbilityArgs args)
         {
             _moveRule.SetMoveBanDirection(_owner.Rotate.Direction);
             yield return null;
@@ -260,19 +241,19 @@ namespace JW.DungeonSliding
     public class CopyAbility : EnemyAbilityBase
     {
         IStatReadOnly _playerStatReader;
-        IEnemyStatModifier _enemyStatModifier;
+        IStatModifier _enemyStatModifier;
         public CopyAbility(EnemyAbilityData data, IEnemyAbilityGetter getter, ICombatant owner, int section) : base(data, getter, owner, section) { }
 
         public override void Bind(IEnemyAbilityGetter bossAbilityGetter)
         {
             _playerStatReader = bossAbilityGetter.PlayerStatReader;
-            if (_owner.TryGet<IEnemyStatModifier>(out var enemyStatModifier))
+            if (_owner.TryGet<IStatModifier>(out var enemyStatModifier))
             {
                 _enemyStatModifier = enemyStatModifier;
             }
         }
 
-        public override IEnumerator Execute()
+        public override IEnumerator Execute(AbilityArgs args)
         {
             //_enemyStatModifier.SetEnemyStat(EEnemyStatType.HP, _playerStatReader.Get(EPlayerStatType.CurrentHP));
             //_enemyStatModifier.SetEnemyStat(EEnemyStatType.Damage, _playerStatReader.Get(EPlayerStatType.Damage));
@@ -293,7 +274,7 @@ namespace JW.DungeonSliding
             _visualController = getter.VisualController;
         }
 
-        public override IEnumerator Execute()
+        public override IEnumerator Execute(AbilityArgs args)
         {
             Debug.Log("Excute");
             if(isBlined == true)
@@ -316,22 +297,22 @@ namespace JW.DungeonSliding
     }
     public class EnemyEnhanceAbility : EnemyAbilityBase
     {
-        IEnemyStatModifier _statModifier;
+        IStatModifier _statModifier;
 
         public EnemyEnhanceAbility(EnemyAbilityData data, IEnemyAbilityGetter getter, ICombatant owner, int section) : base(data, getter, owner, section) { }
 
         public override void Bind(IEnemyAbilityGetter bossAbilityGetter)
         {
-            if(_owner.TryGet<IEnemyStatModifier>(out var service))
+            if(_owner.TryGet<IStatModifier>(out var service))
             {
                 _statModifier = service;
             }
         }
 
-        public override IEnumerator Execute()
+        public override IEnumerator Execute(AbilityArgs args)
         {
-            _statModifier.ModifyEnemyStat(new EnemyApplyStatContext(EEnemyStatType.HP, EApplyStatType.Add, _data.BaseP1, EEnemyStatType.None));
-            _statModifier.ModifyEnemyStat(new EnemyApplyStatContext(EEnemyStatType.Damage, EApplyStatType.Add, _data.BaseP2, EEnemyStatType.None));
+            //_statModifier.ModifyEnemyStat(new EnemyApplyStatContext(EEnemyStatType.HP, EApplyStatType.Add, _data.BaseP1, EEnemyStatType.None));
+            //_statModifier.ModifyEnemyStat(new EnemyApplyStatContext(EEnemyStatType.Damage, EApplyStatType.Add, _data.BaseP2, EEnemyStatType.None));
             yield return null;
         }
     }
@@ -344,16 +325,16 @@ namespace JW.DungeonSliding
             _sensor = getter.CombatantSensor;
         }
 
-        public override IEnumerator Execute()
+        public override IEnumerator Execute(AbilityArgs args)
         {
             var enemies = _sensor.AllEnemyCombatants;
 
             foreach (var enemy in enemies)
             {
-                if (enemy.TryGet<IEnemyStatModifier>(out var service))
+                if (enemy.TryGet<IStatModifier>(out var service))
                 {
-                    service.ModifyEnemyStat(new EnemyApplyStatContext(EEnemyStatType.HP, EApplyStatType.Add, _data.BaseP1, EEnemyStatType.None));
-                    service.ModifyEnemyStat(new EnemyApplyStatContext(EEnemyStatType.Damage, EApplyStatType.Add, _data.BaseP2, EEnemyStatType.None));
+                    //service.ModifyEnemyStat(new EnemyApplyStatContext(EEnemyStatType.HP, EApplyStatType.Add, _data.BaseP1, EEnemyStatType.None));
+                    //service.ModifyEnemyStat(new EnemyApplyStatContext(EEnemyStatType.Damage, EApplyStatType.Add, _data.BaseP2, EEnemyStatType.None));
                 }
             }
 
@@ -366,13 +347,13 @@ namespace JW.DungeonSliding
 
             foreach (var enemy in enemies)
             {
-                if (enemy.TryGet<IEnemyStatModifier>(out var service))
+                if (enemy.TryGet<IStatModifier>(out var service))
                 {
-                    int setHp = Mathf.Max(1, service.Get(EEnemyStatType.HP) - (int)_data.BaseP1);
-                    int setDamage = Mathf.Max(1, service.Get(EEnemyStatType.Damage) - (int)_data.BaseP2);
+                    //int setHp = Mathf.Max(1, service.Get(EEnemyStatType.HP) - (int)_data.BaseP1);
+                    //int setDamage = Mathf.Max(1, service.Get(EEnemyStatType.Damage) - (int)_data.BaseP2);
 
-                    service.SetEnemyStat(EEnemyStatType.HP, setHp);
-                    service.SetEnemyStat(EEnemyStatType.Damage, setDamage);
+                    //service.SetEnemyStat(EEnemyStatType.HP, setHp);
+                    //service.SetEnemyStat(EEnemyStatType.Damage, setDamage);
                 }
             }
         }
@@ -389,7 +370,7 @@ namespace JW.DungeonSliding
             _moveRule = getter.MoveRule;
         }
 
-        public override IEnumerator Execute()
+        public override IEnumerator Execute(AbilityArgs args)
         {
             _moveRule.SetIsMoveable(false);
             var enemies = _sensor.AllEnemyCombatants;
@@ -432,7 +413,7 @@ namespace JW.DungeonSliding
             }
         }
 
-        public override IEnumerator Execute()
+        public override IEnumerator Execute(AbilityArgs args)
         {
             if (_counterAttackable != null)
             {
@@ -459,7 +440,7 @@ namespace JW.DungeonSliding
             }
         }
 
-        public override IEnumerator Execute()
+        public override IEnumerator Execute(AbilityArgs args)
         {
             _barrierable.GainBarrier();
             yield return null;
@@ -477,7 +458,7 @@ namespace JW.DungeonSliding
             }
         }
 
-        public override IEnumerator Execute()
+        public override IEnumerator Execute(AbilityArgs args)
         {
             //_attackable.AddDamageContextStatue(EStatusEffectType.KnockBack, (int)_data.BaseP1);
             yield return null;
@@ -495,7 +476,7 @@ namespace JW.DungeonSliding
             _moveRule = bossAbilityGetter.MoveRule;
         }
 
-        public override IEnumerator Execute()
+        public override IEnumerator Execute(AbilityArgs args)
         {
             _moveRule.SetIsMoveable(false);
 

@@ -5,6 +5,7 @@ using JW.DungeonSliding.GamePlay.Ability;
 using JW.DungeonSliding.GamePlay.Combat;
 using JW.DungeonSliding.GamePlay.Context;
 using JW.DungeonSliding.GamePlay.Entities;
+using JW.DungeonSliding.GamePlay.Stats;
 using JW.DungeonSliding.Map;
 using JW.DungeonSliding.UI;
 using UnityEngine;
@@ -21,7 +22,7 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
         private InputCoordinator _inputCoordinator = new InputCoordinator();
         private GameTriggerEventBus _triggerEventBus = new GameTriggerEventBus();
         private CombatEventBus _combatEventBus = new();
-        private AbilitySystem _abilitySystem;
+        private AbilitySystem _abilitySystem = new AbilitySystem();
         private FieldCombatantManager _fieldCombatantManager;
         private RouteBuilder _routeBuilder;
         private EnemyAbilityManager _enemyAbilityManager;
@@ -50,6 +51,23 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
 
         [SerializeField] private EnemyTooltipClicker _enemyTooltipClicker;
 
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Q))
+            {
+                _playerController.StatModifier.ModifyStat(new StatModifierContext(ECreatureStatType.CurrentHP, EApplyStatType.Add, -5));
+            }
+            if (Input.GetKeyDown(KeyCode.W))
+            {
+                _playerController.StatModifier.ModifyStat(new StatModifierContext(ECreatureStatType.CurrentMoveCount, EApplyStatType.Add, -5));
+            }
+            if (Input.GetKeyDown(KeyCode.A))
+            {
+                _leveling.LevelUp();
+            }
+        }
+
+
         private void Start()
         {
             AbilityBusyCounter.Clear();
@@ -64,19 +82,20 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
 
         private void ChildInit()
         {
-            _leveling.Initialize();
 
             _playerAbilityContext.SetOwner(_playerController.Player);
             _playerAbilityContext.Register<IMoveable>(_playerController.Moveable);
+            _playerAbilityContext.Register<IStatModifier>(_playerController.StatModifier);
             _playerAbilityContext.Register<ICombatantSensor>(_fieldCombatantManager);
+            _playerAbilityContext.Register<INextAttackEnhancer>(_playerController.NextAttackEnhancer);
 
-            _abilitySystem.Init(_playerAbilityContext, _leveling, _playerController.AbilityRegister);
-
+            _abilitySystem.Init(_playerAbilityContext, _leveling);
+  
             _routeBuilder = new RouteBuilder(_mapManager);
 
-            _gameSceneUIManager.Init(_playerController.Player, _leveling, _combatEventBus, _abilitySystem, _gameSceneManager);
+            _gameSceneUIManager.Init(_playerController.Player, _leveling, _playerController.NextAttackEnhancer, _combatEventBus, _abilitySystem, _gameSceneManager);
 
-            _playerController.InitializePlayer(_routeBuilder, _moveRule, _battleManager, _leveling);
+            _playerController.InitializePlayer(_routeBuilder, _moveRule, _battleManager, _leveling, _abilitySystem);
 
             _inputCoordinator.Init(_playerController.Moveable);
 
@@ -96,6 +115,8 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
             _visualContoller = new GameVisualController(cam, dirLight, playerLight, _gameSceneUIManager.EnemyStatUIService);
             _enemyAbilityManager = new EnemyAbilityManager(_fieldCombatantManager, _moveRule, _playerController.StatReadOnly, _visualContoller);
             _enemyAbilityFactory = new EnemyAbilityFactory(_enemyAbilityManager);
+
+            _leveling.Initialize();
         }
 
         private void BindEvent()
@@ -109,6 +130,9 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
             _mapManager.RequestSpawnEnemyEvent += _enemyManager.SpawnEnemy;
 
             _playerController.Moveable.OnMoveEnd += _battleManager.StartBattleSequence;
+
+            _abilitySystem.OnExcuteAbilitySelection += _ => { _modeController.EnterGameMode(EGameModeType.AbilityUI); };
+            _abilitySystem.OnSelectAbility += _ => { _modeController.ExitGameMode(EGameModeType.AbilityUI); };
         }
 
         private void OnDestroy()

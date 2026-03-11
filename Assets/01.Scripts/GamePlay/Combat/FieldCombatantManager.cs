@@ -5,43 +5,32 @@ namespace JW.DungeonSliding.GamePlay.Combat
 {
     public interface IRequesterRegistry
     {
-        public void RegisterEnemyAttackRequester(IAttackRequester requester);
-        public void UnRegisterEnemyAttackRequester(IAttackRequester requester);
-        public void RegisterPlayerAttackRequester(IAttackRequester requester);
-        public void UnRegisterPlayerAttackRequester(IAttackRequester requester);
+        public void RegisterAttackRequester(IAttackRequester requester, int priority);
+        public void UnRegisterAttackRequester(IAttackRequester requester, int priority);
     }
 
     public interface IRequesterProvider
     {
-        public IAttackRequester PlayerRequester { get; }
-        public IReadOnlyList<IAttackRequester> EnemyRequesters { get; }
+        public IReadOnlyDictionary<int, List<IAttackRequester>> RequesterByPriority { get; }
     }
     public class FieldAttackRequesterManager : IRequesterProvider, IRequesterRegistry
     {
-        private IAttackRequester _playerRequester;
-        private List<IAttackRequester> _enemyRequesters = new();
+        public IReadOnlyDictionary<int, List<IAttackRequester>> RequesterByPriority => _requesterByPriority;
+        private SortedDictionary<int, List<IAttackRequester>> _requesterByPriority = new();
+        public void RegisterAttackRequester(IAttackRequester requester, int priority)
+        {
+            if (!_requesterByPriority.ContainsKey(priority))
+                _requesterByPriority.Add(priority, new List<IAttackRequester>());
 
-        public IAttackRequester PlayerRequester => _playerRequester;
-        public IReadOnlyList<IAttackRequester> EnemyRequesters => _enemyRequesters;
-
-
-        public void RegisterPlayerAttackRequester(IAttackRequester requester)
-        {
-            _playerRequester = requester;
+            _requesterByPriority[priority].Add(requester);
         }
-        public void UnRegisterPlayerAttackRequester(IAttackRequester requester)
+        public void UnRegisterAttackRequester(IAttackRequester requester, int priority)
         {
-            _playerRequester = null;
-        }
-        public void RegisterEnemyAttackRequester(IAttackRequester requester)
-        {
-            if (!_enemyRequesters.Contains(requester))
-                _enemyRequesters.Add(requester);
-        }
-        public void UnRegisterEnemyAttackRequester(IAttackRequester requester)
-        {
-            if (_enemyRequesters.Contains(requester))
-                _enemyRequesters.Remove(requester);
+            if (!_requesterByPriority.TryGetValue(priority, out var list))
+            {
+                if (list.Contains(requester))
+                    list.Remove(requester);
+            }
         }
     }
 

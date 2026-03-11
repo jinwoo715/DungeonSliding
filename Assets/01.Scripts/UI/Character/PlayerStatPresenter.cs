@@ -1,5 +1,7 @@
 using JW.DungeonSliding.GamePlay;
+using JW.DungeonSliding.GamePlay.Combat;
 using JW.DungeonSliding.GamePlay.Stats;
+using System;
 using UnityEngine;
 
 namespace JW.DungeonSliding.UI
@@ -9,33 +11,41 @@ namespace JW.DungeonSliding.UI
         [SerializeField] private PlayerStatViewer _viewer;
 
         private IStatReadOnly _statReadOnly;
-        private IStatModifier _statModifier;
-        private ILevelProgress _levelProgress;
-        public void Init(IStatReadOnly statReadOnly, IStatModifier statModifier, ILevelProgress levelProgress)
+
+        private Action OnUnBind;
+
+        public void Init(IStatReadOnly statReadOnly, IStatModifier statModifier, ILevelProgress levelProgress, INextAttackEnhancer nextAttackEnhancer)
         {
-            Bind(statReadOnly, statModifier, levelProgress);
+            Bind(statReadOnly, statModifier, levelProgress, nextAttackEnhancer);
         }
-        private void Bind(IStatReadOnly statReadOnly, IStatModifier statModifier, ILevelProgress levelProgress)
+        private void Bind(IStatReadOnly statReadOnly, IStatModifier statModifier, ILevelProgress levelProgress, INextAttackEnhancer nextAttackEnhancer)
         {
             UnBind();
 
             _statReadOnly = statReadOnly;
-            _statModifier = statModifier;
-            _levelProgress = levelProgress;
 
-            _levelProgress.OnLevelUp += ChangePlayerLevel;
-            _levelProgress.OnChangedXp += ChangePlayerLevelProgress;
+            levelProgress.OnLevelUp += ChangePlayerLevel;
+            levelProgress.OnChangedXp += ChangePlayerLevelProgress;
 
-            _statModifier.OnStatChanged += ChangePlayerStat;
+            statModifier.OnStatChanged += ChangePlayerStat;
+
+            nextAttackEnhancer.OnChangedNextAttackCount += UpdateExraAttackCount;
+            nextAttackEnhancer.OnChangedNextAttackDamage += UpdateAddDamage;
+
+            OnUnBind += () =>
+            {
+                levelProgress.OnLevelUp -= ChangePlayerLevel;
+                levelProgress.OnChangedXp -= ChangePlayerLevelProgress;
+
+                statModifier.OnStatChanged -= ChangePlayerStat;
+
+                nextAttackEnhancer.OnChangedNextAttackCount -= UpdateExraAttackCount;
+                nextAttackEnhancer.OnChangedNextAttackDamage -= UpdateAddDamage;
+            };
         }
         private void UnBind()
         {
-            if(_statReadOnly != null)
-            {
-                _statModifier.OnStatChanged -= ChangePlayerStat;
-                _statReadOnly = null;
-                _statModifier = null;
-            }
+            OnUnBind?.Invoke();
         }
 
         public void ChangePlayerStat(ECreatureStatType changedStat)
@@ -60,16 +70,21 @@ namespace JW.DungeonSliding.UI
                     break;
             }
         }
-        public void ChangePlayerLevel()
+        public void ChangePlayerLevel(int level)
         {
-            int level = _levelProgress.CurrentLevel;
             _viewer.UpdateLevelText(level);
         }
-        public void ChangePlayerLevelProgress()
+        public void ChangePlayerLevelProgress(int currentXp, int requireXp)
         {
-            int currentXP = _levelProgress.CurrentXp;
-            int requireXp = _levelProgress.RequiredXp;
-            _viewer.UpdateLevelProgress(currentXP, requireXp);
+            _viewer.UpdateLevelProgress(currentXp, requireXp);
+        }
+        public void UpdateAddDamage(int damage)
+        {
+            _viewer.UpdateNextAttackExtraDamage(damage);
+        }
+        public void UpdateExraAttackCount(int count)
+        {
+            _viewer.UpdateAttackCount(count);
         }
     }
 }

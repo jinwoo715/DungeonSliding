@@ -80,16 +80,15 @@ namespace JW.DungeonSliding
 
         OnEnterRoom         = 1 << 1,
 
-        OnEnemyDeath        = 1 << 13,
+        OnEnemyDeath        = 1 << 2,
 
-        OnBattleStart       = 1 << 13,
-        OnBattleEnd         = 1 << 14,
+        OnBattleStart       = 1 << 3,
+        OnBattleEnd         = 1 << 4,
 
-        OnTurnStart         = 1 << 20,
-        OnTurnEnd           = 1 << 21,
+        OnTurnStart         = 1 << 5,
+        OnTurnEnd           = 1 << 6,
 
-        OnClearStage        = 1 << 19,
-
+        OnClearStage        = 1 << 7,
     }
 
     public enum EAbilityEffectKind

@@ -5,10 +5,11 @@ using JW.DungeonSliding.GamePlay.Combat;
 using JW.DungeonSliding.GamePlay.Stats;
 using JW.DungeonSliding.Core;
 using System.Collections.Generic;
+using JW.DungeonSliding.GamePlay.Ability;
 
 namespace JW.DungeonSliding.GamePlay.Entities
 {
-    public abstract class Enemy : Creature, IEnemyStatModifier, IRewardSender
+    public abstract class Enemy : Creature, IRewardSender
     {
         [SerializeField] private Transform _statUITransform;
         [SerializeField] private EnemyStat _enemyStat;
@@ -39,8 +40,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
                     if (!gameTriggerAbilities.ContainsKey(ability.GameTrigger))
                     {
                         gameTriggerAbilities.Add(ability.GameTrigger, new List<IAbility>());
-
-                        GameTriggerEventBus.Instance.SubscribeTriggerEvent(ability.GameTrigger, () => ExcuteGameTriggerAbility(ability.GameTrigger));
                     }
 
                     gameTriggerAbilities[ability.GameTrigger].Add(ability);
@@ -52,17 +51,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
                         creatureTriggerAbilities.Add(ability.CreatureTrigger, new List<IAbility>());
 
                     creatureTriggerAbilities[ability.CreatureTrigger].Add(ability);
-                }
-            }
-        }
-
-        private void ExcuteGameTriggerAbility(EGameEventTrigger trigger)
-        {
-            if (gameTriggerAbilities.TryGetValue(trigger, out var list))
-            {
-                foreach (var ability in list)
-                {
-                    StartCoroutine(ability.Execute());
                 }
             }
         }
@@ -94,64 +82,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
             OnStatChangedEvent?.Invoke(EEnemyStatType.Damage);
         }
 
-        public void SetEnemyStat(EEnemyStatType stat, int value)
-        {
-            switch (stat)
-            {
-                case EEnemyStatType.HP:
-                    _enemyStat.HP = value;
-                    break;
-                case EEnemyStatType.Damage:
-                    _enemyStat.Damage = value;
-                    break;
-            }
-            OnStatChangedEvent?.Invoke(stat);
-        }
-        public void ModifyEnemyStat(EnemyApplyStatContext context)
-        {
-            switch (context.EnemyStat)
-            {
-                case EEnemyStatType.HP:
-                    
-                    _enemyStat.HP += (int)context.Value;
-                    _enemyStat.HP = Mathf.Max(0, _enemyStat.HP);
-
-                    OnStatChangedEvent?.Invoke(EEnemyStatType.HP);
-
-                    if (_enemyStat.HP <= 0)
-                    {
-                        OnDeath();
-                    }
-
-                    break;
-
-                case EEnemyStatType.Damage:
-                    _enemyStat.Damage += (int)context.Value;
-                    OnStatChangedEvent?.Invoke(EEnemyStatType.Damage);
-
-                    break;
-            }
-
-        }
-        public int Get(EEnemyStatType stat)
-        {
-            int returnValue = 0;
-            switch (stat)
-            {
-                case EEnemyStatType.HP:
-                    returnValue = _enemyStat.HP;
-                    break;
-                case EEnemyStatType.Damage:
-                    returnValue = _enemyStat.Damage;
-                    break;
-            }
-
-            return returnValue;
-        }
-        protected void ReduceHP(int damage)
-        {
-            ModifyEnemyStat(new EnemyApplyStatContext(EEnemyStatType.HP, EApplyStatType.Add, -damage, EEnemyStatType.None));
-        }
         public override void OnDeath()
         {
             base.OnDeath();

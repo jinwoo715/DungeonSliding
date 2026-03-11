@@ -47,47 +47,48 @@ namespace JW.DungeonSliding.GamePlay.Ability
             service = _owner as T;
             return service != null;
         }
+
+        internal void Register<T>(object nextAttackEnhancer)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     //어빌리티 추가
     //
     public interface IAbilityEventService
     {
-        event Action<AbilityDataBase> OnAddedAbility;
-        event Action<AbilitySession> OnExcuteAbilitySelection;
+        event Action<AbilityDataBase> OnAddedAbilityData;
+        event Action<IAbility> OnSelectAbility;
+        event Action<AbilitySelectSession> OnExcuteAbilitySelection;
     }
 
     public class AbilitySystem : IRerollService, IAbilityRandomGetter, IAbilityEventService
     {
         private ShuffleBag<AbilityDataBase> _abilityBag;
         private Dictionary<string, AbilityDataBase> _abilityDataByUID = new();
-        
         private AbilityFactory _abilityFactory = new AbilityFactory();
 
-        public event Action<AbilityDataBase> OnAddedAbility;
-        public event Action<AbilitySession> OnExcuteAbilitySelection;
-        
-        private IAbilityContextService _abilityHost;
+        public event Action<AbilityDataBase> OnAddedAbilityData;
+        public event Action<IAbility> OnSelectAbility;
+        public event Action<AbilitySelectSession> OnExcuteAbilitySelection;
 
-        private ILevelProgress _playerLevel;
-        private IAbilityRegister _abilityRegister;
+        public event Action OnExcuteAbility;
+        
+        private IAbilityContextService _playerAbilityContext;
 
         private int _rerollCount = 1;
 
-        public void Init(IAbilityContextService abilityHost, ILevelProgress playerLevel, IAbilityRegister abilityRegister)
+        public void Init(IAbilityContextService abilityHost, ILevelProgress playerLevel)
         {
-            _abilityHost = abilityHost;
-            _abilityHost.Register<IRerollService>(this);
-            _abilityHost.Register<IAbilityRandomGetter>(this);
+            _playerAbilityContext = abilityHost;
+            _playerAbilityContext.Register<IRerollService>(this);
+            _playerAbilityContext.Register<IAbilityRandomGetter>(this);
 
             LoadData();
 
-            _playerLevel = playerLevel;
-            _abilityRegister = abilityRegister;
-
-            _playerLevel.OnLevelUp += ProcessAbilityLevel;
+            playerLevel.OnLevelUp += ProcessAbilityLevel;
         }
-
         private void LoadData()
         {
             List<AbilityDataBase> datas = GameManager.Data.Abilities;
@@ -99,18 +100,16 @@ namespace JW.DungeonSliding.GamePlay.Ability
                 _abilityDataByUID.Add(datas[i].UID, datas[i]);
             }
         }
-
-        private void ProcessAbilityLevel()
+        private void ProcessAbilityLevel(int currentLevel)
         {
-            if(IsAchieveAbilityLevel())
+            if(IsAchieveAbilityLevel(currentLevel))
             {
                 RequestAbilitySelect();
             }
         }
-        private bool IsAchieveAbilityLevel()
+        private bool IsAchieveAbilityLevel(int currentLevel)
         {
             int abilityLevel = GameManager.Config.Ability.AbilityLevel;
-            int currentLevel = _playerLevel.CurrentLevel;
 
             int achive = currentLevel % abilityLevel;
 
@@ -118,7 +117,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
         }
         public void RequestAbilitySelect()
         {
-            var session = new AbilitySession(GetRandomAbilities(3), SelectAbility, () => GetRandomAbilities(3), _rerollCount);
+            var session = new AbilitySelectSession(GetRandomAbilities(3), SelectAbility, () => GetRandomAbilities(3), _rerollCount);
 
             OnExcuteAbilitySelection?.Invoke(session);
         }
@@ -134,17 +133,18 @@ namespace JW.DungeonSliding.GamePlay.Ability
         }
         public void SelectAbility(AbilityDataBase _abilityData)
         {
-            IAbility ability = _abilityFactory.CreateAbility(_abilityData, _abilityHost);
+            IAbility ability = _abilityFactory.CreateAbility(_abilityData, _playerAbilityContext);
 
-            _abilityRegister.RegisterAbility(ability);
-
-            OnAddedAbility?.Invoke(_abilityData);
+            Debug.Log($"Select Ability : {_abilityData.Name}");
+            Debug.Log($"Select Ability : {ability.GameTrigger}");
+            Debug.Log($"Select Ability : {ability.CreatureTrigger}");
+            OnSelectAbility?.Invoke(ability);
+            OnAddedAbilityData?.Invoke(_abilityData);
         }
         public void AddReroll(int amount = 1)
         {
             _rerollCount += amount;
         }
-
         public void GetRandomAbility(int count)
         {
             AbilityDataBase[] abilities = new AbilityDataBase[count];

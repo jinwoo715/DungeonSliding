@@ -32,11 +32,20 @@ namespace JW.DungeonSliding.GamePlay.Stats
 
         public event Action<ECreatureStatType> OnStatChanged;
        
+        public CreatureStat()
+        {
+            _stats.Add(ECreatureStatType.MaxHp, new StatValue(0));
+            _stats.Add(ECreatureStatType.Damage, new StatValue(0));
+            _stats.Add(ECreatureStatType.MaxMoveCount, new StatValue(0));
+        }
+
         public void Init(CreatureBaseStat baseStat)
         {
-            _stats.Add(ECreatureStatType.MaxHp, new StatValue(baseStat.HP));
-            _stats.Add(ECreatureStatType.Damage, new StatValue(baseStat.Damage));
-            _stats.Add(ECreatureStatType.MaxMoveCount, new StatValue(baseStat.Move));
+            Clear();
+
+            _stats[ECreatureStatType.MaxHp].SetBase(baseStat.HP);
+            _stats[ECreatureStatType.Damage].SetBase(baseStat.Damage);
+            _stats[ECreatureStatType.MaxMoveCount].SetBase(baseStat.Move);
 
             _currentHP = baseStat.HP;
             _currentMove = baseStat.Move;
@@ -79,23 +88,18 @@ namespace JW.DungeonSliding.GamePlay.Stats
         }
 
         //TODO 메서드 나눠야함
+
         public void ModifyStat(StatModifierContext modifierContext)
         {
-            Debug.Log(modifierContext.ModifyType);
-            Debug.Log(modifierContext.TargetStat);
+            Debug.Log($"{modifierContext.TargetStat}, {modifierContext.ModifyType}, {modifierContext.Value}");
+
             if (modifierContext.TargetStat == ECreatureStatType.CurrentHP)
             {
-                _currentHP += Mathf.RoundToInt(modifierContext.Value);
-
-                int maxHp = Get(ECreatureStatType.MaxHp);
-                _currentHP = Mathf.Clamp(_currentHP, 0, maxHp);
+                ModifyCurrentHp(modifierContext);
             }
             else if (modifierContext.TargetStat == ECreatureStatType.CurrentMoveCount)
             {
-                _currentMove += Mathf.RoundToInt(modifierContext.Value);
-
-                int maxMove = Get(ECreatureStatType.MaxMoveCount);
-                _currentMove = Mathf.Clamp(_currentMove, 0, maxMove);
+                ModifyCurrentMoveCount(modifierContext);
             }
             else if (modifierContext.TargetStat == ECreatureStatType.DamageTakeMultiplier)
             {
@@ -115,7 +119,7 @@ namespace JW.DungeonSliding.GamePlay.Stats
                     if (modifierContext.TargetStat == ECreatureStatType.MaxHp)
                     {
                         _currentHP = Mathf.Clamp(_currentHP, 0, Get(ECreatureStatType.MaxHp));
-                        OnStatChanged?.Invoke(ECreatureStatType.CurrentHP); // 현재 체력도 변했다고 방송!
+                        OnStatChanged?.Invoke(ECreatureStatType.CurrentHP);
                     }
                     else if (modifierContext.TargetStat == ECreatureStatType.MaxMoveCount)
                     {
@@ -126,6 +130,45 @@ namespace JW.DungeonSliding.GamePlay.Stats
             }
 
             OnStatChanged?.Invoke(modifierContext.TargetStat);
+        }
+        private int CalculateFixedAddValue(StatModifierContext modifierContext)
+        {
+            int calValue = 0;
+
+            switch (modifierContext.ModifyType)
+            {
+                case EApplyStatType.Add:
+                    calValue += Mathf.RoundToInt(modifierContext.Value);
+
+                    break;
+                case EApplyStatType.Multiple:
+                    Debug.LogError($"Current Stat Modify Type Error");
+                    break;
+
+                case EApplyStatType.Ratio:
+
+                    int baseValue = Get(modifierContext.RatioBaseStat);
+                    int resultValue = Mathf.RoundToInt(baseValue * modifierContext.Value);
+                    calValue += resultValue;
+
+                    break;
+            }
+
+            return calValue;
+        }
+        private void ModifyCurrentHp(StatModifierContext modifierContext)
+        {
+            _currentHP += CalculateFixedAddValue(modifierContext);
+
+            int maxHp = Get(ECreatureStatType.MaxHp);
+            _currentHP = Mathf.Clamp(_currentHP, 0, maxHp);
+        }
+        private void ModifyCurrentMoveCount(StatModifierContext modifierContext)
+        {
+            _currentMove += CalculateFixedAddValue(modifierContext);
+
+            int maxMove = Get(ECreatureStatType.MaxMoveCount);
+            _currentMove = Mathf.Clamp(_currentMove, 0, maxMove);
         }
 
         public void Clear()

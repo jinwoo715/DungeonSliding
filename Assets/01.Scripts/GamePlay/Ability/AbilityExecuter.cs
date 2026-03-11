@@ -90,14 +90,14 @@ namespace JW.DungeonSliding.GamePlay.Ability
         }
         #endregion
 
-
         #region Registration
         public void RegisterAbility(IAbility ability)
         {
+            Debug.Log($"Register Ability, {ability.CreatureTrigger}");
+            Debug.Log($"Register Ability, {ability.GameTrigger}");
+
             if (ability.CreatureTrigger != ECreatureTrigger.None)
-            {
                 RegisterCreatureEventAbility(ability.CreatureTrigger, ability);
-            }
 
             if (ability.GameTrigger != EGameEventTrigger.None)
                 RegisterGameEventAbility(ability.GameTrigger, ability);
@@ -107,8 +107,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
             if (trigger == ECreatureTrigger.OnAdded)
             {
                 AbilityArgs args = new AbilityArgs(EGameEventTrigger.None, trigger);
-
-                ability.Execute(args);
+                StartCoroutine(ability.Execute(args));
                 return;
             }
 

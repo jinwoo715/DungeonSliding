@@ -16,18 +16,13 @@ namespace JW.DungeonSliding.UI
             _tooltipService = tooltipService;
             _abilityService = abilityService;
 
-            _abilityService.OnAddedAbility += AddAbility;
+            _abilityService.OnAddedAbilityData += AddAbility;
         }
 
         public void AddAbility(AbilityDataBase data)
         {
             HasAbilityItem item = Instantiate(_abilityItemPrefab, _abilityParentTransform);
             item.SetData(data, _tooltipService.ShowTooltip, _tooltipService.CloseTooltip);
-        }
-
-        private void OnDisable()
-        {
-            _abilityService.OnAddedAbility -= AddAbility;
         }
     }
 }

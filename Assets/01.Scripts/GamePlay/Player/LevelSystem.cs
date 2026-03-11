@@ -11,8 +11,8 @@ namespace JW.DungeonSliding.GamePlay
         int RequiredXp { get; } // 현재 레벨에서 다음 레벨로 가기 위한 총 경험치
         float ExpRatio => (float)CurrentXp / RequiredXp; // UI 바(Bar) 용도
 
-        event Action OnChangedXp; // (level, currentExp, maxExp)
-        event Action OnLevelUp; // (newLevel)
+        event Action<int, int> OnChangedXp; // (level, currentExp, maxExp)
+        event Action<int> OnLevelUp; // (newLevel)
 
         void AddXp(int xp);
     }
@@ -23,16 +23,16 @@ namespace JW.DungeonSliding.GamePlay
         public int CurrentXp { get; private set; }
         public int RequiredXp { get; private set; }
 
-        public event Action OnLevelUp;
-        public event Action OnChangedXp;
+        public event Action<int> OnLevelUp;
+        public event Action<int, int> OnChangedXp;
 
         public void Initialize()
         {
             CurrentLevel = 1;
             CurrentXp = 0;
             RequiredXp = MathUtil.GetFib(CurrentLevel + ConstData.LEVELUP_XP_OFFSET);
-            OnChangedXp?.Invoke();
-            OnLevelUp?.Invoke();
+            OnChangedXp?.Invoke(CurrentXp, RequiredXp);
+            OnLevelUp?.Invoke(CurrentLevel);
         }
 
         public void AddXp(int amount)
@@ -45,7 +45,7 @@ namespace JW.DungeonSliding.GamePlay
                 LevelUp();
             }
 
-            OnChangedXp?.Invoke();
+            OnChangedXp?.Invoke(CurrentXp, RequiredXp);
         }
 
         public void LevelUp()
@@ -53,7 +53,7 @@ namespace JW.DungeonSliding.GamePlay
             CurrentLevel++;
             RequiredXp = MathUtil.GetFib(CurrentLevel + ConstData.LEVELUP_XP_OFFSET);
 
-            OnLevelUp?.Invoke();
+            OnLevelUp?.Invoke(CurrentLevel);
         }
     }
 }

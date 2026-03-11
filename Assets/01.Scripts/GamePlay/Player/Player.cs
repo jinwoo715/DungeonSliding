@@ -22,8 +22,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public event Action OnMoveEnd;
         public event Action OnSlideEnd;
 
-        public ILevelProgress _leveling;
-
+        public event Action<int> OnGetXp;
         private void ChangeCharacterState(ECharacterStateType stateType)
         {
             if (_characterState == stateType) return;
@@ -38,11 +37,10 @@ namespace JW.DungeonSliding.GamePlay.Entities
         {
             base.Initialize(cretureType);
         }
-        public void Wire(IRouteService routeService, IMoveRule moveRule, ILevelProgress levelProgress)
+        public void Wire(IRouteService routeService, IMoveRule moveRule)
         {
             _routeService = routeService;
             _moveRule = moveRule;
-            _leveling = levelProgress;
 
             _moveController.Wire(_routeService, this);
             Bind();
@@ -55,20 +53,14 @@ namespace JW.DungeonSliding.GamePlay.Entities
             _moveController.OnSlideBlocked += HandleSlideBlocked;
             _moveController.OnPushedEnd += HandleKnockBackEnd;
             _moveController.OnMoveEnd += () => OnMoveEnd?.Invoke();
-
-            _leveling.OnLevelUp += HandleLevelUp;
-            _leveling.OnChangedXp += HandleXpChanged;
         }
         public void AddReward(RewardData rewardData)
         {
-            _leveling.AddXp(rewardData.Xp);
+            OnGetXp?.Invoke(rewardData.Xp);
         }
-        private void HandleLevelUp()
+        public void HandleLevelUp(int level)
         {
-            
-        }
-        private void HandleXpChanged()
-        {
+            Ability.ExecuteCreatureTrigger(ECreatureTrigger.OnLevelUp);
         }
 
         #region Move
@@ -92,6 +84,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             StatModifier.ModifyStat(new StatModifierContext(ECreatureStatType.CurrentMoveCount, EApplyStatType.Add, -_moveRule.MoveCost));
             ChangeCharacterState(ECharacterStateType.Idle);
             SlideResultType = ESlideResultType.None;
+            Ability.ExecuteCreatureTrigger(ECreatureTrigger.OnSlided);
         }
         private void HandleSlideBlocked()
         {
@@ -129,7 +122,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
                 KnockBack(backDirection);
             }
 
-            _animatorController.SetAnimationTrigger(ConstString.HIT_ANIM);
+            base.TakeDamage(damageInfo);
         }
         public override void EndHittedAnimation()
         {

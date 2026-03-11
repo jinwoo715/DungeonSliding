@@ -23,7 +23,6 @@ namespace JW.DungeonSliding.UI
 
         public void ShowDamage(DamageEvent damageEvent)
         {
-            Debug.Log("Show Damage");
             _showDamageUIStack.Enqueue(damageEvent);
 
             if(_showUICoroutine == null)

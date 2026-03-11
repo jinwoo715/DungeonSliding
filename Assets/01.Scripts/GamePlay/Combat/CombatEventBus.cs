@@ -46,7 +46,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
             _instance = this;
         }
 
-        public void RaiseDamageEvent(DamageEvent e) { Debug.Log("DamageEvent"); OnDamageEvent?.Invoke(e); }
+        public void RaiseDamageEvent(DamageEvent e) { OnDamageEvent?.Invoke(e); }
         public void RaiseDeathEvent(DeathEvent e) => OnDeathEvent?.Invoke(e);
 
         public void Clear()

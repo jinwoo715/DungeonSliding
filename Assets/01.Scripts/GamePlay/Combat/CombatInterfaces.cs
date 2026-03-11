@@ -1,3 +1,4 @@
+using JW.DungeonSliding.GamePlay.Ability;
 using JW.DungeonSliding.GamePlay.Entities;
 using JW.DungeonSliding.GamePlay.Stats;
 using System;
@@ -86,6 +87,8 @@ namespace JW.DungeonSliding.GamePlay.Combat
         IRotateObject Rotate { get; }
 
         IAbilityExcuter Ability {get;}
+
+        INextAttackEnhancer NextAttackEnhancer { get; }
     }
 
     public interface ICombatProvider

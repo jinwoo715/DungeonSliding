@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Entities
 {
-    public class Doppelganger : StoneStatueEnemy, IBossAbility
+    public class Doppelganger : StoneStatueEnemy
     {
         private CopyAbility _copyAbility;
 

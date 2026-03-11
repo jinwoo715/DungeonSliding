@@ -14,9 +14,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
 {
     public class EnemyManager : MonoBehaviour, ICombatProvider
     {
-        [SerializeField] private CretureStatController _cretureStatController;
         [SerializeField] private Enemy _enemyPrefabList;
-        [SerializeField] private List<EnemyBossBase> _enemyBossPrefabList;
 
         private Stack<Enemy> _enemyPoolByUID = new Stack<Enemy>();
         
@@ -105,8 +103,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
                 boss.SetAbility(EnemyAbilityFactory.Instance.GetAbility(_enemyBossDataByUID["ENEMY_BOSS_EREBOS"].AbilityList, boss, 1));
 
-                _enemyStatUIService.Attach(boss.StatUITransform, boss);
-
                 _activeEnemyByTile.Add(tile, boss);
                 _board.RegisterEnemyTile(tile);
             }
@@ -119,31 +115,31 @@ namespace JW.DungeonSliding.GamePlay.Entities
             if (_enemyPoolByUID.Count > 0)
                 enemy = _enemyPoolByUID.Pop();
             else
-                enemy = SpawnEnemy();
+                enemy = InstantiateEnemy();
 
             enemy.gameObject.SetActive(true);
             _enemyStatUIService.Attach(enemy.StatUITransform, enemy);
 
+            enemy.OnDeathEvent += () => { OnEnemyDeath(enemy); };
+
             return enemy;
         }
-        private Enemy SpawnEnemy()
+        private Enemy InstantiateEnemy()
         {
             Enemy enemy = Instantiate(_enemyPrefabList, this.transform);
-            //enemy.OnDeathEvent += OnEnemyDeath;
             enemy.Initialize(ECreatureType.Enemy);
 
             return enemy;
         }
         public void ReturnEnemy(Enemy enemy)
         {
+            enemy.OnDeathEvent -= () => { OnEnemyDeath(enemy); };
             enemy.gameObject.SetActive(false);
             _enemyPoolByUID.Push(enemy);
         }
         private void OnEnemyDeath(Enemy enemy)
         {
             ReturnEnemy(enemy);
-
-            Debug.Log("DeathEvent");
 
             Tile tile = enemy.Tile.TilePosition;
 
@@ -152,6 +148,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             _enemyStatUIService.Detach(enemy);
             _board.UnRegisterEnemyTile(tile);
 
+            Debug.Log(_activeEnemyByTile.Count);
             if (_activeEnemyByTile.Count == 0)
             {
                 GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTrigger.OnClearStage);

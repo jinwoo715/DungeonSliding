@@ -36,10 +36,10 @@ namespace JW.DungeonSliding.UI
         public IEnemyStatUIService EnemyStatUIService => _enemyStatUIManager;
         public ITooltipService EnemyTooltipService => _enemyTooltipPresenter;
 
-        public void Init(ICombatant _player, ILevelProgress levelProgress, ICombatEventPresenter combatEventPresenter, IAbilityEventService abilityService, IActService actService)
+        public void Init(ICombatant _player, ILevelProgress levelProgress, INextAttackEnhancer nextAttackEnhancer, ICombatEventPresenter combatEventPresenter, IAbilityEventService abilityService, IActService actService)
         {
             _abilityUIController.Initialize(abilityService);
-            _playerStatPresenter.Init(_player.StatReadOnly, _player.StatModifier, levelProgress);
+            _playerStatPresenter.Init(_player.StatReadOnly, _player.StatModifier, levelProgress, nextAttackEnhancer);
             _enemyStatUIManager.Init();
             _hitDamageViewer.Init();
 
@@ -55,7 +55,7 @@ namespace JW.DungeonSliding.UI
         {
             yield return _fadeController.CoFadeOut();
         }
-        public void SetAbilitySession(AbilitySession session)
+        public void SetAbilitySession(AbilitySelectSession session)
         {
             _abilityUIController.OpenSelectAbilityView(session);
         }

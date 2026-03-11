@@ -8,7 +8,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
     {
         #region Trigger
         public EGameEventTrigger GameTriggerType = EGameEventTrigger.None;
-        public ECreatureTrigger CreatureTrigger = ECreatureTrigger.None;
+        public ECreatureTrigger CreatureTriggerType = ECreatureTrigger.None;
         #endregion
 
         public EAbilityApplyStatType StatType = EAbilityApplyStatType.None;

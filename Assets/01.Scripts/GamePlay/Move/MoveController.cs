@@ -80,7 +80,7 @@ namespace JW.DungeonSliding
                     moveContext.OnStepEvent?.Invoke();
                 }
             }
-
+            OnSlideEnd?.Invoke();
             FinishMove();
         }
         private IEnumerator CoMove(MoveContext moveContext)
@@ -102,7 +102,6 @@ namespace JW.DungeonSliding
         private void FinishMove()
         {
             OnMoveEnd?.Invoke();
-            OnSlideEnd?.Invoke();
             IsMoving = false;
         }
         public void KnockBack(EDirectionType dir)

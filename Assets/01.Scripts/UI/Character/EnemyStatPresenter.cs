@@ -2,6 +2,7 @@ using UnityEngine;
 using JW.Utility;
 using JW.DungeonSliding.GamePlay.Stats;
 using System.Collections.Generic;
+using JW.DungeonSliding.GamePlay.Combat;
 
 namespace JW.DungeonSliding
 {
@@ -10,7 +11,7 @@ namespace JW.DungeonSliding
         [SerializeField] private EnemyStatViewItem _enemyStatViewItem;
         
         private ObjectPool<EnemyStatViewItem> _statViewItemPool;
-        private Dictionary<IEnemyStatModifier, EnemyStatViewItem> _activeEnemyStatItemByEnemy = new();
+        private Dictionary<ICombatant, EnemyStatViewItem> _activeEnemyStatItemByEnemy = new();
         public void Init()
         {
             _statViewItemPool = new ObjectPool<EnemyStatViewItem>(_enemyStatViewItem, 3, this.transform);
@@ -21,16 +22,15 @@ namespace JW.DungeonSliding
             item.Release();
         }
 
-        public void Attach(Transform transform, IEnemyStatModifier enemyStatReadOnly)
+        public void Attach(Transform transform, ICombatant combatant)
         {
             EnemyStatViewItem item = _statViewItemPool.GetObject();
-            item.Init(transform, enemyStatReadOnly);
+            item.Init(transform, combatant);
 
-            Debug.Log("Attach");
-            _activeEnemyStatItemByEnemy.Add(enemyStatReadOnly, item);
+            _activeEnemyStatItemByEnemy.Add(combatant, item);
         }
 
-        public void Detach(IEnemyStatModifier enemyStatReadOnly)
+        public void Detach(ICombatant enemyStatReadOnly)
         {
             if(_activeEnemyStatItemByEnemy.TryGetValue(enemyStatReadOnly, out var value))
             {

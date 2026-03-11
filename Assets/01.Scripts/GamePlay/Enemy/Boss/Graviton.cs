@@ -2,13 +2,13 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Entities
 {
-    public class Graviton : StoneStatueEnemy, IBossAbility
+    public class Graviton : StoneStatueEnemy
     {
         HeavyGravityAbility _heavyGravityAbility;
         public void SetAbilityGetter(IEnemyAbilityGetter bossAbilityGetter)
         {
             //_heavyGravityAbility = new HeavyGravityAbility(bossAbilityGetter, this);
-            StartCoroutine(_heavyGravityAbility.Execute());
+            //StartCoroutine(_heavyGravityAbility.Execute());
         }
         public void ExcuteAttack()
         {

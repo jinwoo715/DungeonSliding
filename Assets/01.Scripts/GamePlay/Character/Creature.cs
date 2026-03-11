@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Entities
 {
-    public abstract class Creature : MonoBehaviour, ICombatant, INextAttackEnhancer
+    public abstract class Creature : MonoBehaviour, ICombatant
     {
         [SerializeField] protected AnimatorController _animatorController;
         [SerializeField] private AbilityExecuter _abilityExcuter;
@@ -18,9 +18,10 @@ namespace JW.DungeonSliding.GamePlay.Entities
         private CreatureStat _stat = new CreatureStat();
         private StatusEffectManager _status;
         private AttackRequester _attackRequester;
-        private CombatSystem _combatSystem;
+        private CombatController _combatController;
         private GridPositioner _gridTransform;
         private ObjectRotator _objectRotator;
+        private AttackEnhancer _attackEnhancer = new AttackEnhancer();
 
         public bool IsActive { get; protected set; } = true;
 
@@ -29,7 +30,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
         public event Action OnDeathEvent;
 
-        private event Action<IAttackRequester> _unRegisterRequesterEvent;
+        private event Action<IAttackRequester, int> _unRegisterRequesterEvent;
 
         public IStatModifier StatModifier => _stat;
         public IStatReadOnly StatReadOnly => _stat;
@@ -39,12 +40,12 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public IRotateObject Rotate => _objectRotator;
         public IAbilityRegister AbilityRegister => _abilityExcuter;
         public IAbilityExcuter Ability => _abilityExcuter;
+        public INextAttackEnhancer NextAttackEnhancer => _attackEnhancer;
 
         private void OnDestroy()
         {
             UnBindAnimEvent();
         }
-
         public virtual void Initialize(ECreatureType cretureType)
         {
             IsActive = true;
@@ -53,22 +54,26 @@ namespace JW.DungeonSliding.GamePlay.Entities
             _objectRotator = new ObjectRotator(this.transform);
             _gridTransform = new GridPositioner(this.transform);
             _attackRequester = new AttackRequester(this, _creatureType);
-            _combatSystem = new CombatSystem(this);
+            _combatController = new CombatController(this);
             _status = new StatusEffectManager();
+            _attackEnhancer.Init(_stat);
 
-            _combatSystem.OnPrepareAttack += () => _abilityExcuter.ExecuteCreatureTrigger(ECreatureTrigger.OnAttackPrepared);
+            _combatController.OnPrepareAttack += () => _abilityExcuter.ExecuteCreatureTrigger(ECreatureTrigger.OnAttackPrepared);
+            _combatController.OnPerformedAttack += () => _abilityExcuter.ExecuteCreatureTrigger(ECreatureTrigger.OnAttackPerformed);
+            _combatController.OnPerformedAttack += () => _attackEnhancer.Clear();
+
+            _stat.OnStatChanged += (value) => { _attackEnhancer.CalculateFinalExtraDamage(); };
 
             BindAnimEvent();
         }
-
         public void InitData(CreatureBaseStat baseStat)
         {
             _stat.Init(baseStat);
         }
         public void RegisterRequester(IRequesterRegistry requesterRegistry)
         {
-            requesterRegistry.RegisterPlayerAttackRequester(_attackRequester);
-            _unRegisterRequesterEvent += requesterRegistry.UnRegisterPlayerAttackRequester;
+            requesterRegistry.RegisterAttackRequester(_attackRequester, (int)_creatureType);
+            _unRegisterRequesterEvent += requesterRegistry.UnRegisterAttackRequester;
         }
         private void BindAnimEvent()
         {
@@ -90,23 +95,23 @@ namespace JW.DungeonSliding.GamePlay.Entities
         #region Combat
         public virtual void TakeDamage(DamageContext damageInfo)
         {
-            _combatSystem.TakeDamage(damageInfo);
+            _combatController.TakeDamage(damageInfo);
             _animatorController.SetAnimationTrigger(ConstString.HIT_ANIM);
         }
         public virtual void ExcuteAttack(ActPair actPair)
         {
-            _combatSystem.SetAttackPayload(actPair);
+            _combatController.SetAttackPayload(actPair);
             _animatorController.SetAnimationTrigger(ConstString.ONE_HAND_ATTACK_ANIM);
         }
         public void AddStatusEffect(EStatusEffectType effectType, int amount)
         {
-            _combatSystem.AddAttackStatus(effectType, amount);
+            _combatController.AddAttackStatus(effectType, amount);
         }
         public virtual void OnDeath()
         {
             IsActive = false;
             _animatorController.SetAnimationTrigger(ConstString.STOP_ALL_TRIGGER_ANIMATION);
-            CombatEventBus.Excuter.RaiseDeathEvent(new DeathEvent(_combatSystem.LastAttacker, this));
+            CombatEventBus.Excuter.RaiseDeathEvent(new DeathEvent(_combatController.LastAttacker, this));
 
             _status.Reset();
             _stat.Clear();
@@ -114,11 +119,12 @@ namespace JW.DungeonSliding.GamePlay.Entities
             OnHitSequenceEnd?.Invoke();
             OnAttackSequenceEnd?.Invoke();
 
+            Debug.Log($"{name} : Death");
+
             OnDeathEvent?.Invoke();
 
-            _unRegisterRequesterEvent?.Invoke(this._attackRequester);
+            _unRegisterRequesterEvent?.Invoke(this._attackRequester, (int)_creatureType);
         }
-
         bool IsCheckDie()
         {
             int currentHp = _stat.Get(ECreatureStatType.CurrentHP);
@@ -149,16 +155,17 @@ namespace JW.DungeonSliding.GamePlay.Entities
         {
             _abilityExcuter.ExecuteCreatureTrigger(type);
         }
-
-        public void AddNextAttackDamage(int damage) => _combatSystem.AddNextAttackDamage(damage);
-        public void AddNextAttackDamageMulti(float multi) => _combatSystem.AddNextAttackDamageMulti(multi);
-        public void AddNextAttackCount(int count) => _combatSystem.AddNextAttackCount(count);
         #endregion
 
         #region Animation CallBack
         public virtual void EndHittedAnimation()
         {
             OnHitSequenceEnd?.Invoke();
+
+            if (IsCheckDie())
+            {
+                OnDeath();
+            }
         }
         public virtual void EndAttackAnimation()
         {
@@ -167,7 +174,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         protected virtual void ApplyAttack()
         {
             if (!IsActive) return;
-            _combatSystem.ExcuteAttack();
+            _combatController.ExcuteAttack(_attackEnhancer);
         }
         #endregion
 
@@ -175,15 +182,9 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public void OnTurnEnd()
         {
             _status.TimePassStatueUpdate();
-            _combatSystem.OnCombatEnd();
-
-            if(IsCheckDie())
-            {
-                OnDeath();
-            }
+            _combatController.OnCombatEnd();
         }
         #endregion
-
         public bool TryGet<T>(out T service) where T : class
         {
             service = (object)this as T;
