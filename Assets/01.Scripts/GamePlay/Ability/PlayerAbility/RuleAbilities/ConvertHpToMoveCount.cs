@@ -1,6 +1,7 @@
 using JW.DungeonSliding.GamePlay.Combat;
 using JW.DungeonSliding.GamePlay.Stats;
 using JW.DungeonSliding.Map;
+using System.Collections;
 using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Ability
@@ -15,20 +16,9 @@ namespace JW.DungeonSliding.GamePlay.Ability
             
         }
 
-        public override void ExcuteAbility()
+        public override IEnumerator Execute(AbilityArgs args)
         {
-            //if (_statReadOnly.Get(EPlayerStatType.CurrentHP) > _data.P1)
-            //{
-            //    _statModifier.ModifyStat(new PlayerApplyStatContext(EPlayerStatType.CurrentHP, EApplyStatType.Add, EPlayerStatType.None, -_data.P1));
-            //    _statModifier.ModifyStat(new PlayerApplyStatContext(EPlayerStatType.CurrentMoveCount, EApplyStatType.Add, EPlayerStatType.None, _data.P2));
-            //}
-        }
-        public override void ProcTrigger(EGameEventTrigger triggerType)
-        {
-            //if (triggerType == EGameEventTriggerType.OnDeathByMoveCount)
-            //{
-            //    ExcuteAbility();
-            //}
+            throw new System.NotImplementedException();
         }
 
         protected override void BindService()

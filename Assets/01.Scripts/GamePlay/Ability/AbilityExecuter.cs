@@ -93,9 +93,6 @@ namespace JW.DungeonSliding.GamePlay.Ability
         #region Registration
         public void RegisterAbility(IAbility ability)
         {
-            Debug.Log($"Register Ability, {ability.CreatureTrigger}");
-            Debug.Log($"Register Ability, {ability.GameTrigger}");
-
             if (ability.CreatureTrigger != ECreatureTrigger.None)
                 RegisterCreatureEventAbility(ability.CreatureTrigger, ability);
 

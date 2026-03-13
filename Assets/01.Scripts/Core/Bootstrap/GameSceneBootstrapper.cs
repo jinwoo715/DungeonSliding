@@ -13,44 +13,48 @@ using UnityEngine;
    
 namespace JW.DungeonSliding.GamePlay.Bootstrap 
 {
-    
-    
     public class GameSceneBootstrapper : MonoBehaviour
     {
-        private RewardManager _rewardManager = new RewardManager();
-        private GameModeController _modeController = new GameModeController();
-        private InputCoordinator _inputCoordinator = new InputCoordinator();
-        private GameTriggerEventBus _triggerEventBus = new GameTriggerEventBus();
-        private CombatEventBus _combatEventBus = new();
         private AbilitySystem _abilitySystem = new AbilitySystem();
-        private FieldCombatantManager _fieldCombatantManager;
-        private RouteBuilder _routeBuilder;
+        private CombatEventBus _combatEventBus = new();
         private EnemyAbilityManager _enemyAbilityManager;
-        private MoveRule _moveRule = new MoveRule();
-        private GameVisualController _visualContoller;
         private EnemyAbilityFactory _enemyAbilityFactory;
+        private FieldCombatantManager _fieldCombatantManager;
+        private GameVisualController _visualContoller;
+        private GameModeController _modeController = new GameModeController();
+        private GameTriggerEventBus _triggerEventBus = new GameTriggerEventBus();
+        private InputCoordinator _inputCoordinator = new InputCoordinator();
         private LevelSystem _leveling = new LevelSystem();
+        private MoveRule _moveRule = new MoveRule();
+        private RewardManager _rewardManager = new RewardManager();
+        private RouteBuilder _routeBuilder;
 
         private PlayerAbilityContext _playerAbilityContext = new PlayerAbilityContext();
 
         [Header("Camera Controller")]
-        [SerializeField] private CameraController cameraController;
+        [SerializeField] private BattleManager _battleManager;
 
+        [SerializeField] private CameraController cameraController;
+        
         [SerializeField] private Camera cam;
+        
+        [SerializeField] private EnemyManager _enemyManager;
+        
         [SerializeField] private GameObject dirLight;
         [SerializeField] private GameObject playerLight;
 
         [SerializeField] private GameSceneManager _gameSceneManager;
         [SerializeField] private GameSceneUIManager _gameSceneUIManager;
+        
         [SerializeField] private MapManager _mapManager;
         [SerializeField] private PlayerController _playerController;
-        [SerializeField] private EnemyManager _enemyManager;
-        [SerializeField] private BattleManager _battleManager;
         [SerializeField] private InputSystem _inputSystem;
         [SerializeField] private ObstacleObjectController _obstacleController;
-
         [SerializeField] private EnemyTooltipClicker _enemyTooltipClicker;
 
+
+
+        public FunctionTester functionTester;
         private void Update()
         {
             if (Input.GetKeyDown(KeyCode.Q))
@@ -61,7 +65,7 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
             {
                 _playerController.StatModifier.ModifyStat(new StatModifierContext(ECreatureStatType.CurrentMoveCount, EApplyStatType.Add, -5));
             }
-            if (Input.GetKeyDown(KeyCode.A))
+            if (Input.GetKeyDown(KeyCode.U))
             {
                 _leveling.LevelUp();
             }
@@ -78,16 +82,19 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
             ChildInit();
 
             _gameSceneManager.ClearFloor();
+            _leveling.Initialize();
+
+            functionTester.Init(_abilitySystem);
         }
 
         private void ChildInit()
         {
-
             _playerAbilityContext.SetOwner(_playerController.Player);
             _playerAbilityContext.Register<IMoveable>(_playerController.Moveable);
             _playerAbilityContext.Register<IStatModifier>(_playerController.StatModifier);
             _playerAbilityContext.Register<ICombatantSensor>(_fieldCombatantManager);
             _playerAbilityContext.Register<INextAttackEnhancer>(_playerController.NextAttackEnhancer);
+            _playerAbilityContext.Register<IRouteService>(_routeBuilder);
 
             _abilitySystem.Init(_playerAbilityContext, _leveling);
   
@@ -115,8 +122,6 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
             _visualContoller = new GameVisualController(cam, dirLight, playerLight, _gameSceneUIManager.EnemyStatUIService);
             _enemyAbilityManager = new EnemyAbilityManager(_fieldCombatantManager, _moveRule, _playerController.StatReadOnly, _visualContoller);
             _enemyAbilityFactory = new EnemyAbilityFactory(_enemyAbilityManager);
-
-            _leveling.Initialize();
         }
 
         private void BindEvent()

@@ -11,6 +11,11 @@ namespace JW.DungeonSliding.GamePlay.Entities
         [SerializeField] protected Transform _avatar;
         [SerializeField] private GameObject _eyeLight;
 
+        public override void Initialize(ECreatureType cretureType)
+        {
+            base.Initialize(cretureType);
+            Rotate.OnRotateEnd += EndHittedAnimation;
+        }
         public void ExcuteAttack()
         {
             _eyeLight.SetActive(true);
@@ -27,21 +32,25 @@ namespace JW.DungeonSliding.GamePlay.Entities
             StopAllCoroutines();
         }
 
+        private float _rotateDelay = 0.3f;
         public override void TakeDamage(DamageContext damageInfo)
         {
-            if (IsActive == false)
-                return;
-
-            base.TakeDamage(damageInfo);
+            if (IsActive == false) return;
 
             Vector3 punchScale = new Vector3(0.02f, 0f, 0.02f);
-            _avatar.transform.DOPunchPosition(punchScale, 0.3f, 20);
+            _avatar.transform.DOPunchPosition(punchScale, _rotateDelay, 20);
 
             EDirectionType toDir = GridUtility.GetDirFromTileToTile(Tile.TilePosition, damageInfo.Attacker.Tile.TilePosition);
 
             var particle = ParticlePool.Instance.GetParticle("HitDust");
             particle.SetParticle(this.transform.position + Vector3.up * 0.65f + GetHitParticlePosition(toDir), 1.0f);
 
+            base.TakeDamage(damageInfo);
+
+            if (IsActive == false) return;
+
+
+            //적 흔들림 -> 회전 -> 턴 종료
             float targetRotation = GetEulerYByDirection(toDir);
             particle.transform.rotation = Quaternion.Euler(-20, targetRotation, 0);
 
@@ -50,11 +59,16 @@ namespace JW.DungeonSliding.GamePlay.Entities
                 var rotateDustParticle = ParticlePool.Instance.GetParticle("RotationDust");
                 rotateDustParticle.SetParticle(this.transform.position + Vector3.up * 0.15f, 2.0f);
 
-                Rotate.OnRotateEnd += EndHittedAnimation;
-
-                StartCoroutine(Rotate.CoRotateToDirection(toDir));
+                StartCoroutine(CoDelayRotate(toDir));
             }
             else EndHittedAnimation();
+        }
+
+        private IEnumerator CoDelayRotate(EDirectionType toDir)
+        {
+            yield return new WaitForSeconds(_rotateDelay);
+
+            StartCoroutine(Rotate.CoRotateToDirection(toDir));
         }
         public float GetEulerYByDirection(EDirectionType direction)
         {

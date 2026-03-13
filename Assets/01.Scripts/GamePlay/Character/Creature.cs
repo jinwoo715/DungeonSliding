@@ -15,13 +15,13 @@ namespace JW.DungeonSliding.GamePlay.Entities
         [SerializeField] private AbilityExecuter _abilityExcuter;
         private ECreatureType _creatureType;
         
-        private CreatureStat _stat = new CreatureStat();
-        private StatusEffectManager _status;
         private AttackRequester _attackRequester;
+        private AttackEnhancer _attackEnhancer = new AttackEnhancer();
+        private CreatureStat _stat = new CreatureStat();
         private CombatController _combatController;
         private GridPositioner _gridTransform;
         private ObjectRotator _objectRotator;
-        private AttackEnhancer _attackEnhancer = new AttackEnhancer();
+        private StatusEffectManager _status;
 
         public bool IsActive { get; protected set; } = true;
 
@@ -58,9 +58,12 @@ namespace JW.DungeonSliding.GamePlay.Entities
             _status = new StatusEffectManager();
             _attackEnhancer.Init(_stat);
 
-            _combatController.OnPrepareAttack += () => _abilityExcuter.ExecuteCreatureTrigger(ECreatureTrigger.OnAttackPrepared);
+            _combatController.OnPrepareAttack += (value) => _abilityExcuter.ExecuteCreatureTrigger(ECreatureTrigger.OnAttackPrepared, value);
+
+
             _combatController.OnPerformedAttack += () => _abilityExcuter.ExecuteCreatureTrigger(ECreatureTrigger.OnAttackPerformed);
             _combatController.OnPerformedAttack += () => _attackEnhancer.Clear();
+            _combatController.OnBackAttacked += () => Ability.ExecuteCreatureTrigger(ECreatureTrigger.OnBackAttacked);
 
             _stat.OnStatChanged += (value) => { _attackEnhancer.CalculateFinalExtraDamage(); };
 
@@ -97,6 +100,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         {
             _combatController.TakeDamage(damageInfo);
             _animatorController.SetAnimationTrigger(ConstString.HIT_ANIM);
+            CheckHPOut();
         }
         public virtual void ExcuteAttack(ActPair actPair)
         {
@@ -119,53 +123,52 @@ namespace JW.DungeonSliding.GamePlay.Entities
             OnHitSequenceEnd?.Invoke();
             OnAttackSequenceEnd?.Invoke();
 
-            Debug.Log($"{name} : Death");
-
             OnDeathEvent?.Invoke();
 
+            Debug.Log(_unRegisterRequesterEvent);
             _unRegisterRequesterEvent?.Invoke(this._attackRequester, (int)_creatureType);
         }
-        bool IsCheckDie()
+        void CheckHPOut()
         {
-            int currentHp = _stat.Get(ECreatureStatType.CurrentHP);
-            int currentMove = _stat.Get(ECreatureStatType.CurrentMoveCount);
+            if (!IsOutOfHp()) return;
+                Ability.ExecuteCreatureTrigger(ECreatureTrigger.OnDeathByHp);
 
-            if (currentHp <= 0)
-                ExecuteCreatureEvent(ECreatureTrigger.OnDeathByHp);
+            if (!IsOutOfHp()) return;
+                Ability.ExecuteCreatureTrigger(ECreatureTrigger.OnDeath);
 
-            if (currentMove <= 0)
-                ExecuteCreatureEvent(ECreatureTrigger.OnDeathByMoveCount);
+            if (!IsOutOfHp()) return;
 
-            currentHp = _stat.Get(ECreatureStatType.CurrentHP);
-            currentMove = _stat.Get(ECreatureStatType.CurrentMoveCount);
+            OnDeath();
+        }
+        bool IsOutOfHp()
+        {
+            int remainHP = _stat.Get(ECreatureStatType.CurrentHP);
+            return remainHP == 0;
+        }
+        private void CheckMoveOut()
+        {
+            if (!IsOutOfMoveCount()) return;
+            Ability.ExecuteCreatureTrigger(ECreatureTrigger.OnDeathByMoveCount);
 
-            if (currentHp <= 0 || currentMove <= 0)
-                ExecuteCreatureEvent(ECreatureTrigger.OnDeath);
+            if (!IsOutOfMoveCount()) return;
+            Ability.ExecuteCreatureTrigger(ECreatureTrigger.OnDeath);
 
-            currentHp = _stat.Get(ECreatureStatType.CurrentHP);
-            currentMove = _stat.Get(ECreatureStatType.CurrentMoveCount);
+            if (!IsOutOfMoveCount()) return;
 
-            if (currentHp <= 0 || currentMove <= 0)
-                return true;
-
-            return false;
+            OnDeath();
+        }
+        public bool IsOutOfMoveCount()
+        {
+            int remainMove = StatReadOnly.Get(ECreatureStatType.CurrentMoveCount);
+            return remainMove == 0;
         }
 
-        private void ExecuteCreatureEvent(ECreatureTrigger type)
-        {
-            _abilityExcuter.ExecuteCreatureTrigger(type);
-        }
         #endregion
 
         #region Animation CallBack
         public virtual void EndHittedAnimation()
         {
             OnHitSequenceEnd?.Invoke();
-
-            if (IsCheckDie())
-            {
-                OnDeath();
-            }
         }
         public virtual void EndAttackAnimation()
         {
@@ -179,10 +182,11 @@ namespace JW.DungeonSliding.GamePlay.Entities
         #endregion
 
         #region Sequence Method
-        public void OnTurnEnd()
+        public virtual void OnTurnEnd()
         {
             _status.TimePassStatueUpdate();
             _combatController.OnCombatEnd();
+            CheckMoveOut();
         }
         #endregion
         public bool TryGet<T>(out T service) where T : class

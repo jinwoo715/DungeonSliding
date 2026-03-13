@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Ability
@@ -11,13 +12,9 @@ namespace JW.DungeonSliding.GamePlay.Ability
             
         }
 
-        public override void ExcuteAbility()
+        public override IEnumerator Execute(AbilityArgs args)
         {
-            _rerollService.AddReroll();
-        }
-
-        public override void ProcTrigger(EGameEventTrigger triggerType)
-        {
+            throw new System.NotImplementedException();
         }
 
         protected override void BindService()

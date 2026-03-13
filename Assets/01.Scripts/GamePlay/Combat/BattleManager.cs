@@ -100,6 +100,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
         }
         public void EnqueueActPair(ActPair pair)
         {
+            Debug.Log(pair.Attacker);
             _actPairs.Enqueue(pair);
         }
         public void EnqueueCounterActPair(ActPair pair)
@@ -119,7 +120,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
         }
         public void UnRegisterAttackRequester(IAttackRequester requester, int priority)
         {
-            if (!_requesterByPriority.TryGetValue(priority, out var list))
+            if (_requesterByPriority.TryGetValue(priority, out var list))
             {
                 if (list.Contains(requester))
                 {

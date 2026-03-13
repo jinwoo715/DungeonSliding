@@ -11,7 +11,7 @@ namespace JW.DungeonSliding.GamePlay
         public EGameEventTrigger Trigger;
 
         public Dictionary<EGameEventTrigger, Action> _triggerEventsByTriggerType = new Dictionary<EGameEventTrigger, Action>();
-
+        public Dictionary<EGameEventTrigger, Queue<Action>> _instanceEventQueue = new Dictionary<EGameEventTrigger, Queue<Action>>();
         public GameTriggerEventBus()
         {
             Instance = this;
@@ -34,11 +34,31 @@ namespace JW.DungeonSliding.GamePlay
         {
             _triggerEventsByTriggerType[triggerType] -= bindAction;
         }
+
+        public void EnqueueInstanceTriggerEvent(EGameEventTrigger trigger, Action instanceAction)
+        {
+            if (!_instanceEventQueue.ContainsKey(trigger))
+            {
+                _instanceEventQueue.Add(trigger, new Queue<Action>());
+            }
+
+            _instanceEventQueue[trigger].Enqueue(instanceAction);
+        }
+
         public void ExcuteAbilityEvent(EGameEventTrigger triggerType)
         {
             if(_triggerEventsByTriggerType.TryGetValue(triggerType, out Action action))
             {
                 action?.Invoke();
+            }
+
+            if(_instanceEventQueue.TryGetValue(triggerType, out var queue))
+            {
+                while(queue.Count != 0)
+                {
+                    var instanceEvent = queue.Dequeue();
+                    instanceEvent?.Invoke();
+                }
             }
         }
     }

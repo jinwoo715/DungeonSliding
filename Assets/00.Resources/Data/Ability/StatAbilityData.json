@@ -60,7 +60,7 @@
     "IsResetEnabled": "TRUE",
     "ResetGameTrigger": "OnTurnEnd",
     "ResetCreatureTrigger": "None",
-    "ResetThreshold": 2
+    "ResetThreshold": 4
   },
   {
     "UID": "SA_MULTI_HIT_EVERY_N_ATTACK",

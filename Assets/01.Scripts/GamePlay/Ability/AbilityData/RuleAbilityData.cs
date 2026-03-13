@@ -6,7 +6,8 @@ namespace JW.DungeonSliding.GamePlay.Ability
     [System.Serializable]
     public class RuleAbilityData : AbilityDataBase
     {
-        public EGameEventTrigger TriggerType;
+        public EGameEventTrigger GameTrigger;
+        public ECreatureTrigger CreatureTrigger;
         public ERuleAbilityType RuleType;
         public float P1;
         public float P2;

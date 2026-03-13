@@ -74,10 +74,10 @@ namespace JW.DungeonSliding.GamePlay.Ability
         public event Action<AbilitySelectSession> OnExcuteAbilitySelection;
 
         public event Action OnExcuteAbility;
-        
+
         private IAbilityContextService _playerAbilityContext;
 
-        private int _rerollCount = 1;
+        private int _rerollCount = 100;
 
         public void Init(IAbilityContextService abilityHost, ILevelProgress playerLevel)
         {
@@ -88,6 +88,8 @@ namespace JW.DungeonSliding.GamePlay.Ability
             LoadData();
 
             playerLevel.OnLevelUp += ProcessAbilityLevel;
+
+            GameTriggerEventBus.Instance.EnqueueInstanceTriggerEvent(EGameEventTrigger.OnEnterRoom, RequestAbilitySelect);
         }
         private void LoadData()
         {
@@ -104,7 +106,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
         {
             if(IsAchieveAbilityLevel(currentLevel))
             {
-                RequestAbilitySelect();
+                GameTriggerEventBus.Instance.EnqueueInstanceTriggerEvent(EGameEventTrigger.OnTurnEnd, RequestAbilitySelect);
             }
         }
         private bool IsAchieveAbilityLevel(int currentLevel)
@@ -118,9 +120,9 @@ namespace JW.DungeonSliding.GamePlay.Ability
         public void RequestAbilitySelect()
         {
             var session = new AbilitySelectSession(GetRandomAbilities(3), SelectAbility, () => GetRandomAbilities(3), _rerollCount);
-
             OnExcuteAbilitySelection?.Invoke(session);
         }
+
         public AbilityDataBase[] GetRandomAbilities(int count)
         {
             AbilityDataBase[] abilityDatas = new AbilityDataBase[count];
@@ -135,9 +137,6 @@ namespace JW.DungeonSliding.GamePlay.Ability
         {
             IAbility ability = _abilityFactory.CreateAbility(_abilityData, _playerAbilityContext);
 
-            Debug.Log($"Select Ability : {_abilityData.Name}");
-            Debug.Log($"Select Ability : {ability.GameTrigger}");
-            Debug.Log($"Select Ability : {ability.CreatureTrigger}");
             OnSelectAbility?.Invoke(ability);
             OnAddedAbilityData?.Invoke(_abilityData);
         }
@@ -154,6 +153,14 @@ namespace JW.DungeonSliding.GamePlay.Ability
             {
                 SelectAbility(abilities[i]);
             }
+        }
+
+        /// <summary>
+        /// Ability Test Function
+        /// </summary>
+        public void GetSpecificAbility(AbilityDataBase abilityDataBase)
+        {
+            SelectAbility(abilityDataBase);
         }
     }
 }

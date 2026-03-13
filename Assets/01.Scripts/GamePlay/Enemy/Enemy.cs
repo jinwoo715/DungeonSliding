@@ -24,6 +24,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public string EnemyUID => _enemyData.UID;
         public Transform StatUITransform => _statUITransform;
 
+        public event Action<Enemy> OnEnemyReturnEvent;
+
         //TODO Enemy Skill ±¸Çö
         #region Enemy Skill
         private Dictionary<EGameEventTrigger, List<IAbility>> gameTriggerAbilities = new();
@@ -63,6 +65,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
          
             _backAttackMultiplier = GameManager.Config.Combat.BackAttackDMGMultiple;
         }
+        
         public void SetData(EnemyData data, int floor)
         {
             IsActive = true;
@@ -85,8 +88,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public override void OnDeath()
         {
             base.OnDeath();
-            //GameTriggerEventBus.Instance?.ExcuteAbilityEvent(EGameEventTriggerType.OnKillEnemy);
-            //OnDeathEvent?.Invoke(this);
+            OnEnemyReturnEvent?.Invoke(this);
         }
 
         #region Calculate Stat
@@ -113,7 +115,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         }
         public RewardData CreateReward()
         {
-            return new RewardData(_enemyStat.XP);
+            return new RewardData(ERewardType.KillReward, _enemyStat.XP);
         }
         #endregion
     }

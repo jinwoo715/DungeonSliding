@@ -8,6 +8,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
     {
         public ICombatant Attacker = null;
         public int Damage = 0;
+        public bool IsBackAttack = false;
         public bool IsCritical = false;
         public bool IsCounterAttack = false;
 

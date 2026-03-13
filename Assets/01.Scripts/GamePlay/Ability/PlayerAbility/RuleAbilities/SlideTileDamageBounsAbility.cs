@@ -1,5 +1,6 @@
 using JW.DungeonSliding.GamePlay.Combat;
 using JW.DungeonSliding.Map;
+using System.Collections;
 using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Ability
@@ -13,16 +14,9 @@ namespace JW.DungeonSliding.GamePlay.Ability
             
         }
 
-        public override void ExcuteAbility()
+        public override IEnumerator Execute(AbilityArgs args)
         {
-            int moveTileCount = _moveable.SlideTileCount();
-            _nextAttackEnhancer.AddNextAttackDamage(Mathf.RoundToInt(moveTileCount * _data.P1));
-        }
-
-        public override void ProcTrigger(EGameEventTrigger triggerType)
-        {
-            if(_moveable.SlideResultType == ESlideResultType.EnemyStop)
-                ExcuteAbility();
+            throw new System.NotImplementedException();
         }
 
         protected override void BindService()

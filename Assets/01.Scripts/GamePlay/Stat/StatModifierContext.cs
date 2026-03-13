@@ -47,6 +47,10 @@ namespace JW.DungeonSliding.GamePlay.Stats
         {
             Value += value;
         }
+        public void SetValue(float value)
+        {
+            Value = value;
+        }
         public void Reset()
         {
             Value = 0;

@@ -1,4 +1,5 @@
 using JW.DungeonSliding.GamePlay.Combat;
+using System.Collections;
 
 namespace JW.DungeonSliding.GamePlay.Ability
 {
@@ -9,17 +10,9 @@ namespace JW.DungeonSliding.GamePlay.Ability
         {
         }
 
-        public override void ExcuteAbility()
+        public override IEnumerator Execute(AbilityArgs args)
         {
-            _barrierable.GainBarrier();
-        }
-
-        public override void ProcTrigger(EGameEventTrigger triggerType)
-        {
-            if (triggerType == _data.TriggerType)
-            {
-                ExcuteAbility();
-            }
+            throw new System.NotImplementedException();
         }
 
         protected override void BindService()

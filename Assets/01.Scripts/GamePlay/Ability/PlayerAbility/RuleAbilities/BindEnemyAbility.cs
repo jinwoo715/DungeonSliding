@@ -4,6 +4,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
 {
     using JW.DungeonSliding.GamePlay.Combat;
     using JW.DungeonSliding.GamePlay.Entities;
+    using System.Collections;
 
     public class BindEnemyAbility : RuleAbilityBase
     {
@@ -14,26 +15,9 @@ namespace JW.DungeonSliding.GamePlay.Ability
             
         }
 
-        public override void ExcuteAbility()
+        public override IEnumerator Execute(AbilityArgs args)
         {
-            //if (!_bindEenmies.Contains(_combatant.AttackTarget))
-            //{
-            //    _bindEenmies.Add(_combatant.AttackTarget);
-            //    //_combatant.AttackTarget.ApplyStatus(ECreatureStatus.Bind, 1);
-            //}
-        }
-
-        public override void ProcTrigger(EGameEventTrigger triggerType)
-        {
-            //if (triggerType == EGameTriggerType.OnAttack)
-            //{
-            //    ExcuteAbility();
-            //}
-
-            if(triggerType == EGameEventTrigger.OnEnterRoom)
-            {
-                _bindEenmies.Clear();
-            }
+            throw new System.NotImplementedException();
         }
 
         protected override void BindService()

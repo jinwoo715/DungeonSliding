@@ -12,6 +12,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
         private int _extraFixedAddDamage = 0;
         private float _extraMultiplierDamageRatio = 0;
         private int _extraAttackCount = 0;
+        private bool _guaranteedCritical = false;
 
         private IStatReadOnly _statReadOnly;
 
@@ -23,6 +24,8 @@ namespace JW.DungeonSliding.GamePlay.Combat
         public float MultipleAddDamage => _extraMultiplierDamageRatio;
         public int FinalExtraAttackCount => _extraAttackCount;
         public int FinalEnhanceDamage => CalculateFinalExtraDamage();
+
+        public bool IsGuaranteedCritical => throw new NotImplementedException();
 
         public void AddNextAttackCount(int count)
         {
@@ -39,6 +42,10 @@ namespace JW.DungeonSliding.GamePlay.Combat
         {
             _extraMultiplierDamageRatio += multi;
             CalculateFinalExtraDamage();
+        }
+        public void GuaranteedCritical()
+        {
+            _guaranteedCritical = true;
         }
         public int CalculateFinalExtraDamage()
         {
@@ -58,6 +65,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
             _extraFixedAddDamage = 0;
             _extraAttackCount = 0;
             _extraMultiplierDamageRatio = 0;
+            _guaranteedCritical = false;
 
             OnChangedNextAttackDamage?.Invoke(0);
             OnChangedNextAttackCount?.Invoke(0);

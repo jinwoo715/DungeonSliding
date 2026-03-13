@@ -34,10 +34,12 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         public void Reset()
         {
-            _statContext.AddValue(-_stackedValue * 2);
-            _modifier.ModifyStat(_statContext);
+            StatModifierContext revert = _statContext;
+            revert.SetValue(-_stackedValue);
+            
+            _modifier.ModifyStat(revert);
 
-            _statContext.Reset();
+            _stackedValue = 0;
         }
     }
 

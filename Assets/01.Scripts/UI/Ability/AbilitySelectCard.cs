@@ -38,49 +38,19 @@ namespace JW.DungeonSliding.UI
             //TODO Image Sprite
             //_abilityImage.sprite = _data.AbilitySprite;
             _abilityName.text = _data.Name;
-            _abilityDescription.text = GetDescription(_data.Description, _data);
+
+            _abilityDescription.text = GetDescription(abilityData);
         }
 
-        private string GetDescription(string description, AbilityDataBase data)
+        private string GetDescription(AbilityDataBase abilityData)
         {
-            StringBuilder sb = new StringBuilder(description);
+            if (abilityData is StatAbilityData sa)
+                return AbilityTextFormatter.ConvertStatAbilityDescription(sa);
 
-            if (data is StatAbilityData)
-            {
-                var sa = data as StatAbilityData;
+            if (abilityData is RuleAbilityData ra)
+                return AbilityTextFormatter.ConvertRuleAbilityDescription(ra);
 
-                var convertList = new Dictionary<string, string>
-                {
-                    { "{StatValue}", sa.ApplyType == EApplyStatType.Add ? sa.StatValue.ToString() : (sa.StatValue * 100).ToString()},
-                    { "{NextAttackValue}", sa.NextAttackType == GamePlay.Combat.ENextAttackType.Multiple ? 
-                    (sa.NextAttackValue * 100).ToString() : sa.NextAttackValue.ToString() },
-
-                    { "{NeedStackCount}", sa.NeedStackCount.ToString() },
-                    { "{ResetThreshold}", sa.ResetThreshold.ToString() }
-                };
-
-                foreach (var replaceData in convertList)
-                {
-                    sb.Replace(replaceData.Key, replaceData.Value);
-                }
-            }
-            else
-            {
-                var ra = data as RuleAbilityData;
-
-                var convertList = new Dictionary<string, string>
-                {
-                    { "{P1}", ra.P1.ToString() },
-                    { "{P2}", ra.P2.ToString() },
-                };
-
-                foreach (var replaceData in convertList)
-                {
-                    sb.Replace(replaceData.Key, replaceData.Value);
-                }
-            }
-
-            return sb.ToString();
+            return string.Empty;
         }
 
         public void OnClickSelectButton()

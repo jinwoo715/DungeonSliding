@@ -10,12 +10,14 @@ namespace JW.DungeonSliding.GamePlay.Combat
         int FixedAddDamage { get; }
         float MultipleAddDamage { get; }
         int FinalExtraAttackCount { get; }
+        bool IsGuaranteedCritical { get; }
 
         int FinalEnhanceDamage { get; }
 
         void AddNextAttackDamage(int damage);
         void AddNextAttackDamageMulti(float multi);
         void AddNextAttackCount(int count);
+        void GuaranteedCritical();
         void Clear();
     }
 

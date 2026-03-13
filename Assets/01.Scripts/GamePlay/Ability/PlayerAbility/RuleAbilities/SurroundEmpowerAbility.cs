@@ -1,6 +1,7 @@
 using JW.DungeonSliding.GamePlay.Combat;
 using JW.DungeonSliding.GamePlay.Stats;
 using JW.DungeonSliding.Map;
+using System.Collections;
 using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Ability
@@ -20,27 +21,9 @@ namespace JW.DungeonSliding.GamePlay.Ability
             //_applyStatContext = new PlayerApplyStatContext(EPlayerStatType.Damage, EApplyStatType.Add, EPlayerStatType.None, 0);
         }
 
-        public override void ExcuteAbility()
+        public override IEnumerator Execute(AbilityArgs args)
         {
-            int count = _sensor.GetNearEnemyCount(_combatant.Tile.TilePosition);
-
-            _applyStatContext.AddValue(-_data.P1 * count);
-            
-            //PlayerApplyStatContext applyStatContext = new PlayerApplyStatContext(EPlayerStatType.Damage, EApplyStatType.Add, EPlayerStatType.None, _data.P1 * count);
-            //_modifier.ModifyStat(applyStatContext);
-
-            //_nextAttackEnhancer.AddEnhance(count);
-        }
-
-        public override void ProcTrigger(EGameEventTrigger triggerType)
-        {
-            //if (triggerType == EGameEventTriggerType.OnMoveEnd)
-            //{
-            //    _modifier.ModifyStat(_applyStatContext);
-            //    _applyStatContext.Reset();
-
-            //    ExcuteAbility();
-            //}
+            throw new System.NotImplementedException();
         }
 
         protected override void BindService()

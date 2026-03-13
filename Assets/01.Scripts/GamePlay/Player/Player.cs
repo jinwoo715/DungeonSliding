@@ -56,7 +56,11 @@ namespace JW.DungeonSliding.GamePlay.Entities
         }
         public void AddReward(RewardData rewardData)
         {
+            Debug.Log(rewardData.Xp);
             OnGetXp?.Invoke(rewardData.Xp);
+
+            if (rewardData.RewardType == ERewardType.KillReward)
+                Ability.ExecuteCreatureTrigger(ECreatureTrigger.OnKilled);
         }
         public void HandleLevelUp(int level)
         {
@@ -64,6 +68,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
         }
 
         #region Move
+
+        
         public void SlideRoute(EDirectionType inputDirection)
         {
             if (!_moveRule.IsCanMove(inputDirection)) return;
@@ -74,7 +80,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
             _moveController.SlideRoute(inputDirection);
         }
-
         private void HandleSlideStart()
         {
             ChangeCharacterState(ECharacterStateType.Run);
@@ -95,12 +100,10 @@ namespace JW.DungeonSliding.GamePlay.Entities
         {
             base.EndHittedAnimation();
         }
-
         public int SlideTileCount()
         {
             return _routeService.LastMoveTileCount;
         }
-
         public void KnockBack(EDirectionType dir)
         {
             _moveController.KnockBack(dir);

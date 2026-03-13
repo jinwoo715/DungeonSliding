@@ -50,8 +50,8 @@ namespace JW.DungeonSliding.GamePlay.Stats
             _currentHP = baseStat.HP;
             _currentMove = baseStat.Move;
 
-            _damageDealMultiplier = 1;
-            _damageTakeMultiplier = 1;
+            _damageDealMultiplier = 100;
+            _damageTakeMultiplier = 100;
 
             OnStatChanged?.Invoke(ECreatureStatType.CurrentHP);
             OnStatChanged?.Invoke(ECreatureStatType.MaxHp);
@@ -91,8 +91,6 @@ namespace JW.DungeonSliding.GamePlay.Stats
 
         public void ModifyStat(StatModifierContext modifierContext)
         {
-            Debug.Log($"{modifierContext.TargetStat}, {modifierContext.ModifyType}, {modifierContext.Value}");
-
             if (modifierContext.TargetStat == ECreatureStatType.CurrentHP)
             {
                 ModifyCurrentHp(modifierContext);
@@ -114,15 +112,22 @@ namespace JW.DungeonSliding.GamePlay.Stats
             {
                 if (_stats.TryGetValue(modifierContext.TargetStat, out StatValue value))
                 {
+                    int beforeValue = value.Final(this);
+
                     value.ModifiyStat(modifierContext);
+
+                    int afterValue = value.Final(this);
+                    int diffValue = afterValue - beforeValue;
 
                     if (modifierContext.TargetStat == ECreatureStatType.MaxHp)
                     {
+                        _currentHP += diffValue;
                         _currentHP = Mathf.Clamp(_currentHP, 0, Get(ECreatureStatType.MaxHp));
                         OnStatChanged?.Invoke(ECreatureStatType.CurrentHP);
                     }
                     else if (modifierContext.TargetStat == ECreatureStatType.MaxMoveCount)
                     {
+                        _currentMove += diffValue;
                         _currentMove = Mathf.Clamp(_currentMove, 0, Get(ECreatureStatType.MaxMoveCount));
                         OnStatChanged?.Invoke(ECreatureStatType.CurrentMoveCount);
                     }
@@ -181,8 +186,8 @@ namespace JW.DungeonSliding.GamePlay.Stats
             _currentHP = 0;
             _currentMove = 0;
 
-            _damageDealMultiplier = 1;
-            _damageTakeMultiplier = 1;
+            _damageDealMultiplier = 100;
+            _damageTakeMultiplier = 100;
         }
     }
 }

@@ -59,16 +59,17 @@ namespace JW.DungeonSliding
                 {
                     _effect.Apply();
                     _currentStack = 0;
+                    _currentResetTriggerThreshold = 0;
                 }
             }
 
             if (_data.IsResetEnabled == true)
             {
-                if (args.GameTrigger == _data.GameTriggerType || args.CreatureTrigger == _data.CreatureTriggerType)
+                if (args.GameTrigger == _data.ResetGameTrigger || args.CreatureTrigger == _data.ResetCreatureTrigger)
                 {
                     _currentResetTriggerThreshold++;
 
-                    if(_currentResetTriggerThreshold >= _data.ResetThreshold)
+                    if(_currentResetTriggerThreshold > _data.ResetThreshold)
                     {
                         ReleaseAbility();
                     }
@@ -81,6 +82,8 @@ namespace JW.DungeonSliding
 
         public void ReleaseAbility()
         {
+            _currentStack = 0;
+            _currentResetTriggerThreshold = 0;
             _effect.Reset();
         }
     }

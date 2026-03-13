@@ -40,6 +40,7 @@ namespace JW.DungeonSliding.GamePlay.Context
 
         private int _floorPerAct;
         private int _actCount;
+        private bool _isGameStart = false;
 
         public void Init(RewardManager reward, MapManager map,
             ICombatant player, EnemyManager enemyManager, BattleManager battleManager, 
@@ -90,6 +91,8 @@ namespace JW.DungeonSliding.GamePlay.Context
 
         public IEnumerator CoWaitStartStage()
         {
+            yield return null;
+
             yield return new WaitUntil(() => _gameModeController.GameMode == EGameModeType.Play);
             
             _gameModeController.EnterGameMode(EGameModeType.PrepareStage);
@@ -106,7 +109,6 @@ namespace JW.DungeonSliding.GamePlay.Context
 
             _gameModeController.ExitGameMode(EGameModeType.PrepareStage);
             GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTrigger.OnEnterRoom);
-
         }
         public void CheckGameOver()
         {

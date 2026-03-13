@@ -397,7 +397,6 @@ namespace JW.DungeonSliding
     public class CounterAbility : EnemyAbilityBase
     {
         IDamageable _damageable;
-        ICounterAttackable _counterAttackable;
 
         public CounterAbility(EnemyAbilityData data, IEnemyAbilityGetter getter, ICombatant owner, int section) : base(data, getter, owner, section) { }
         public override void Bind(IEnemyAbilityGetter bossAbilityGetter)
@@ -407,24 +406,10 @@ namespace JW.DungeonSliding
                 _damageable = damageable;
             }
 
-            if (_owner.TryGet<ICounterAttackable>(out var counter))
-            {
-                _counterAttackable = counter;
-            }
         }
 
         public override IEnumerator Execute(AbilityArgs args)
         {
-            if (_counterAttackable != null)
-            {
-                int chanceValue = UnityEngine.Random.Range(0, 101);
-
-                if (chanceValue <= _data.BaseP1)
-                {
-                    //_counterAttackable.RequestCounterAttack(_damageable.LastAttacker);
-                }
-            }
-
             yield return null;
         }
     }

@@ -1,4 +1,5 @@
 using JW.DungeonSliding.Core;
+using JW.DungeonSliding.GamePlay.Stats;
 using System;
 using UnityEngine;
 
@@ -18,6 +19,24 @@ namespace JW.DungeonSliding.GamePlay.Combat
         }
     }
 
+    public struct AttackPreparePayLoad
+    {
+        public ICombatant Target;
+
+        public AttackPreparePayLoad(ICombatant target)
+        {
+            Target = target;
+        }
+    }
+
+    public interface ICriticalSetter
+    {
+        public bool IsCritical { get; }
+        public float CriticalValue { get; }
+
+        public void AddCriticalValue(float value);
+        public void SetCritical(float value);
+    }
 
     public class CombatController
     {
@@ -28,9 +47,10 @@ namespace JW.DungeonSliding.GamePlay.Combat
         private DamageContext _receivedDamageContext;
         private DamageContext _sendDamageContext;
 
-        public event Action OnPrepareAttack;
-        public event Action OnPerformedAttack;
+        public event Action<AttackPreparePayLoad> OnPrepareAttack;
         public event Action<AttackResultPayload> OnHitted;
+        public event Action OnPerformedAttack;
+        public event Action OnBackAttacked;
 
         public bool IsCombated => _isAttacked || _isHitted;
         private bool _isAttacked = false;
@@ -43,7 +63,9 @@ namespace JW.DungeonSliding.GamePlay.Combat
         public void SetAttackPayload(ActPair payload)
         {
             LastTarget = payload.Target;
-            OnPrepareAttack?.Invoke();
+
+            AttackPreparePayLoad preparePayLoad = new AttackPreparePayLoad(payload.Target);
+            OnPrepareAttack?.Invoke(preparePayLoad);
         }
         public void ExcuteAttack(INextAttackEnhancer nextAttackEnhancer)
         {
@@ -57,33 +79,60 @@ namespace JW.DungeonSliding.GamePlay.Combat
             }
 
             OnPerformedAttack?.Invoke();
+
+            bool isBackAttack = DirectionUtility.IsBackAttack(_owner, LastTarget);
+
+            if (isBackAttack)
+                OnBackAttacked?.Invoke();
         }
 
         public void AddAttackStatus(EStatusEffectType status, int amount)
         {
             _sendDamageContext.AddStatus(status, amount);
         }
+
+        //TODO 데미지 계산 공식 수정
         public DamageContext CreateDamageContext(INextAttackEnhancer nextAttackEnhancer)
         {
             int damage = _owner.StatReadOnly.Get(ECreatureStatType.Damage);
 
             damage += nextAttackEnhancer.FinalEnhanceDamage;
 
+            float dealMultiplier = _owner.StatReadOnly.Get(ECreatureStatType.DamageDealtMultiplier) / (float)100;
+            damage = Mathf.RoundToInt(damage * dealMultiplier);
+
             return new DamageContext(_owner, damage, false);
         }
+
+        //TODO 피격 판정 수정
         public void TakeDamage(DamageContext damageContext)
         {
             _receivedDamageContext = damageContext;
             LastAttacker = _receivedDamageContext.Attacker;
 
-            bool isBackAttack = DamageCalculator.IsBackAttack(LastAttacker, _owner);
+            bool isBackAttack = DirectionUtility.IsBackAttack(LastAttacker, _owner);
+
+            float takeDealMultiplier = _owner.StatReadOnly.Get(ECreatureStatType.DamageTakeMultiplier) / (float)100;
             int finalDamage = CalculateFinalDamage(damageContext.Damage, isBackAttack);
 
-            _owner.StatModifier.ModifyStat(new Stats.StatModifierContext(ECreatureStatType.CurrentHP, EApplyStatType.Add, -finalDamage));
+            finalDamage = Mathf.RoundToInt(finalDamage * takeDealMultiplier);
+
+            _owner.StatModifier.ModifyStat(new StatModifierContext(ECreatureStatType.CurrentHP, EApplyStatType.Add, -finalDamage));
 
             CombatEventBus.Excuter.RaiseDamageEvent(new DamageEvent(LastAttacker, _owner, finalDamage, isBackAttack));
 
             OnHitted?.Invoke(new AttackResultPayload(damageContext.Attacker, finalDamage, damageContext.IsCounterAttack));
+
+            if(damageContext.Status.TryGetValue(EStatusEffectType.Execution, out int value))
+            {
+                int maxHP = _owner.StatReadOnly.Get(ECreatureStatType.MaxHp);
+                int remainHP = _owner.StatReadOnly.Get(ECreatureStatType.CurrentHP);
+
+                int remainRatio = Mathf.RoundToInt(((float)remainHP / maxHP) * 100);
+
+                if(remainRatio <= value)
+                    _owner.StatModifier.ModifyStat(new StatModifierContext(ECreatureStatType.CurrentHP, EApplyStatType.Add, -remainHP));
+            }
         }
         public int CalculateFinalDamage(int baseDamage, bool isBackAttack)
         {

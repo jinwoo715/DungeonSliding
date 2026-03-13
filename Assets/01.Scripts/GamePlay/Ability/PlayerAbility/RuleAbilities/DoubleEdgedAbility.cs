@@ -1,5 +1,6 @@
 using JW.DungeonSliding.GamePlay.Combat;
 using JW.DungeonSliding.GamePlay.Entities;
+using System.Collections;
 using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Ability
@@ -13,12 +14,10 @@ namespace JW.DungeonSliding.GamePlay.Ability
             
         }
 
-        public override void ExcuteAbility() 
+        public override IEnumerator Execute(AbilityArgs args)
         {
-            //_attackable.AddDamageDealtMultiplier(_data.P1 * 0.01f);
-            //_damageable.AddDamageTakenMultiplier(_data.P2 * 0.01f);
+            throw new System.NotImplementedException();
         }
-        public override void ProcTrigger(EGameEventTrigger triggerType) { }
 
         protected override void BindService()
         {

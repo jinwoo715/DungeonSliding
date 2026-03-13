@@ -33,11 +33,6 @@ namespace JW.DungeonSliding.GamePlay.Combat
         void ExcuteAttack(ActPair actPair);
     }
 
-    public interface ICounterAttackable
-    {
-        public void RequestCounterAttack(ICombatant target);
-    }
-
     public interface IBarrierable
     {
         public bool IsBarrierActive { get; }

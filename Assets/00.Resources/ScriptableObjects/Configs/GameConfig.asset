@@ -28,7 +28,7 @@ MonoBehaviour:
     _floorUpHpValue: 0
     _floorUpDMGValue: 0
   Ability:
-    _GainAbilityPerLevel: 1
+    _GainAbilityPerLevel: 3
     _nomalCardRatio: 0
     _rareCardRatio: 0
     _epicCardRatio: 0

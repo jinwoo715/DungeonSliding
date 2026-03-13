@@ -24,7 +24,6 @@ namespace JW.DungeonSliding.UI
 
         public void ShowTooltip(TooltipRequest tooltipContext)
         {
-            Debug.Log("Show Tooltip");
             _viewer.SetData(tooltipContext.IconSprite, tooltipContext.Name, tooltipContext.Description);
             _viewer.gameObject.SetActive(true);
 

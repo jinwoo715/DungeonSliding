@@ -1,4 +1,5 @@
 using System.Collections;
+using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Ability
 {
@@ -6,11 +7,9 @@ namespace JW.DungeonSliding.GamePlay.Ability
     {
         public readonly RuleAbilityData _data;
         private IAbilityContextService _context;
-        public EGameEventTrigger ProgTriggers => _data.TriggerType;
 
-        public EGameEventTrigger GameTrigger => throw new System.NotImplementedException();
-
-        public ECreatureTrigger CreatureTrigger => throw new System.NotImplementedException();
+        public EGameEventTrigger GameTrigger => _data.GameTrigger;
+        public ECreatureTrigger CreatureTrigger => _data.CreatureTrigger;
 
         public RuleAbilityBase(RuleAbilityData data, IAbilityContextService context)
         {
@@ -18,33 +17,30 @@ namespace JW.DungeonSliding.GamePlay.Ability
             _context = context;
 
             BindService();
+            InitData();
         }
-
+        public abstract IEnumerator Execute(AbilityArgs args);
         protected abstract void BindService();
-
-        public abstract void ExcuteAbility();
-        public abstract void ProcTrigger(EGameEventTrigger triggerType);
+        protected virtual void InitData() { }
         public void BindService<T>(ref T service) where T : class
         {
             if (_context.TryGet<T>(out var getService))
             {
                 service = getService;
             }
+            else
+            {
+                service = null;
+                Debug.LogError($"Not Found Type {typeof(T)}");
+            }
         }
-
-        public IEnumerator Execute()
-        {
-            throw new System.NotImplementedException();
-        }
-
         public void ReleaseAbility()
         {
-            throw new System.NotImplementedException();
         }
-
-        public IEnumerator Execute(AbilityArgs args)
+        public bool IsCheckChanceSuccess(float chance)
         {
-            throw new System.NotImplementedException();
+            int ranNum = UnityEngine.Random.Range(1, 101);
+            return chance >= ranNum;
         }
     }
 }

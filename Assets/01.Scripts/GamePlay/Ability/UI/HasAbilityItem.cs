@@ -23,7 +23,7 @@ namespace JW.DungeonSliding.UI
         {
             TooltipRequest request = new TooltipRequest();
             request.Name = _abilityData.Name;
-            request.Description = _abilityData.Description;
+            request.Description = AbilityTextFormatter.ConvertPlayerAbility(_abilityData);
             request.Anchor = TextAnchor.LowerLeft;
 
             ShowTooltipEvent?.Invoke(request);
@@ -31,7 +31,6 @@ namespace JW.DungeonSliding.UI
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            Debug.Log("On Pointer Up");
             CloseTooltipEvent?.Invoke();
         }
     }

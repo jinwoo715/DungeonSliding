@@ -98,7 +98,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
                 CreatureBaseStat baseStat = new CreatureBaseStat(data.BaseHP, data.BaseDamage, 100);
                 boss.InitData(baseStat);
                 boss.RegisterRequester(_requesterRegistry);
-                //boss.SetData(new EnemyData(), floor);
                 boss.Tile.SetPosition(tile);
 
                 boss.SetAbility(EnemyAbilityFactory.Instance.GetAbility(_enemyBossDataByUID["ENEMY_BOSS_EREBOS"].AbilityList, boss, 1));
@@ -120,7 +119,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             enemy.gameObject.SetActive(true);
             _enemyStatUIService.Attach(enemy.StatUITransform, enemy);
 
-            enemy.OnDeathEvent += () => { OnEnemyDeath(enemy); };
+            enemy.OnEnemyReturnEvent += OnEnemyDeath;
 
             return enemy;
         }
@@ -131,15 +130,11 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
             return enemy;
         }
-        public void ReturnEnemy(Enemy enemy)
-        {
-            enemy.OnDeathEvent -= () => { OnEnemyDeath(enemy); };
-            enemy.gameObject.SetActive(false);
-            _enemyPoolByUID.Push(enemy);
-        }
         private void OnEnemyDeath(Enemy enemy)
         {
             ReturnEnemy(enemy);
+
+            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTrigger.OnEnemyDeath);
 
             Tile tile = enemy.Tile.TilePosition;
 
@@ -148,11 +143,17 @@ namespace JW.DungeonSliding.GamePlay.Entities
             _enemyStatUIService.Detach(enemy);
             _board.UnRegisterEnemyTile(tile);
 
-            Debug.Log(_activeEnemyByTile.Count);
             if (_activeEnemyByTile.Count == 0)
             {
-                GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTrigger.OnClearStage);
+                Action clearEvent = () => GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTrigger.OnClearStage);
+                GameTriggerEventBus.Instance.EnqueueInstanceTriggerEvent(EGameEventTrigger.OnTurnEnd, clearEvent);
             }
+        }
+        public void ReturnEnemy(Enemy enemy)
+        {
+            enemy.OnEnemyReturnEvent -= OnEnemyDeath;
+            enemy.gameObject.SetActive(false);
+            _enemyPoolByUID.Push(enemy);
         }
 
         //Interface

@@ -30,7 +30,8 @@ namespace JW.DungeonSliding
     {
         None,
         KnockBack,
-        Blind
+        Blind,
+        Execution,
     }
 
     public enum EEffectObjectType
@@ -89,6 +90,8 @@ namespace JW.DungeonSliding
         OnTurnEnd           = 1 << 6,
 
         OnClearStage        = 1 << 7,
+
+        OnGameStart         = 1 << 10,
     }
 
     public enum EAbilityEffectKind
