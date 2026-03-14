@@ -12,7 +12,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
     public class Player : Creature, IMoveable, IRewardReceiver
     {
         [SerializeField] private MoveController _moveController;
-        
+        [SerializeField] private BarrierObject _barrier;
+
         private ECharacterStateType _characterState = ECharacterStateType.Idle;
         public ESlideResultType SlideResultType { get; private set; }
 
@@ -53,6 +54,16 @@ namespace JW.DungeonSliding.GamePlay.Entities
             _moveController.OnSlideBlocked += HandleSlideBlocked;
             _moveController.OnPushedEnd += HandleKnockBackEnd;
             _moveController.OnMoveEnd += () => OnMoveEnd?.Invoke();
+            StatusModifier.OnAppliedStatus += (status) => 
+            {
+                if (status == ECreatureStatus.Barrier)
+                    _barrier.ExcuteBarrier();                
+            };
+            StatusModifier.OnReleasedStatus += (status) =>
+            {
+                if (status == ECreatureStatus.Barrier)
+                    _barrier.BreakBarrier();
+            };
         }
         public void AddReward(RewardData rewardData)
         {

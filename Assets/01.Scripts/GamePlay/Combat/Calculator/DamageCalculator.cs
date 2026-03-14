@@ -43,5 +43,21 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
             return (attackDir - targetDir) == 2;
         }
+        public static EDirectionType ReverseDirection(EDirectionType currentDir)
+        {
+            switch (currentDir)
+            {
+                case EDirectionType.Up:
+                    return EDirectionType.Down;
+                case EDirectionType.Right:
+                    return EDirectionType.Left;
+                case EDirectionType.Down:
+                    return EDirectionType.Up;
+                case EDirectionType.Left:
+                    return EDirectionType.Right;
+                default:
+                    return EDirectionType.None;
+            }
+        }
     }
 }

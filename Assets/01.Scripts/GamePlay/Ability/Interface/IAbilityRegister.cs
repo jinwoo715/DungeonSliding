@@ -10,4 +10,8 @@ namespace JW.DungeonSliding.GamePlay.Ability
         public void RegisterAbility(IAbility ability);
         public void RegisterAutoAllAbility(List<IAbility> abilities);
     }
+    public interface IAbilityPayloadSender
+    {
+        public void SendPayload<T>(T payload);
+    }
 }

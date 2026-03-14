@@ -34,9 +34,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
                 Debug.LogError($"Not Found Type {typeof(T)}");
             }
         }
-        public void ReleaseAbility()
-        {
-        }
+        public virtual void ReleaseAbility() { }
         public bool IsCheckChanceSuccess(float chance)
         {
             int ranNum = UnityEngine.Random.Range(1, 101);

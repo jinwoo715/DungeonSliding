@@ -18,7 +18,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
         }
     }
 
-    public class AbilityExecuter : MonoBehaviour, IAbilityExcuter, IAbilityRegister
+    public class AbilityExecuter : MonoBehaviour, IAbilityExcuter, IAbilityRegister, IAbilityPayloadSender
     {
         private Dictionary<EGameEventTrigger, List<IAbility>> _gameTriggerAbilities = new();
         private Dictionary<ECreatureTrigger, List<IAbility>> _creatureTriggerAbilities = new();
@@ -139,6 +139,21 @@ namespace JW.DungeonSliding.GamePlay.Ability
         }
         #endregion
 
+        public void SendPayload<T>(T payload)
+        {
+            foreach (var gameAbility in _gameTriggerAbilities)
+            {
+                if (gameAbility.Value is IAbilityPayloadReceiver<T> receiver)
+                    receiver.ReceivePayload(payload);
+            }
+
+            foreach (var creatureAbility in _creatureTriggerAbilities)
+            {
+                if (creatureAbility.Value is IAbilityPayloadReceiver<T> receiver)
+                    receiver.ReceivePayload(payload);
+            }
+        }
+
         public void Clear()
         {
             _creatureTriggerAbilities.Clear();
@@ -168,6 +183,6 @@ namespace JW.DungeonSliding.GamePlay.Ability
             _creatureTriggerAbilities.Clear();
         }
 
-        
+
     }
 }

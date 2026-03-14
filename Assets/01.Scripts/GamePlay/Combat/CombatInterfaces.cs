@@ -50,6 +50,8 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
     public interface IStatusModifier
     {
+        public event Action<ECreatureStatus> OnAppliedStatus;
+        public event Action<ECreatureStatus> OnReleasedStatus;
         void ApplyStatus(ECreatureStatus status, int durationTurnCount);
         void RemoveStatus(ECreatureStatus status);
         void TimePassStatueUpdate();

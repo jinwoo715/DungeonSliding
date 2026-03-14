@@ -1,3 +1,4 @@
+using JW.DungeonSliding.GamePlay.Entities;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -49,10 +50,12 @@ namespace JW.DungeonSliding.GamePlay.Combat
         public List<ICombatant> AllEnemyCombatants => _enemyCombatProvider.GetAllActiveCombatant();
         public bool GetCombatant(Tile tile, ECreatureType targetType, out ICombatant combatant)
         {
+            combatant = default;
+
             switch (targetType)
             {
                 case ECreatureType.Player:
-                    if (_playerCombatant.Tile.TilePosition == tile)
+                    if (_playerCombatant.Tile.TilePosition == tile && !_playerCombatant.StatusReadOnly.HasStatus(ECreatureStatus.Hide))
                     {
                         combatant = _playerCombatant;
                         return true;
@@ -61,8 +64,11 @@ namespace JW.DungeonSliding.GamePlay.Combat
                 case ECreatureType.Enemy:
                     if (_enemyCombatProvider.TryGetCombatant(tile, out ICombatant combat))
                     {
-                        combatant = combat;
-                        return true;
+                        if (!combat.StatusReadOnly.HasStatus(ECreatureStatus.Hide))
+                        {
+                            combatant = combat;
+                            return true;
+                        }
                     }
                     break;
             }

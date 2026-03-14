@@ -18,7 +18,6 @@ namespace JW.DungeonSliding.GamePlay.Combat
             IsCounterAttack = isCounterAttacked;
         }
     }
-
     public struct AttackPreparePayLoad
     {
         public ICombatant Target;
@@ -28,12 +27,19 @@ namespace JW.DungeonSliding.GamePlay.Combat
             Target = target;
         }
     }
+    public struct BattleResultPayLoad
+    {
+        public bool IsCombatted;
+        public BattleResultPayLoad(bool isCombatted)
+        {
+            IsCombatted = isCombatted;
+        }
+    }
 
     public interface ICriticalSetter
     {
         public bool IsCritical { get; }
         public float CriticalValue { get; }
-
         public void AddCriticalValue(float value);
         public void SetCritical(float value);
     }

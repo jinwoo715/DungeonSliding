@@ -30,6 +30,10 @@ namespace JW.DungeonSliding.GamePlay.Stats
         private int _damageDealMultiplier;
         private int _damageTakeMultiplier;
 
+        private int _criticalMultiple = 150;
+        private float _hpRecoveryMultiple = 1;
+        private float _moveRecoveryMultiple = 1;
+
         public event Action<ECreatureStatType> OnStatChanged;
        
         public CreatureStat()
@@ -66,6 +70,7 @@ namespace JW.DungeonSliding.GamePlay.Stats
             if (stat == ECreatureStatType.CurrentMoveCount) return _currentMove;
             if (stat == ECreatureStatType.DamageTakeMultiplier) return _damageTakeMultiplier;
             if (stat == ECreatureStatType.DamageDealtMultiplier) return _damageDealMultiplier;
+            if (stat == ECreatureStatType.CriticalMultiplier) return _criticalMultiple;
             if (_stats.TryGetValue(stat, out StatValue value))
             {
                 // 1. 이미 계산 중인 스탯을 또 물어본다면? (순환 참조 발견!)
@@ -91,22 +96,35 @@ namespace JW.DungeonSliding.GamePlay.Stats
 
         public void ModifyStat(StatModifierContext modifierContext)
         {
-            if (modifierContext.TargetStat == ECreatureStatType.CurrentHP)
+            ECreatureStatType type = modifierContext.TargetStat;
+
+            if (type == ECreatureStatType.CurrentHP)
             {
                 ModifyCurrentHp(modifierContext);
             }
-            else if (modifierContext.TargetStat == ECreatureStatType.CurrentMoveCount)
+            else if (type == ECreatureStatType.CurrentMoveCount)
             {
                 ModifyCurrentMoveCount(modifierContext);
             }
-            else if (modifierContext.TargetStat == ECreatureStatType.DamageTakeMultiplier)
+            else if (type == ECreatureStatType.DamageTakeMultiplier)
             {
                 _damageTakeMultiplier += Mathf.RoundToInt(modifierContext.Value);
-
             }
-            else if (modifierContext.TargetStat == ECreatureStatType.DamageDealtMultiplier)
+            else if (type == ECreatureStatType.DamageDealtMultiplier)
             {
                 _damageDealMultiplier += Mathf.RoundToInt(modifierContext.Value);
+            }
+            else if(type == ECreatureStatType.HPRecoveryMultiplier)
+            {
+                _hpRecoveryMultiple += modifierContext.Value;
+            }
+            else if(type == ECreatureStatType.MoveRecoveryMultiplier)
+            {
+                _moveRecoveryMultiple += modifierContext.Value;
+            }
+            else if(type == ECreatureStatType.CriticalMultiplier)
+            {
+                _criticalMultiple += Mathf.RoundToInt(modifierContext.Value);
             }
             else
             {
@@ -163,14 +181,20 @@ namespace JW.DungeonSliding.GamePlay.Stats
         }
         private void ModifyCurrentHp(StatModifierContext modifierContext)
         {
-            _currentHP += CalculateFixedAddValue(modifierContext);
+            int fixedValue = CalculateFixedAddValue(modifierContext);
+            int finalValue = Mathf.RoundToInt(_hpRecoveryMultiple * fixedValue); 
+
+            _currentHP += finalValue;
 
             int maxHp = Get(ECreatureStatType.MaxHp);
             _currentHP = Mathf.Clamp(_currentHP, 0, maxHp);
         }
         private void ModifyCurrentMoveCount(StatModifierContext modifierContext)
         {
-            _currentMove += CalculateFixedAddValue(modifierContext);
+            int fixedValue = CalculateFixedAddValue(modifierContext);
+            int finalValue = Mathf.RoundToInt(_moveRecoveryMultiple * fixedValue);
+
+            _currentMove += finalValue;
 
             int maxMove = Get(ECreatureStatType.MaxMoveCount);
             _currentMove = Mathf.Clamp(_currentMove, 0, maxMove);

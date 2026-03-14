@@ -1,6 +1,8 @@
 using JW.DungeonSliding.GamePlay.Combat;
 using JW.DungeonSliding.GamePlay.Stats;
+using JW.DungeonSliding.Map;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Ability
@@ -494,6 +496,8 @@ namespace JW.DungeonSliding.GamePlay.Ability
             BindService(ref _nextAttackEnhancer);
         }
     }
+
+    //급소 노리기
     public class VitalStrikeAbility : RuleAbilityBase, IAbilityPayloadReceiver<AttackPreparePayLoad>
     {
         IStatReadOnly _targetStat;
@@ -526,4 +530,166 @@ namespace JW.DungeonSliding.GamePlay.Ability
             BindService(ref _nextAttackEnhancer);
         }
     }
+
+    //속박 일격
+    public class ShackleStrikeAbility : RuleAbilityBase, IAbilityPayloadReceiver<AttackPreparePayLoad>
+    {
+        IAttackable _attackable;
+        HashSet<ICombatant> _shackedList = new HashSet<ICombatant>();
+
+        ICombatant _attackTarget;
+
+        public ShackleStrikeAbility(RuleAbilityData data, IAbilityContextService host) : base(data, host) 
+        {
+            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameEventTrigger.OnClearStage, ReleaseAbility);
+        }
+
+        public override IEnumerator Execute(AbilityArgs args)
+        {
+            if (IsApplyShackle())
+            {
+                _shackedList.Add(_attackTarget);
+                _attackTarget = null;
+            }
+
+            yield break;
+        }
+
+        public void ReceivePayload(AttackPreparePayLoad payload)
+        {
+            _attackTarget = payload.Target;
+        }
+
+        private bool IsApplyShackle()
+        {
+            if (_attackTarget == null) return false;
+
+            return !_shackedList.Contains(_attackTarget);
+        }
+
+        public override void ReleaseAbility()
+        {
+            _shackedList.Clear();
+        }
+
+        protected override void BindService()
+        {
+            BindService(ref _attackable);
+        }
+    }
+
+    public class RerollPlusAbility : RuleAbilityBase
+    {
+        IRerollService _rerollService;
+        public RerollPlusAbility(RuleAbilityData data, IAbilityContextService host) : base(data, host) { }
+
+        public override IEnumerator Execute(AbilityArgs args)
+        {
+            _rerollService.AddReroll(1);
+            yield break;
+        }
+
+        protected override void BindService()
+        {
+            BindService(ref _rerollService);
+        }
+    }
+    public class GetExtraAbility : RuleAbilityBase
+    {
+        IAbilityRandomGetter _abilityRandomGetter;
+
+        public GetExtraAbility(RuleAbilityData data, IAbilityContextService host) : base(data, host) { }
+
+        public override IEnumerator Execute(AbilityArgs args)
+        {
+            _abilityRandomGetter.GetRandomAbility(2);
+
+            yield break;
+        }
+
+        protected override void BindService()
+        {
+            BindService(ref _abilityRandomGetter);
+        }
+    }
+
+    public class SpellShieldAbility : RuleAbilityBase
+    {
+        IStatusModifier _statusModifier;
+        public SpellShieldAbility(RuleAbilityData data, IAbilityContextService host) : base(data, host) { }
+
+        public override IEnumerator Execute(AbilityArgs args)
+        {
+            _statusModifier.ApplyStatus(Entities.ECreatureStatus.Barrier, 1);
+
+            yield break;
+        }
+
+        protected override void BindService()
+        {
+            BindService(ref _statusModifier);
+        }
+    }
+
+    public class WallBounceAbility : RuleAbilityBase
+    {
+        public IRotateObject _rotate;
+        public IMoveable _moveable;
+
+        public WallBounceAbility(RuleAbilityData data, IAbilityContextService host) : base(data, host) { }
+
+        public override IEnumerator Execute(AbilityArgs args)
+        {
+            EDirectionType backDir = DirectionUtility.ReverseDirection(_rotate.Direction);
+            _moveable.KnockBack(backDir);
+
+            yield break;
+        }
+
+        protected override void BindService()
+        {
+            BindService(ref _moveable);
+            BindService(ref _rotate);
+        }
+    }
+
+    //그림자 숨기
+    public class HideShadowAbility : RuleAbilityBase, IAbilityPayloadReceiver<BattleResultPayLoad>
+    {
+        IStatusModifier _statusModifier;
+        int _nonBattleCount = 0;
+
+        bool _isBattleResult = false;
+
+        public HideShadowAbility(RuleAbilityData data, IAbilityContextService host) : base(data, host) { }
+
+        public override IEnumerator Execute(AbilityArgs args)
+        {
+            if (_isBattleResult)
+            {
+                _nonBattleCount++;
+                if (_nonBattleCount >= _data.P1)
+                {
+                    _statusModifier.ApplyStatus(Entities.ECreatureStatus.Hide,1);
+                }
+            }
+            else
+            {
+                _nonBattleCount = 0;
+            }
+
+            yield break;
+        }
+
+        public void ReceivePayload(BattleResultPayLoad payload)
+        {
+            _isBattleResult = payload.IsCombatted;
+        }
+
+        protected override void BindService()
+        {
+            BindService(ref _statusModifier);
+        }
+    }
+
 }

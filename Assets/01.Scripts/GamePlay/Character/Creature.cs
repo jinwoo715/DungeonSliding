@@ -184,6 +184,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
         #region Sequence Method
         public virtual void OnTurnEnd()
         {
+            BattleResultPayLoad turnResultPayLoad = new BattleResultPayLoad(_combatController.IsCombated);
+
             _status.TimePassStatueUpdate();
             _combatController.OnCombatEnd();
             CheckMoveOut();

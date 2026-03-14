@@ -1,5 +1,6 @@
 using JW.DungeonSliding.GamePlay.Combat;
 using JW.DungeonSliding.GamePlay.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -11,11 +12,13 @@ namespace JW.DungeonSliding.GamePlay.Statues
         private ECreatureStatus _statusFlags;
         private Dictionary<ECreatureStatus, int> _statusDurations = new();
 
+        public event Action<ECreatureStatus> OnAppliedStatus;
+        public event Action<ECreatureStatus> OnReleasedStatus;
+
         public bool HasStatus(ECreatureStatus status)
         {
             return status != ECreatureStatus.None && (_statusFlags & status) == status;
         }
-
         public void ApplyStatus(ECreatureStatus status, int durationTurnCount)
         {
             _statusFlags |= status;
@@ -28,6 +31,8 @@ namespace JW.DungeonSliding.GamePlay.Statues
             {
                 _statusDurations.Add(status, durationTurnCount);
             }
+
+            OnAppliedStatus?.Invoke(status);
         }
         public void RemoveStatus(ECreatureStatus status)
         {
@@ -37,8 +42,9 @@ namespace JW.DungeonSliding.GamePlay.Statues
             {
                 _statusDurations.Remove(status);
             }
-        }
 
+            OnReleasedStatus?.Invoke(status);
+        }
         public void TimePassStatueUpdate()
         {
             var keys = _statusDurations.Keys.ToList();
@@ -56,13 +62,10 @@ namespace JW.DungeonSliding.GamePlay.Statues
                 }
             }
         }
-
         public void Reset()
         {
             _statusDurations.Clear();
             _statusFlags = ECreatureStatus.None;
         }
-
-
     }
 }
