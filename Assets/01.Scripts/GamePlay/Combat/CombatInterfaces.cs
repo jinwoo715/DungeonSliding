@@ -33,13 +33,6 @@ namespace JW.DungeonSliding.GamePlay.Combat
         void ExcuteAttack(ActPair actPair);
     }
 
-    public interface IBarrierable
-    {
-        public bool IsBarrierActive { get; }
-        public void GainBarrier();
-        public void ReleaseBarrier();
-    }
-    
     public enum ENextAttackType
     {
         None,
@@ -84,8 +77,9 @@ namespace JW.DungeonSliding.GamePlay.Combat
         IRotateObject Rotate { get; }
 
         IAbilityExcuter Ability {get;}
-
         INextAttackEnhancer NextAttackEnhancer { get; }
+
+        IAttackRequester AttackRequester { get; }
     }
 
     public interface ICombatProvider

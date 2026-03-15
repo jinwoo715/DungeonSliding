@@ -10,11 +10,10 @@ namespace JW.DungeonSliding
     {
         private StatAbilityData _data;
         private IAbilityContextService _context;
+        private IStatAbilityEffect _effect;
 
         private int _currentStack = 0;
         private int _currentResetTriggerThreshold = 0;
-
-        private IStatAbilityEffect _effect;
 
         public EGameEventTrigger GameTrigger => _data.GameTriggerType | _data.ResetGameTrigger;
         public ECreatureTrigger CreatureTrigger => _data.CreatureTriggerType | _data.ResetCreatureTrigger;
@@ -48,7 +47,6 @@ namespace JW.DungeonSliding
                 }
             }
         }
-
         public IEnumerator Execute(AbilityArgs args)
         {
             if(args.GameTrigger == _data.GameTriggerType || args.CreatureTrigger == _data.CreatureTriggerType)
@@ -79,7 +77,6 @@ namespace JW.DungeonSliding
 
             yield return null;
         }
-
         public void ReleaseAbility()
         {
             _currentStack = 0;

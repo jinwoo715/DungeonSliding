@@ -46,21 +46,37 @@ namespace JW.DungeonSliding.GamePlay.Ability
         }
         private IAbility CreateAbility(EnemyAbilityData data, ICombatant host, int section)
         {
-            switch (data.EnemyAbilityType)
+            Type type = Type.GetType(data.EnemyAbilityType.ToString());
+
+            if (type != null)
             {
-                case EEnemyAbilityType.HeavyGravity: return new HeavyGravityAbility(data, _getter, host, section);
-                case EEnemyAbilityType.AutoRotate: return new AutoRotateAbility(data, _getter, host, section);
-                case EEnemyAbilityType.MoveBanToDirection: return new FacingMoveBanAbility(data, _getter, host, section);
-                case EEnemyAbilityType.CopyPlayerStat: return new CopyAbility(data, _getter, host, section);
-                case EEnemyAbilityType.Blind: return new BlindAbility(data, _getter, host, section);
-                case EEnemyAbilityType.EnhanceAbility: return new EnemyEnhanceAbility(data, _getter, host, section);
-                case EEnemyAbilityType.Exaltation: return new ExaltationAbility(data, _getter, host, section);
-                case EEnemyAbilityType.CommandRotate: return new CommandRotateAbility(data, _getter, host, section);
-                case EEnemyAbilityType.CounterAbility: return new CounterAbility(data, _getter, host, section);
-                case EEnemyAbilityType.DefenceFrontAttack: return new DefenceFrontAttackAbility(data, _getter, host, section);
-                case EEnemyAbilityType.AutoRotateToPlayer: return new RotateToPlayerAbility(data, _getter, host, section);
-                default: return null;
+                // 생성자 호출 (매개변수가 있는 경우 포함)
+                object[] args = new object[] { data, _getter };
+
+                return (IAbility)Activator.CreateInstance(type, args);
             }
+            else
+            {
+                Debug.LogError("Not Exist Ability");
+                return null;
+            }
+
+
+            //switch (data.EnemyAbilityType)
+            //{
+            //    case EEnemyAbilityType.HeavyGravity: return new HeavyGravityAbility(data, _getter, host, section);
+            //    case EEnemyAbilityType.AutoRotate: return new AutoRotateAbility(data, _getter, host, section);
+            //    case EEnemyAbilityType.MoveBanToDirection: return new FacingMoveBanAbility(data, _getter, host, section);
+            //    case EEnemyAbilityType.CopyPlayerStat: return new CopyAbility(data, _getter, host, section);
+            //    case EEnemyAbilityType.Blind: return new BlindAbility(data, _getter, host, section);
+            //    case EEnemyAbilityType.EnhanceAbility: return new EnemyEnhanceAbility(data, _getter, host, section);
+            //    case EEnemyAbilityType.Exaltation: return new ExaltationAbility(data, _getter, host, section);
+            //    case EEnemyAbilityType.CommandRotate: return new CommandRotateAbility(data, _getter, host, section);
+            //    case EEnemyAbilityType.CounterAbility: return new CounterAbility(data, _getter, host, section);
+            //    case EEnemyAbilityType.DefenceFrontAttack: return new DefenceFrontAttackAbility(data, _getter, host, section);
+            //    case EEnemyAbilityType.AutoRotateToPlayer: return new RotateToPlayerAbility(data, _getter, host, section);
+            //    default: return null;
+            //}
         }
     }
 }

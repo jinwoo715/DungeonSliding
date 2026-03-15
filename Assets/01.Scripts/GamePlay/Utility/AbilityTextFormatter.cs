@@ -42,10 +42,17 @@ namespace JW.DungeonSliding
         public static string ConvertRuleAbilityDescription(RuleAbilityData ra)
         {
             StringBuilder sb = new StringBuilder(ra.Description);
-            
+            var convertList = new Dictionary<string, string>();
+
+            convertList.Add("{P1}", ra.P1.ToString());
+            convertList.Add("{P2}", ra.P2.ToString());
+
+            foreach (var replaceData in convertList)
+            {
+                sb.Replace(replaceData.Key, replaceData.Value);
+            }
+
             return sb.ToString();
-
-
         }
         public static string ConvertEnemyAbilityDescription(StatAbilityData sa)
         {

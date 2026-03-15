@@ -19,9 +19,10 @@ namespace JW.DungeonSliding.GamePlay.Ability
             BindService();
             InitData();
         }
-        public abstract IEnumerator Execute(AbilityArgs args);
-        protected abstract void BindService();
         protected virtual void InitData() { }
+        public abstract IEnumerator Execute(AbilityArgs args);
+        public virtual void ReleaseAbility() { }
+        protected abstract void BindService();
         public void BindService<T>(ref T service) where T : class
         {
             if (_context.TryGet<T>(out var getService))
@@ -33,12 +34,6 @@ namespace JW.DungeonSliding.GamePlay.Ability
                 service = null;
                 Debug.LogError($"Not Found Type {typeof(T)}");
             }
-        }
-        public virtual void ReleaseAbility() { }
-        public bool IsCheckChanceSuccess(float chance)
-        {
-            int ranNum = UnityEngine.Random.Range(1, 101);
-            return chance >= ranNum;
         }
     }
 }

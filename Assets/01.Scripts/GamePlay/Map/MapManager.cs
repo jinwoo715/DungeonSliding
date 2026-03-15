@@ -172,40 +172,4 @@ namespace JW.DungeonSliding.Map
         }
     }
 
-    public class GridUtility
-    {
-        public static EDirectionType GetDirFromTileToTile(Tile baseTile, Tile targetTile)
-        {
-            float xDistance = targetTile.X - baseTile.X;
-            float zDistance = targetTile.Z - baseTile.Z;
-
-            if (Mathf.Abs(xDistance) >= Mathf.Abs(zDistance))
-            {
-                if (xDistance >= 0) return EDirectionType.Right;
-                else return EDirectionType.Left;
-            }
-            else
-            {
-                if (zDistance >= 0) return EDirectionType.Up;
-                else return EDirectionType.Down;
-            }
-        }
-
-        public static EDirectionType GetReverseDirection(EDirectionType baseDirection)
-        {
-            switch (baseDirection)
-            {
-                case EDirectionType.Up:
-                    return EDirectionType.Down;
-                case EDirectionType.Right:
-                    return EDirectionType.Left;
-                case EDirectionType.Down:
-                    return EDirectionType.Up;
-                case EDirectionType.Left:
-                    return EDirectionType.Right;
-                default:
-                    return EDirectionType.None;
-            }
-        }
-    }
 }

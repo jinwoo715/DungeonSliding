@@ -92,8 +92,6 @@ namespace JW.DungeonSliding.GamePlay.Stats
             return 0;
         }
 
-        //TODO 메서드 나눠야함
-
         public void ModifyStat(StatModifierContext modifierContext)
         {
             ECreatureStatType type = modifierContext.TargetStat;

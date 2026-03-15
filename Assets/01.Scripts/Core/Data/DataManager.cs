@@ -27,11 +27,8 @@ namespace JW.DungeonSliding.Core.Data
             string rule = GameManager.Resource.GetTextData(ConstDataKey.RULE_ABILITY_DATA);
             string stat = GameManager.Resource.GetTextData(ConstDataKey.STAT_ABILITY_DATA);
 
-            //Abilities.AddRange(JsonConvert.DeserializeObject<List<RuleAbilityData>>(rule, settings));
-
-            var datas = JsonConvert.DeserializeObject<List<StatAbilityData>>(stat, settings);
-
-            Abilities.AddRange(JsonConvert.DeserializeObject<List<StatAbilityData>>(stat, settings));
+            Abilities.AddRange(JsonConvert.DeserializeObject<List<RuleAbilityData>>(rule, settings));
+            //Abilities.AddRange(JsonConvert.DeserializeObject<List<StatAbilityData>>(stat, settings));
 
             EnemyAbilityDatas = new List<EnemyAbilityData>();
             string enemyAbility = GameManager.Resource.GetTextData(ConstDataKey.ENEMY_ABILITY_DATA);

@@ -35,6 +35,16 @@ namespace JW.DungeonSliding.GamePlay.Combat
             IsCombatted = isCombatted;
         }
     }
+    public struct TakeAttackPayLoad
+    {
+        public readonly ICombatant Attacker;
+        public readonly int Damage;
+        public TakeAttackPayLoad(ICombatant attacker, int damage)
+        {
+            Attacker = attacker;
+            Damage = damage;
+        }
+    }
 
     public interface ICriticalSetter
     {
@@ -55,6 +65,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
         public event Action<AttackPreparePayLoad> OnPrepareAttack;
         public event Action<AttackResultPayload> OnHitted;
+        public event Action<TakeAttackPayLoad> OnBeforeHit;
         public event Action OnPerformedAttack;
         public event Action OnBackAttacked;
 
@@ -105,6 +116,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
             damage += nextAttackEnhancer.FinalEnhanceDamage;
 
             float dealMultiplier = _owner.StatReadOnly.Get(ECreatureStatType.DamageDealtMultiplier) / (float)100;
+
             damage = Mathf.RoundToInt(damage * dealMultiplier);
 
             return new DamageContext(_owner, damage, false);
@@ -115,6 +127,14 @@ namespace JW.DungeonSliding.GamePlay.Combat
         {
             _receivedDamageContext = damageContext;
             LastAttacker = _receivedDamageContext.Attacker;
+
+            OnBeforeHit?.Invoke(new TakeAttackPayLoad(damageContext.Attacker, damageContext.Damage));
+
+            if (_owner.StatusReadOnly.HasStatus(Entities.ECreatureStatus.Barrier))
+            {
+                _owner.StatusModifier.RemoveStatus(Entities.ECreatureStatus.Barrier);
+                return;
+            }
 
             bool isBackAttack = DirectionUtility.IsBackAttack(LastAttacker, _owner);
 
@@ -149,8 +169,10 @@ namespace JW.DungeonSliding.GamePlay.Combat
                 float multiplier = GameManager.Config.Combat.BackAttackDMGMultiple;
                 damage = DamageCalculator.CalculateBackAttackDamage(baseDamage, multiplier);
             }
-            
-            damage = damage * _owner.StatReadOnly.Get(ECreatureStatType.DamageTakeMultiplier);
+
+            float takeMultiplier = _owner.StatReadOnly.Get(ECreatureStatType.DamageTakeMultiplier) / (float)100;
+
+            damage = Mathf.RoundToInt(damage * takeMultiplier);
             return damage;
         }
 

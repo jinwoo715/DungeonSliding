@@ -29,7 +29,6 @@ namespace JW.DungeonSliding.GamePlay.Ability
         #region Excute
         public void ExecuteCreatureTrigger(ECreatureTrigger trigger)
         {
-            
             if (_creatureTriggerAbilities.TryGetValue(trigger, out var abilities))
             {
                 AbilityArgs args = new AbilityArgs(EGameEventTrigger.None, trigger);

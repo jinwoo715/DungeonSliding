@@ -8,7 +8,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
     {
         public EGameEventTrigger GameTrigger;
         public ECreatureTrigger CreatureTrigger;
-        public ERuleAbilityType RuleType;
+        public string AbilityName;
         public float P1;
         public float P2;
         public string Notes;

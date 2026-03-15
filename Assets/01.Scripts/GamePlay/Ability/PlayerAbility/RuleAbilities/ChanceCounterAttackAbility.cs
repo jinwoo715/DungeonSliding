@@ -18,7 +18,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
         {
             if (_payload.IsCounterAttack) yield break;
 
-            if(IsCheckChanceSuccess(_data.P1))
+            if(Chance.IsChanceSuccess(_data.P1))
             {
                 _attackRequester.RequestCounterAttack(_payload.Attacker);
             }
@@ -43,7 +43,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         public override IEnumerator Execute(AbilityArgs args)
         {
-            if (IsCheckChanceSuccess(_data.P1))
+            if (Chance.IsChanceSuccess(_data.P1))
             {
                 _nextAttackEnhancer.AddNextAttackCount((Mathf.RoundToInt(_data.P2)));
             }
@@ -80,9 +80,8 @@ namespace JW.DungeonSliding.GamePlay.Ability
     public class SurrondEnemyAddDamageAbility : RuleAbilityBase
     {
         ICombatantSensor _combatantSensor;
-        IStatModifier _statModifier;
+        INextAttackEnhancer _nextAttackEnhancer;
         IReadOnlyTilePosition _tile;
-        int value = 0;
 
         public SurrondEnemyAddDamageAbility(RuleAbilityData data, IAbilityContextService host) : base(data, host) { }
 
@@ -91,15 +90,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
             int enemyCount = _combatantSensor.GetNearEnemyCount(_tile.TilePosition);
             int addDamage = enemyCount * (Mathf.RoundToInt(_data.P1));
 
-            StatModifierContext context = new StatModifierContext(ECreatureStatType.Damage, EApplyStatType.Add, -value);
-
-            _statModifier.ModifyStat(context);
-
-            value = addDamage;
-
-            context.SetValue(addDamage);
-
-            _statModifier.ModifyStat(context);
+            _nextAttackEnhancer.AddNextAttackDamage(addDamage);
 
             yield break;
         }
@@ -107,7 +98,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
         protected override void BindService()
         {
             BindService(ref _combatantSensor);
-            BindService(ref _statModifier);
+            BindService(ref _nextAttackEnhancer);
         }
     }
     public class GlassCannonAbility : RuleAbilityBase
@@ -138,21 +129,18 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         public override IEnumerator Execute(AbilityArgs args)
         {
-            if (_isInit)
-            {
-                _statModifier.ModifyStat(new StatModifierContext(ECreatureStatType.Damage, EApplyStatType.Multiple, _data.P1));
-                _isInit = true;
-            }
-            else
-            {
-                if (_remainValue >= _data.P1)
-                    yield break;
+            if (_remainValue >= _data.P1)
+                yield break;
 
-                _remainValue += _data.P2;
-                _statModifier.ModifyStat(new StatModifierContext(ECreatureStatType.Damage, EApplyStatType.Multiple, -_data.P2));
-            }
+            _remainValue += _data.P2;
+            _statModifier.ModifyStat(new StatModifierContext(ECreatureStatType.Damage, EApplyStatType.Multiple, -_data.P2));
 
             yield break;
+        }
+
+        protected override void InitData()
+        {
+            _statModifier.ModifyStat(new StatModifierContext(ECreatureStatType.Damage, EApplyStatType.Multiple, _data.P1));
         }
 
         protected override void BindService()
@@ -362,8 +350,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
     {
         ICombatantSensor _sensor;
         ITileObject _ownerPosition;
-        IStatModifier _statModifier;
-        float value = 0;
+        INextAttackEnhancer _nextAttackEnhancer;
         
         public IsolationAbility(RuleAbilityData data, IAbilityContextService host) : base(data, host) { }
 
@@ -371,16 +358,9 @@ namespace JW.DungeonSliding.GamePlay.Ability
         {
             int nearEnemyCount = _sensor.GetNearEnemyCount(_ownerPosition.TilePosition);
 
-            _statModifier.ModifyStat(new StatModifierContext(ECreatureStatType.Damage, EApplyStatType.Multiple, -value));
-
             if(nearEnemyCount == 1)
             {
-                value = _data.P1;
-                _statModifier.ModifyStat(new StatModifierContext(ECreatureStatType.Damage, EApplyStatType.Multiple, value));
-            }
-            else
-            {
-                value = 0;
+                _nextAttackEnhancer.AddNextAttackDamageMulti(_data.P1);
             }
 
             yield break;
@@ -390,6 +370,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
         {
             BindService(ref _sensor);
             BindService(ref _ownerPosition);
+            BindService(ref _nextAttackEnhancer);
         }
     }
 
@@ -424,7 +405,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
         }
     }
 
-    //격차 이용
+    //약자 멸시
     public class WeakContemptAbility : RuleAbilityBase, IAbilityPayloadReceiver<AttackPreparePayLoad>
     {
         IStatReadOnly _statReadOnly;
@@ -594,6 +575,8 @@ namespace JW.DungeonSliding.GamePlay.Ability
             BindService(ref _rerollService);
         }
     }
+
+    //뜻밖의 수확
     public class GetExtraAbility : RuleAbilityBase
     {
         IAbilityRandomGetter _abilityRandomGetter;

@@ -11,8 +11,9 @@ namespace JW.DungeonSliding.GamePlay.Entities
 {
     public class Player : Creature, IMoveable, IRewardReceiver
     {
+        [SerializeField] private ObjectFader _objectFader;
         [SerializeField] private MoveController _moveController;
-        [SerializeField] private BarrierObject _barrier;
+        [SerializeField] private BarrierVisualViewer _barrier;
 
         private ECharacterStateType _characterState = ECharacterStateType.Idle;
         public ESlideResultType SlideResultType { get; private set; }
@@ -57,12 +58,18 @@ namespace JW.DungeonSliding.GamePlay.Entities
             StatusModifier.OnAppliedStatus += (status) => 
             {
                 if (status == ECreatureStatus.Barrier)
-                    _barrier.ExcuteBarrier();                
+                    _barrier.ExcuteBarrier();
+
+                if (status == ECreatureStatus.Hide)
+                    _objectFader.FadeOut();
             };
             StatusModifier.OnReleasedStatus += (status) =>
             {
                 if (status == ECreatureStatus.Barrier)
                     _barrier.BreakBarrier();
+
+                if (status == ECreatureStatus.Hide)
+                    _objectFader.FadeIn();
             };
         }
         public void AddReward(RewardData rewardData)
@@ -125,13 +132,13 @@ namespace JW.DungeonSliding.GamePlay.Entities
         #region Combat
         public override void TakeDamage(DamageContext damageInfo)
         {
-            EDirectionType dir = GridUtility.GetDirFromTileToTile(Tile.TilePosition, damageInfo.Attacker.Tile.TilePosition);
+            EDirectionType dir = DirectionUtility.GetDirFromTileToTile(Tile.TilePosition, damageInfo.Attacker.Tile.TilePosition);
             Rotate.SetRotation(dir);
 
             if(damageInfo.Status.ContainsKey(EStatusEffectType.KnockBack))
             {
-                EDirectionType toAttackDir = GridUtility.GetDirFromTileToTile(Tile.TilePosition, damageInfo.Attacker.Tile.TilePosition);
-                EDirectionType backDirection = GridUtility.GetReverseDirection(toAttackDir);
+                EDirectionType toAttackDir = DirectionUtility.GetDirFromTileToTile(Tile.TilePosition, damageInfo.Attacker.Tile.TilePosition);
+                EDirectionType backDirection = DirectionUtility.GetReverseDirection(toAttackDir);
 
                 KnockBack(backDirection);
             }

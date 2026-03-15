@@ -30,7 +30,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
         }
         public IAbility CreateRuleAbility(RuleAbilityData data, IAbilityContextService context)
         {
-            Type type = Type.GetType(data.RuleType.ToString());
+            Type type = Type.GetType(data.AbilityName.ToString());
 
             if (type != null)
             {

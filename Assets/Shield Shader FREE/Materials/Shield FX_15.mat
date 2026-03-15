@@ -21,8 +21,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Shield FX_15
-  m_Shader: {fileID: -6465566751694194690, guid: 7273ade5faebcb9448394e807492b217,
-    type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: 7273ade5faebcb9448394e807492b217, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -94,6 +93,7 @@ Material:
     - _Texture_Opacity_Full: 0
     - _Texture_Strength: 1
     - _Threshold: 0.236
+    - _TotalAlpha: 1
     m_Colors:
     - _Color: {r: 0, g: 0.46740404, b: 2.670157, a: 0}
     - _Color_1: {r: 2.811218, g: 0, b: 2.9960785, a: 0}
@@ -111,6 +111,7 @@ Material:
     - _Tiling: {r: 8, g: 8, b: 0, a: 0}
     - _Tiling_Tex_2: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1
 --- !u!114 &5565035484657618864
 MonoBehaviour:
   m_ObjectHideFlags: 11

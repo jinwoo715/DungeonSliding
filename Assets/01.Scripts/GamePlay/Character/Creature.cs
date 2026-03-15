@@ -41,6 +41,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public IAbilityRegister AbilityRegister => _abilityExcuter;
         public IAbilityExcuter Ability => _abilityExcuter;
         public INextAttackEnhancer NextAttackEnhancer => _attackEnhancer;
+        public IAttackRequester AttackRequester => _attackRequester;
 
         private void OnDestroy()
         {
