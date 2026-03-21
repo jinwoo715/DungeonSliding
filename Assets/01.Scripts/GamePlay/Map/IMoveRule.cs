@@ -128,6 +128,7 @@ namespace JW.DungeonSliding
         OnRotate,
 
         // 공격 시퀀스
+        OnRegisterAttack,
         OnAttackPrepared,   // 공격 직전 (버프 주입, 데미지 계산 전)
         OnAttackPerformed,  // 공격 실행 완료 (흡혈, 처치 시 효과) - OnAttacked 대신 더 명확한 표현
         OnBackAttacked,

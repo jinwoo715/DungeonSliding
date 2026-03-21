@@ -1,4 +1,5 @@
 
+using JW.DungeonSliding.GamePlay.Entities;
 using System.Collections.Generic;
 
 namespace JW.DungeonSliding.GamePlay.Combat
@@ -14,17 +15,18 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
         public int AppliedFinalDamage { get; set; }
 
-        private Dictionary<EStatusEffectType, int> _statusMap = new();
-        public IReadOnlyDictionary<EStatusEffectType, int> Status => _statusMap;
+        private Dictionary<ECreatureStatus, int> _statusMap = new();
+        public IReadOnlyDictionary<ECreatureStatus, int> Status => _statusMap;
 
-        public DamageContext(ICombatant attacker, int amount, bool isCritical)
+        public void Clear()
         {
-            Attacker = attacker;
-            Damage = amount;
-            IsCritical = isCritical;
-            _statusMap = new();
+            Attacker = null;
+            Damage = 0;
+            IsCritical = false;
+            _statusMap.Clear();
         }
-        public void AddStatus(EStatusEffectType statusType, int amount)
+
+        public void AddStatus(ECreatureStatus statusType, int amount)
         {
             if (!_statusMap.ContainsKey(statusType))
                 _statusMap.Add(statusType, 0);

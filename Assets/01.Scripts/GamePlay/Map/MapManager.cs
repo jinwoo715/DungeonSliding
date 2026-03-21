@@ -81,7 +81,7 @@ namespace JW.DungeonSliding.Map
         {
             MoveContext moveContext = new MoveContext(startPoint, direction, enterType);
 
-            if(_effectTileDic.TryGetValue(startPoint, out IEffectTile effectTile))
+            if(enterType == ETileEnterType.Slide && _effectTileDic.TryGetValue(startPoint, out IEffectTile effectTile))
             {
                 effectTile.OnEnterTile(ref moveContext);
 

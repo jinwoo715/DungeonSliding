@@ -71,15 +71,11 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
                 Enemy boss = GetEnemy();
 
-                CreatureBaseStat baseStat = new CreatureBaseStat(data.BaseHP, data.BaseDamage, 100);
-
                 boss.SetData(data, floor);
-                boss.InitData(baseStat);
+                
                 boss.RegisterRequester(_requesterRegistry);
 
                 boss.Tile.SetPosition(tile);
-
-                boss.SetAbility(EnemyAbilityFactory.Instance.GetAbility(data.AbilityList, boss, 1));
 
                 _activeEnemyByTile.Add(tile, boss);
                 _board.RegisterEnemyTile(tile);
@@ -99,8 +95,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
                 boss.InitData(baseStat);
                 boss.RegisterRequester(_requesterRegistry);
                 boss.Tile.SetPosition(tile);
-
-                boss.SetAbility(EnemyAbilityFactory.Instance.GetAbility(_enemyBossDataByUID["ENEMY_BOSS_EREBOS"].AbilityList, boss, 1));
 
                 _activeEnemyByTile.Add(tile, boss);
                 _board.RegisterEnemyTile(tile);

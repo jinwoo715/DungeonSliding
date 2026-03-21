@@ -25,7 +25,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
         public int FinalExtraAttackCount => _extraAttackCount;
         public int FinalEnhanceDamage => CalculateFinalExtraDamage();
 
-        public bool IsGuaranteedCritical => throw new NotImplementedException();
+        public bool IsGuaranteedCritical => _guaranteedCritical;
 
         public void AddNextAttackCount(int count)
         {

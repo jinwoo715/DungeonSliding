@@ -10,5 +10,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
         Knockback = 1 << 2,
         Barrier = 1 << 3,
         Hide = 1 << 4,
+        Execution =  1 << 5,
     }
 }

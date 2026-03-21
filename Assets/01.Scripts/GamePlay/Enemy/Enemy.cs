@@ -17,8 +17,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
         [SerializeField] private EnemyData _enemyData;
 
         public event Action<EEnemyStatType> OnStatChangedEvent;
-        private float _backAttackMultiplier = 2f;
-
         public string Name => _enemyData.Name;
         public string Description => _enemyData.Description;
         public string EnemyUID => _enemyData.UID;
@@ -26,44 +24,11 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
         public event Action<Enemy> OnEnemyReturnEvent;
 
-        //TODO Enemy Skill ±¸Çö
-        #region Enemy Skill
-        private Dictionary<EGameEventTrigger, List<IAbility>> gameTriggerAbilities = new();
-        private Dictionary<ECreatureTrigger, List<IAbility>> creatureTriggerAbilities = new ();
-
-        public void SetAbility(List<IAbility> abilities)
-        {
-            if (abilities == null) return;
-
-            foreach (var ability in abilities)
-            {
-                if(ability.GameTrigger != EGameEventTrigger.None)
-                {
-                    if (!gameTriggerAbilities.ContainsKey(ability.GameTrigger))
-                    {
-                        gameTriggerAbilities.Add(ability.GameTrigger, new List<IAbility>());
-                    }
-
-                    gameTriggerAbilities[ability.GameTrigger].Add(ability);
-                }
-
-                if(ability.CreatureTrigger != ECreatureTrigger.None)
-                {
-                    if (!creatureTriggerAbilities.ContainsKey(ability.CreatureTrigger))
-                        creatureTriggerAbilities.Add(ability.CreatureTrigger, new List<IAbility>());
-
-                    creatureTriggerAbilities[ability.CreatureTrigger].Add(ability);
-                }
-            }
-        }
-
-        #endregion
+        private int _xp;
 
         public override void Initialize(ECreatureType cretureType)
         {
             base.Initialize(cretureType);
-         
-            _backAttackMultiplier = GameManager.Config.Combat.BackAttackDMGMultiple;
         }
         
         public void SetData(EnemyData data, int floor)
@@ -78,8 +43,10 @@ namespace JW.DungeonSliding.GamePlay.Entities
             int hp = CalculateHP(_enemyData.BaseHP, floor);
             int dmg = CalculateDamage(_enemyData.BaseDamage, floor);
             int xp = CalculateXp(_enemyData.BaseXP, floor);
+            _xp = CalculateXp(_enemyData.BaseXP, floor);
 
-            _enemyStat = new EnemyStat(hp, dmg, xp);
+            CreatureBaseStat stat = new CreatureBaseStat(hp, dmg, 100);
+            InitData(stat);
 
             OnStatChangedEvent?.Invoke(EEnemyStatType.HP);
             OnStatChangedEvent?.Invoke(EEnemyStatType.Damage);
@@ -115,7 +82,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         }
         public RewardData CreateReward()
         {
-            return new RewardData(ERewardType.KillReward, _enemyStat.XP);
+            return new RewardData(ERewardType.KillReward, _xp);
         }
         #endregion
     }

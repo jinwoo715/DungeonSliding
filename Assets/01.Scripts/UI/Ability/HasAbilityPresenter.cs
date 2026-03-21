@@ -21,6 +21,7 @@ namespace JW.DungeonSliding.UI
 
         public void AddAbility(AbilityDataBase data)
         {
+            Debug.Log(data.Name);
             HasAbilityItem item = Instantiate(_abilityItemPrefab, _abilityParentTransform);
             item.SetData(data, _tooltipService.ShowTooltip, _tooltipService.CloseTooltip);
         }

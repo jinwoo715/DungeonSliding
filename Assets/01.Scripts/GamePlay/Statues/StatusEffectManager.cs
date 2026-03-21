@@ -54,7 +54,9 @@ namespace JW.DungeonSliding.GamePlay.Statues
                 // duration이 -1(영구 지속)인 상태(예: 배리어)는 턴 계산을 건너뜀
                 if (_statusDurations[key] == -1) continue;
 
-                int remainDuration = _statusDurations[key]--;
+                int remainDuration = --_statusDurations[key];
+
+                Debug.Log($"{key}, {remainDuration}");
 
                 if (remainDuration <= 0)
                 {

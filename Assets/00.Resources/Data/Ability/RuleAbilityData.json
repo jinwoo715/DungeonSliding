@@ -132,13 +132,13 @@
   {
     "UID": "RA_EXECUTE_MARK",
     "Name": "처형 선고",
-    "Description": "공격 대상의 남은 체력이 {P1}보다 낮으면 즉시 처형",
+    "Description": "공격 대상의 남은 체력이 {P1}%보다 낮으면 즉시 처형",
     "IconName": "Fire",
     "Rank": "Rare",
     "GameTrigger": "None",
     "CreatureTrigger": "OnAttackPrepared",
     "AbilityName": "FinishingBlowAbility",
-    "P1": 5,
+    "P1": 10,
     "P2": 0,
     "Notes": ""
   },
@@ -149,7 +149,7 @@
     "IconName": "Fire",
     "Rank": "Rare",
     "GameTrigger": "OnTurnEnd",
-    "CreatureTrigger": "None",
+    "CreatureTrigger": "OnRegisterAttack",
     "AbilityName": "HideShadowAbility",
     "P1": 3,
     "P2": 0,
@@ -203,7 +203,7 @@
     "GameTrigger": "None",
     "CreatureTrigger": "OnAttackPrepared",
     "AbilityName": "FocusStrikeAbility",
-    "P1": 10,
+    "P1": 50,
     "P2": 0,
     "Notes": ""
   },
@@ -216,8 +216,8 @@
     "GameTrigger": "None",
     "CreatureTrigger": "OnAttackPrepared",
     "AbilityName": "VitalStrikeAbility",
-    "P1": 30,
-    "P2": 10,
+    "P1": 50,
+    "P2": 50,
     "Notes": ""
   },
   {

@@ -3,8 +3,8 @@
     "UID": "ENEMY_NOMAL",
     "Name": "석상",
     "Description": "",
-    "BaseDamage": 1,
-    "BaseHP": 2,
+    "BaseDamage": 3,
+    "BaseHP": 20,
     "BaseXP": 1,
     "AbilityList": "",
     "EnemyAbilityType": ""

@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.Core.Flow
 {
-    public class GameModeController : IGameModeReader
+    public class GameSequenceController : IGameModeReader
     {
         private EGameModeType _gameFlowType = EGameModeType.Play;
         public bool IsCanMove => GameMode == 0;
@@ -33,12 +33,13 @@ namespace JW.DungeonSliding.Core.Flow
             GameModeEvent[mode] += action;
         }
 
-        private void EnterSlideMode() => EnterGameMode(EGameModeType.Sliding);
-        private void ExitSlideMode() => ExitGameMode(EGameModeType.Sliding);
         private void EnterStartBattle() => EnterGameMode(EGameModeType.Battle);
-        private void ExitStartBattle() => ExitGameMode(EGameModeType.Battle);
-        private void EnterAbilityUI() => EnterGameMode(EGameModeType.AbilityUI);
-        private void ExitAbilityUI() => ExitGameMode(EGameModeType.AbilityUI);
+        private void ExitStartBattle() 
+        {
+            ExitGameMode(EGameModeType.Battle);
+            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTrigger.OnTurnEnd);
+            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTrigger.OnTurnStart);
+        }
 
         public void EnterGameMode(EGameModeType flowType)
         {

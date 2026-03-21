@@ -1,13 +1,14 @@
 using JW.DungeonSliding.GamePlay.Combat;
+using JW.DungeonSliding.GamePlay.Entities;
 using System.Collections;
 using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Ability.Combat
 {
-    public class ChanceCounterAbility : EnemyAbilityBase, IAbilityPayloadReceiver<AttackResultPayload>
+    public class ChanceCounterAbility : EnemyAbilityBase, IAbilityPayloadReceiver<HitResultPayload>
     {
         IAttackRequester _attackRequester;
-        AttackResultPayload _payLoad;
+        HitResultPayload _payLoad;
         public ChanceCounterAbility(EnemyAbilityData data, IAbilityContextService context, ICombatant owner, int section) : base(data, context, owner, section) { }
 
         public override IEnumerator Execute(AbilityArgs args)
@@ -23,7 +24,7 @@ namespace JW.DungeonSliding.GamePlay.Ability.Combat
             yield break;
         }
 
-        public void ReceivePayload(AttackResultPayload payload)
+        public void ReceivePayload(HitResultPayload payload)
         {
             _payLoad = payload;
         }
@@ -66,7 +67,7 @@ namespace JW.DungeonSliding.GamePlay.Ability.Combat
 
         public override IEnumerator Execute(AbilityArgs args)
         {
-            _attackable.AddStatusEffect(EStatusEffectType.KnockBack, 1);
+            _attackable.AddStatusEffect(ECreatureStatus.Knockback, 1);
             yield break;
         }
 

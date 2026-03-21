@@ -20,6 +20,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
     public interface IAttackRequester
     {
+        public event Action OnRegisterAttack;
         public event Action<ActPair> OnRequestAttack;
         public event Action<ActPair> OnRequestCounterAttack;
         bool TrySubmitAttackRequest(ICombatantSensor sensor);
@@ -29,7 +30,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
     public interface IAttackable
     {
         event Action OnAttackSequenceEnd;
-        void AddStatusEffect(EStatusEffectType effectType, int amount);
+        void AddStatusEffect(ECreatureStatus effectType, int amount);
         void ExcuteAttack(ActPair actPair);
     }
 

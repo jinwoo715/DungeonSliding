@@ -1,4 +1,5 @@
 using JW.DungeonSliding.GamePlay.Combat;
+using JW.DungeonSliding.GamePlay.Entities;
 using JW.DungeonSliding.GamePlay.Stats;
 using JW.DungeonSliding.Map;
 using System.Collections;
@@ -7,10 +8,11 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Ability
 {
-    public class ChanceCounterAttackAbility : RuleAbilityBase, IAbilityPayloadReceiver<AttackResultPayload>
+    //TODO 카운터 발동 연출 필요해보임
+    public class ChanceCounterAttackAbility : RuleAbilityBase, IAbilityPayloadReceiver<HitResultPayload>
     {
         IAttackRequester _attackRequester;
-        AttackResultPayload _payload;
+        HitResultPayload _payload;
 
         public ChanceCounterAttackAbility(RuleAbilityData data, IAbilityContextService host) : base(data, host) { }
 
@@ -26,7 +28,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
             yield break;
         }
 
-        public void ReceivePayload(AttackResultPayload payload)
+        public void ReceivePayload(HitResultPayload payload)
         {
             _payload = payload;
         }
@@ -81,7 +83,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
     {
         ICombatantSensor _combatantSensor;
         INextAttackEnhancer _nextAttackEnhancer;
-        IReadOnlyTilePosition _tile;
+        ITileObject _tile;
 
         public SurrondEnemyAddDamageAbility(RuleAbilityData data, IAbilityContextService host) : base(data, host) { }
 
@@ -97,10 +99,14 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         protected override void BindService()
         {
+            BindService(ref _tile);
             BindService(ref _combatantSensor);
             BindService(ref _nextAttackEnhancer);
         }
     }
+
+    //양날의 검
+    //TODO 주는 피해에 대한 표시를 해줘야 하나?
     public class GlassCannonAbility : RuleAbilityBase
     {
         IStatModifier _statModifier;
@@ -122,7 +128,6 @@ namespace JW.DungeonSliding.GamePlay.Ability
     public class FadingStrengthAbility : RuleAbilityBase
     {
         IStatModifier _statModifier;
-        bool _isInit = false;
         float _remainValue = 0;
 
         public FadingStrengthAbility(RuleAbilityData data, IAbilityContextService host) : base(data, host) { }
@@ -132,15 +137,18 @@ namespace JW.DungeonSliding.GamePlay.Ability
             if (_remainValue >= _data.P1)
                 yield break;
 
+            float multiplier = _data.P2 / 100;
+
             _remainValue += _data.P2;
-            _statModifier.ModifyStat(new StatModifierContext(ECreatureStatType.Damage, EApplyStatType.Multiple, -_data.P2));
+            _statModifier.ModifyStat(new StatModifierContext(ECreatureStatType.Damage, EApplyStatType.Multiple, -multiplier));
 
             yield break;
         }
 
         protected override void InitData()
         {
-            _statModifier.ModifyStat(new StatModifierContext(ECreatureStatType.Damage, EApplyStatType.Multiple, _data.P1));
+            float multiplier = _data.P1 / 100;
+            _statModifier.ModifyStat(new StatModifierContext(ECreatureStatType.Damage, EApplyStatType.Multiple, multiplier));
         }
 
         protected override void BindService()
@@ -168,7 +176,9 @@ namespace JW.DungeonSliding.GamePlay.Ability
             _statModifier.ModifyStat(new StatModifierContext(_recoveryStatType, EApplyStatType.Add, value));
         }
     }
-    public class BloodDrainAbility : RuleAbilityBase, IAbilityPayloadReceiver<AttackResultPayload>
+
+    //생명 흡수
+    public class BloodDrainAbility : RuleAbilityBase, IAbilityPayloadReceiver<AttackResultPayLoad>
     {
         IStatModifier _statModifier;
         private RecoveryEffect _recoveryEffect;
@@ -178,14 +188,14 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         public override IEnumerator Execute(AbilityArgs args)
         {
-            int recoveryValue = Mathf.RoundToInt(_appliedDamage * _data.P1);
+            float ratio = _data.P1 * 0.01f;
+            int recoveryValue = Mathf.CeilToInt(_appliedDamage * ratio);
             _recoveryEffect.Recovery(recoveryValue);
             yield break;
         }
-
-        public void ReceivePayload(AttackResultPayload payload)
+        public void ReceivePayload(AttackResultPayLoad payload)
         {
-            _appliedDamage = payload.Damage;
+            _appliedDamage = payload.AppliedDamage;
         }
 
         protected override void BindService()
@@ -194,7 +204,9 @@ namespace JW.DungeonSliding.GamePlay.Ability
             _recoveryEffect = new RecoveryEffect(ECreatureStatType.CurrentHP, _statModifier);
         }
     }
-    public class VitalAbsorbAbility : RuleAbilityBase, IAbilityPayloadReceiver<AttackResultPayload>
+
+    //기력 흡수
+    public class VitalAbsorbAbility : RuleAbilityBase, IAbilityPayloadReceiver<AttackResultPayLoad>
     {
         IStatModifier _statModifier;
         private RecoveryEffect _recoveryEffect;
@@ -204,15 +216,16 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         public override IEnumerator Execute(AbilityArgs args)
         {
-            int recoveryValue = Mathf.RoundToInt(_appliedDamage * _data.P1);
+            float ratio = _data.P1 * 0.01f;
+            int recoveryValue = Mathf.CeilToInt(_appliedDamage * ratio);
             _recoveryEffect.Recovery(recoveryValue);
 
             yield break;
         }
 
-        public void ReceivePayload(AttackResultPayload payload)
+        public void ReceivePayload(AttackResultPayLoad payload)
         {
-            _appliedDamage = payload.Damage;
+            _appliedDamage = payload.AppliedDamage;
         }
 
         protected override void BindService()
@@ -222,6 +235,8 @@ namespace JW.DungeonSliding.GamePlay.Ability
         }
     }
 
+    //TODO 연출 고민
+    #region 부활 메커니즘
     //Revive
     public class EmergencyConvertMoveToHPAbility : RuleAbilityBase
     {
@@ -292,13 +307,18 @@ namespace JW.DungeonSliding.GamePlay.Ability
             int maxHP = _statReadOnly.Get(ECreatureStatType.MaxHp);
             int maxMove = _statReadOnly.Get(ECreatureStatType.MaxMoveCount);
 
-            int percentHP = Mathf.RoundToInt(maxHP * _data.P2);
-            int percentMove = Mathf.RoundToInt(maxMove * _data.P2);
+            float recoveryRatio = _data.P2 / 100;
+            
+            int percentHP = Mathf.CeilToInt(maxHP * recoveryRatio);
+            int percentMove = Mathf.CeilToInt(maxMove * recoveryRatio);
 
             int currentHP = _statReadOnly.Get(ECreatureStatType.CurrentHP);
             int currentMove = _statReadOnly.Get(ECreatureStatType.CurrentMoveCount);
 
-            if(currentHP < percentHP)
+            Debug.Log($"{maxHP} : {percentHP} : {currentHP}");
+            Debug.Log($"{maxMove} : {percentMove}: {currentMove}");
+
+            if (currentHP < percentHP)
             {
                 int diff = percentHP - currentHP;
                 _statModifier.ModifyStat(new StatModifierContext(ECreatureStatType.CurrentHP, EApplyStatType.Add, diff));
@@ -323,6 +343,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
             BindService(ref _statReadOnly);
         }
     }
+    #endregion
 
     //처형 선고
     public class FinishingBlowAbility : RuleAbilityBase
@@ -333,8 +354,8 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         public override IEnumerator Execute(AbilityArgs args)
         {
-            int excutionRatio = Mathf.RoundToInt(_data.P1);
-            _attackable.AddStatusEffect(EStatusEffectType.Execution, excutionRatio);
+            int excutionRatio = Mathf.CeilToInt(_data.P1);
+            _attackable.AddStatusEffect(ECreatureStatus.Execution, excutionRatio);
 
             yield break;
         }
@@ -360,7 +381,8 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
             if(nearEnemyCount == 1)
             {
-                _nextAttackEnhancer.AddNextAttackDamageMulti(_data.P1);
+                float multiplier = _data.P1 * 0.01f;
+                _nextAttackEnhancer.AddNextAttackDamageMulti(multiplier);
             }
 
             yield break;
@@ -435,6 +457,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
         protected override void BindService()
         {
             BindService(ref _statReadOnly);
+            BindService(ref _nextAttackEnhancer);
         }
     }
 
@@ -442,18 +465,19 @@ namespace JW.DungeonSliding.GamePlay.Ability
     public class FocusStrikeAbility : RuleAbilityBase, IAbilityPayloadReceiver<AttackPreparePayLoad>
     {
         INextAttackEnhancer _nextAttackEnhancer;
-        ICombatant _lastTarget;
+        ICombatant _lastTarget = null;
         bool _isSameTarget = false;
-        float _stackDamage = 0;
+        int _multiplyStack = 0;
         public FocusStrikeAbility(RuleAbilityData data, IAbilityContextService host) : base(data, host) { }
 
         public override IEnumerator Execute(AbilityArgs args)
         {
             if(_isSameTarget)
             {
-                _stackDamage += _data.P1;
+                float ratio = _data.P1 * 0.01f;
 
-                _nextAttackEnhancer.AddNextAttackDamageMulti(_stackDamage);
+                float addMultiply = _multiplyStack * ratio;
+                _nextAttackEnhancer.AddNextAttackDamageMulti(addMultiply);
             }
 
             yield break;
@@ -464,11 +488,13 @@ namespace JW.DungeonSliding.GamePlay.Ability
             if (_lastTarget != null && _lastTarget == payload.Target)
             {
                 _isSameTarget = true;
+                _multiplyStack++;
             }
             else
             {
+                _lastTarget = payload.Target;
                 _isSameTarget = false;
-                _stackDamage = 0;
+                _multiplyStack = 0;
             }
         }
 
@@ -491,11 +517,13 @@ namespace JW.DungeonSliding.GamePlay.Ability
             int currentTargetHP = _targetStat.Get(ECreatureStatType.CurrentHP);
             int maxTargetHP = _targetStat.Get(ECreatureStatType.MaxHp);
 
-            int ratio = Mathf.RoundToInt(currentTargetHP / maxTargetHP);
+            float pivotRatio = _data.P1 * 0.01f;
+            int pivotHP = Mathf.CeilToInt(maxTargetHP * pivotRatio);
 
-            if(ratio <= _data.P1)
+            if(currentTargetHP <= pivotHP)
             {
-                _nextAttackEnhancer.AddNextAttackDamageMulti(_data.P2);
+                float multiple = _data.P2 * 0.01f;
+                _nextAttackEnhancer.AddNextAttackDamageMulti(multiple);
             }
 
             yield break;
@@ -513,11 +541,11 @@ namespace JW.DungeonSliding.GamePlay.Ability
     }
 
     //속박 일격
+    //TODO 속박 연출 필요해보임
     public class ShackleStrikeAbility : RuleAbilityBase, IAbilityPayloadReceiver<AttackPreparePayLoad>
     {
         IAttackable _attackable;
         HashSet<ICombatant> _shackedList = new HashSet<ICombatant>();
-
         ICombatant _attackTarget;
 
         public ShackleStrikeAbility(RuleAbilityData data, IAbilityContextService host) : base(data, host) 
@@ -530,6 +558,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
             if (IsApplyShackle())
             {
                 _shackedList.Add(_attackTarget);
+                _attackable.AddStatusEffect(ECreatureStatus.Bind, 1);
                 _attackTarget = null;
             }
 
@@ -640,38 +669,62 @@ namespace JW.DungeonSliding.GamePlay.Ability
     public class HideShadowAbility : RuleAbilityBase, IAbilityPayloadReceiver<BattleResultPayLoad>
     {
         IStatusModifier _statusModifier;
+        IMoveable _moveable;
         int _nonBattleCount = 0;
 
-        bool _isBattleResult = false;
+        bool _isHideMode = false;
+        bool _isCombatted = false;
 
         public HideShadowAbility(RuleAbilityData data, IAbilityContextService host) : base(data, host) { }
 
         public override IEnumerator Execute(AbilityArgs args)
         {
-            if (_isBattleResult)
+            if(args.CreatureTrigger == ECreatureTrigger.OnRegisterAttack)
             {
-                _nonBattleCount++;
-                if (_nonBattleCount >= _data.P1)
+                if (_isHideMode == true)
                 {
-                    _statusModifier.ApplyStatus(Entities.ECreatureStatus.Hide,1);
+                    _statusModifier.RemoveStatus(ECreatureStatus.Hide);
+                    _nonBattleCount = 0;
+                    _isHideMode = false;
+
+                    yield break;
                 }
             }
-            else
-            {
-                _nonBattleCount = 0;
-            }
 
+            if (_moveable.SlideTileCount() < 1)
+                yield break;
+
+            if (!_isHideMode)
+            {
+                if (!_isCombatted)
+                {
+                    _nonBattleCount++;
+
+                    if (_nonBattleCount >= _data.P1)
+                    {
+                        _isHideMode = true;
+                        _statusModifier.ApplyStatus(Entities.ECreatureStatus.Hide, 1);
+                    }
+                }
+                else
+                {
+                    _nonBattleCount = 0;
+                }
+            }
+            Debug.Log(_nonBattleCount);
             yield break;
         }
 
         public void ReceivePayload(BattleResultPayLoad payload)
         {
-            _isBattleResult = payload.IsCombatted;
+            _isCombatted = payload.IsCombatted;
+            Debug.Log($"BattleResultPayLoad {_isCombatted}");
         }
 
         protected override void BindService()
         {
             BindService(ref _statusModifier);
+            BindService(ref _moveable);
         }
     }
 

@@ -26,14 +26,6 @@ namespace JW.DungeonSliding
         Teleport
     }
 
-    public enum EStatusEffectType
-    {
-        None,
-        KnockBack,
-        Blind,
-        Execution,
-    }
-
     public enum EEffectObjectType
     {
         Stop,

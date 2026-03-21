@@ -15,9 +15,10 @@ namespace JW.DungeonSliding
 
         public event Action OnSlideStart;
         public event Action OnSlideEnd;
-        public event Action OnSlideBlocked;
+        public event Action<ESlideResultType> OnSlideBlocked;
         public event Action OnMoveEnd;
         public event Action<EDirectionType> OnDirectionChanged;
+        public event Action OnStepOnEffectTile;
 
         public event Action OnPushedStart;
         public event Action OnPushedEnd;
@@ -42,7 +43,7 @@ namespace JW.DungeonSliding
                 MoveContext cur = moveQueue.Dequeue();
                 _moveable.SetMoveResult(cur.ResultType);
 
-                OnSlideBlocked?.Invoke();
+                OnSlideBlocked?.Invoke(cur.ResultType);
 
                 FinishMove();
             }
@@ -78,6 +79,7 @@ namespace JW.DungeonSliding
                 if (moveContext.OnEnterEffectTile)
                 {
                     moveContext.OnStepEvent?.Invoke();
+                    OnStepOnEffectTile?.Invoke();
                 }
             }
             OnSlideEnd?.Invoke();

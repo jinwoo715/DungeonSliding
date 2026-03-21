@@ -28,7 +28,7 @@ namespace JW.DungeonSliding.GamePlay.Context
         private EnemyManager _enemyManager;
         private BattleManager _battleManager;
         private InputSystem _inputSystem;
-        private GameModeController _gameModeController;
+        private GameSequenceController _gameModeController;
         private IUIFader _uiFader;
         private IObstacleRequest _obstacleRequest;
 
@@ -44,7 +44,7 @@ namespace JW.DungeonSliding.GamePlay.Context
 
         public void Init(RewardManager reward, MapManager map,
             ICombatant player, EnemyManager enemyManager, BattleManager battleManager, 
-            InputSystem input, GameModeController gameModeController, IUIFader uiFader
+            InputSystem input, GameSequenceController gameModeController, IUIFader uiFader
             , IObstacleRequest obstacleRequest)
         {
             PlayerReward = reward;
@@ -61,7 +61,7 @@ namespace JW.DungeonSliding.GamePlay.Context
             _actCount = GameManager.Config.Act.ActCount;
 
             GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameEventTrigger.OnClearStage, ClearFloor);
-            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameEventTrigger.OnTurnEnd, CheckGameOver);
+            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameEventTrigger.OnTurnStart, CheckGameOver);
         }
 
         public void PrepareStage() 

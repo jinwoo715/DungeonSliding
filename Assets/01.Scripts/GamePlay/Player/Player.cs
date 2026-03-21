@@ -38,6 +38,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public override void Initialize(ECreatureType cretureType)
         {
             base.Initialize(cretureType);
+            _objectFader.Init();
         }
         public void Wire(IRouteService routeService, IMoveRule moveRule)
         {
@@ -55,6 +56,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
             _moveController.OnSlideBlocked += HandleSlideBlocked;
             _moveController.OnPushedEnd += HandleKnockBackEnd;
             _moveController.OnMoveEnd += () => OnMoveEnd?.Invoke();
+            _moveController.OnStepOnEffectTile += () => Ability.ExecuteCreatureTrigger(ECreatureTrigger.OnSteppedEffectTile);
+
             StatusModifier.OnAppliedStatus += (status) => 
             {
                 if (status == ECreatureStatus.Barrier)
@@ -109,10 +112,10 @@ namespace JW.DungeonSliding.GamePlay.Entities
             SlideResultType = ESlideResultType.None;
             Ability.ExecuteCreatureTrigger(ECreatureTrigger.OnSlided);
         }
-        private void HandleSlideBlocked()
+        private void HandleSlideBlocked(ESlideResultType slideResultType)
         {
-            //if (SlideResultType == ESlideResultType.Stop)
-                //GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTriggerType.OnSlideBlocked);
+            if (slideResultType == ESlideResultType.Stop)
+                Ability.ExecuteCreatureTrigger(ECreatureTrigger.OnBlockedByWall);
         }
         private void HandleKnockBackEnd()
         {
@@ -135,7 +138,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             EDirectionType dir = DirectionUtility.GetDirFromTileToTile(Tile.TilePosition, damageInfo.Attacker.Tile.TilePosition);
             Rotate.SetRotation(dir);
 
-            if(damageInfo.Status.ContainsKey(EStatusEffectType.KnockBack))
+            if(damageInfo.Status.ContainsKey(ECreatureStatus.Knockback))
             {
                 EDirectionType toAttackDir = DirectionUtility.GetDirFromTileToTile(Tile.TilePosition, damageInfo.Attacker.Tile.TilePosition);
                 EDirectionType backDirection = DirectionUtility.GetReverseDirection(toAttackDir);

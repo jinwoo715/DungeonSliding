@@ -6,6 +6,13 @@ namespace JW.DungeonSliding
     {
         [SerializeField] private Material _mat;
 
+        private Material _matClone;
+
+        public void Init()
+        {
+            FadeIn();
+        }
+
         public void FadeOut()
         {
             _mat.SetFloat("_TotalAlpha", 0.5f);

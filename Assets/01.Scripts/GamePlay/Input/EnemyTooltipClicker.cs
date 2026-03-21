@@ -19,11 +19,6 @@ namespace JW.DungeonSliding
             {
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-                if(Physics.Raycast(ray, out var collider, 10000))
-                {
-                    Debug.Log(collider.transform.name);
-                }
-
                 if(Physics.Raycast(ray, out var hit, 100000, LayerMask.GetMask("Enemy")))
                 {
                     Enemy enemy = hit.transform.GetComponent<Enemy>();

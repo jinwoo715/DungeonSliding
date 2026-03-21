@@ -37,6 +37,18 @@ namespace JW.DungeonSliding.GamePlay.Entities
             _player.OnGetXp += levelProgress.AddXp;
             levelProgress.OnLevelUp += _player.HandleLevelUp;
         }
+        public void RegisterContext(IAbilityContextService abilityContextService)
+        {
+            abilityContextService.Register<IMoveable>(Moveable);
+            abilityContextService.Register<IStatModifier>(StatModifier);
+            abilityContextService.Register<IStatReadOnly>(StatReadOnly);
+            abilityContextService.Register<IStatusModifier>(_player.StatusModifier);
+            abilityContextService.Register<INextAttackEnhancer>(NextAttackEnhancer);
+            abilityContextService.Register<IRotateObject>(_player.Rotate);
+            abilityContextService.Register<ITileObject>(_player.Tile);
+            abilityContextService.Register<IAttackRequester>(_player.AttackRequester);
+        }
+
         private CreatureBaseStat CreatePlayerBaseStat()
         {
             PlayerConfig playerConfig = GameManager.Config.Player;

@@ -137,8 +137,8 @@ namespace JW.DungeonSliding.GamePlay.Ability
         {
             IAbility ability = _abilityFactory.CreateAbility(_abilityData, _playerAbilityContext);
 
-            OnSelectAbility?.Invoke(ability);
             OnAddedAbilityData?.Invoke(_abilityData);
+            OnSelectAbility?.Invoke(ability);
         }
         public void AddReroll(int amount = 1)
         {

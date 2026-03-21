@@ -11,6 +11,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
         
         public event Action<ActPair> OnRequestAttack;
         public event Action<ActPair> OnRequestCounterAttack;
+        public event Action OnRegisterAttack;
 
         public AttackRequester(ICombatant owner, ECreatureType myType)
         {
@@ -20,6 +21,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
         public void RequestCounterAttack(ICombatant target)
         {
+            Debug.Log("CounterAttack");
             OnRequestCounterAttack?.Invoke(new ActPair(_owner, target, EAttackType.Counter));
         }
 
@@ -31,6 +33,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
             if (sensor.GetCombatant(_owner.Tile.TilePosition.GetNextTileByDir(_owner.Rotate.Direction), searchType, out var target))
             {
+                OnRegisterAttack?.Invoke();
                 OnRequestAttack?.Invoke(new ActPair(_owner, target, EAttackType.Nomal));
                 return true;
             }

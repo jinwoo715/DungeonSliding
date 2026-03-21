@@ -1,17 +1,29 @@
 using JW.DungeonSliding.Core;
+using JW.DungeonSliding.GamePlay.Entities;
 using JW.DungeonSliding.GamePlay.Stats;
 using System;
 using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Combat
 {
-    public struct AttackResultPayload
+    public struct AttackResultPayLoad
+    {
+        public readonly ICombatant Target;
+        public readonly int AppliedDamage;
+
+        public AttackResultPayLoad(ICombatant target, int appliedDamage)
+        {
+            Target = target;
+            AppliedDamage = appliedDamage;
+        }
+    }
+    public struct HitResultPayload
     {
         public readonly ICombatant Attacker;
         public readonly int Damage;
         public readonly bool IsCounterAttack;
 
-        public AttackResultPayload(ICombatant attacker, int damage, bool isCounterAttacked)
+        public HitResultPayload(ICombatant attacker, int damage, bool isCounterAttacked)
         {
             Attacker = attacker;
             Damage = damage;
@@ -60,13 +72,13 @@ namespace JW.DungeonSliding.GamePlay.Combat
         public ICombatant LastTarget { get; private set; }
         public ICombatant LastAttacker { get; private set; }
 
-        private DamageContext _receivedDamageContext;
-        private DamageContext _sendDamageContext;
+        private DamageContext _receivedDamageContext = new DamageContext();
+        private DamageContext _sendDamageContext = new DamageContext();
 
         public event Action<AttackPreparePayLoad> OnPrepareAttack;
-        public event Action<AttackResultPayload> OnHitted;
+        public event Action<HitResultPayload> OnHitted;
         public event Action<TakeAttackPayLoad> OnBeforeHit;
-        public event Action OnPerformedAttack;
+        public event Action<AttackResultPayLoad> OnPerformedAttack;
         public event Action OnBackAttacked;
 
         public bool IsCombated => _isAttacked || _isHitted;
@@ -88,28 +100,38 @@ namespace JW.DungeonSliding.GamePlay.Combat
         {
             if (LastTarget == null || !LastTarget.IsActive) return;
 
-            _sendDamageContext = CreateDamageContext(nextAttackEnhancer);
+            CreateDamageContext(nextAttackEnhancer);
+
+            bool isBackAttack = DirectionUtility.IsBackAttack(_owner, LastTarget);
+
+            if(isBackAttack == true || nextAttackEnhancer.IsGuaranteedCritical)
+            {
+                float criticalMultiplier = _owner.StatReadOnly.Get(ECreatureStatType.CriticalMultiplier);
+                criticalMultiplier = criticalMultiplier / 100;
+
+                _sendDamageContext.Damage = Mathf.RoundToInt(_sendDamageContext.Damage * criticalMultiplier);
+                _sendDamageContext.IsCritical = true;
+            }
 
             for (int i = 0; i <= nextAttackEnhancer.FinalExtraAttackCount; i++)
             {
                 LastTarget.TakeDamage(_sendDamageContext);
             }
 
-            OnPerformedAttack?.Invoke();
-
-            bool isBackAttack = DirectionUtility.IsBackAttack(_owner, LastTarget);
+            OnPerformedAttack?.Invoke(new AttackResultPayLoad(LastTarget, _sendDamageContext.AppliedFinalDamage));
+            _isAttacked = true;
 
             if (isBackAttack)
                 OnBackAttacked?.Invoke();
         }
 
-        public void AddAttackStatus(EStatusEffectType status, int amount)
+        public void AddAttackStatus(ECreatureStatus status, int amount)
         {
             _sendDamageContext.AddStatus(status, amount);
         }
 
         //TODO 데미지 계산 공식 수정
-        public DamageContext CreateDamageContext(INextAttackEnhancer nextAttackEnhancer)
+        public void CreateDamageContext(INextAttackEnhancer nextAttackEnhancer)
         {
             int damage = _owner.StatReadOnly.Get(ECreatureStatType.Damage);
 
@@ -119,7 +141,8 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
             damage = Mathf.RoundToInt(damage * dealMultiplier);
 
-            return new DamageContext(_owner, damage, false);
+            _sendDamageContext.Attacker = _owner;
+            _sendDamageContext.Damage = damage;
         }
 
         //TODO 피격 판정 수정
@@ -130,58 +153,58 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
             OnBeforeHit?.Invoke(new TakeAttackPayLoad(damageContext.Attacker, damageContext.Damage));
 
-            if (_owner.StatusReadOnly.HasStatus(Entities.ECreatureStatus.Barrier))
-            {
-                _owner.StatusModifier.RemoveStatus(Entities.ECreatureStatus.Barrier);
-                return;
-            }
+            int finalDamage = CalculateFinalDamage(damageContext.Damage);
+            damageContext.AppliedFinalDamage = finalDamage;
 
-            bool isBackAttack = DirectionUtility.IsBackAttack(LastAttacker, _owner);
-
-            float takeDealMultiplier = _owner.StatReadOnly.Get(ECreatureStatType.DamageTakeMultiplier) / (float)100;
-            int finalDamage = CalculateFinalDamage(damageContext.Damage, isBackAttack);
-
-            finalDamage = Mathf.RoundToInt(finalDamage * takeDealMultiplier);
 
             _owner.StatModifier.ModifyStat(new StatModifierContext(ECreatureStatType.CurrentHP, EApplyStatType.Add, -finalDamage));
 
-            CombatEventBus.Excuter.RaiseDamageEvent(new DamageEvent(LastAttacker, _owner, finalDamage, isBackAttack));
+            CombatEventBus.Excuter.RaiseDamageEvent(new DamageEvent(LastAttacker, _owner, finalDamage, damageContext.IsCritical));
 
-            OnHitted?.Invoke(new AttackResultPayload(damageContext.Attacker, finalDamage, damageContext.IsCounterAttack));
+            OnHitted?.Invoke(new HitResultPayload(damageContext.Attacker, finalDamage, damageContext.IsCounterAttack));
 
-            if(damageContext.Status.TryGetValue(EStatusEffectType.Execution, out int value))
+
+            if(damageContext.Status.TryGetValue(ECreatureStatus.Execution, out int value))
             {
                 int maxHP = _owner.StatReadOnly.Get(ECreatureStatType.MaxHp);
                 int remainHP = _owner.StatReadOnly.Get(ECreatureStatType.CurrentHP);
 
-                int remainRatio = Mathf.RoundToInt(((float)remainHP / maxHP) * 100);
+                float excuteValue = (maxHP * value * 0.01f);
 
-                if(remainRatio <= value)
+                if(remainHP <= excuteValue)
                     _owner.StatModifier.ModifyStat(new StatModifierContext(ECreatureStatType.CurrentHP, EApplyStatType.Add, -remainHP));
             }
-        }
-        public int CalculateFinalDamage(int baseDamage, bool isBackAttack)
-        {
-            int damage = baseDamage;
 
-            if (isBackAttack)
+            //TODO상태이상 로직 분리
+            foreach (var status in damageContext.Status)
             {
-                float multiplier = GameManager.Config.Combat.BackAttackDMGMultiple;
-                damage = DamageCalculator.CalculateBackAttackDamage(baseDamage, multiplier);
+                var key = status.Key;
+
+                if (key == ECreatureStatus.Execution)
+                    continue;
+
+                _owner.StatusModifier.ApplyStatus(status.Key, status.Value);
             }
 
+            _isHitted = true;
+        }
+        public int CalculateFinalDamage(int baseDamage)
+        {
+            int finalDamage = baseDamage;
             float takeMultiplier = _owner.StatReadOnly.Get(ECreatureStatType.DamageTakeMultiplier) / (float)100;
 
-            damage = Mathf.RoundToInt(damage * takeMultiplier);
-            return damage;
+            finalDamage = Mathf.RoundToInt(baseDamage * takeMultiplier);
+            return finalDamage;
         }
 
         public void OnCombatEnd()
         {
-            _isAttacked = true;
-            _isHitted = true;
+            _isAttacked = false;
+            _isHitted = false;
             LastTarget = null;
             LastAttacker = null;
+            _sendDamageContext.Clear();
+            _receivedDamageContext.Clear();
         }
     }
 }

@@ -95,12 +95,9 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
             _actPairs.Clear();
             _counterActPairs.Clear();
-
-            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTrigger.OnTurnEnd);
         }
         public void EnqueueActPair(ActPair pair)
         {
-            Debug.Log(pair.Attacker);
             _actPairs.Enqueue(pair);
         }
         public void EnqueueCounterActPair(ActPair pair)

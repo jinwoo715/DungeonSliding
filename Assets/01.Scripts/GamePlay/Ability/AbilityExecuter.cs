@@ -142,14 +142,24 @@ namespace JW.DungeonSliding.GamePlay.Ability
         {
             foreach (var gameAbility in _gameTriggerAbilities)
             {
-                if (gameAbility.Value is IAbilityPayloadReceiver<T> receiver)
-                    receiver.ReceivePayload(payload);
+                foreach (var ability in gameAbility.Value)
+                {
+                    if (ability is IAbilityPayloadReceiver<T> receiver)
+                    {
+                        receiver.ReceivePayload(payload);
+                    }
+                }
             }
 
             foreach (var creatureAbility in _creatureTriggerAbilities)
             {
-                if (creatureAbility.Value is IAbilityPayloadReceiver<T> receiver)
-                    receiver.ReceivePayload(payload);
+                foreach (var ability in creatureAbility.Value)
+                {
+                    if (ability is IAbilityPayloadReceiver<T> receiver)
+                    {
+                        receiver.ReceivePayload(payload);
+                    }
+                }
             }
         }
 

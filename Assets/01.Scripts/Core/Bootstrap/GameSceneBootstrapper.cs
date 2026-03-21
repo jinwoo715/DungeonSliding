@@ -21,13 +21,13 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
         private EnemyAbilityFactory _enemyAbilityFactory;
         private FieldCombatantManager _fieldCombatantManager;
         private GameVisualController _visualContoller;
-        private GameModeController _modeController = new GameModeController();
+        private GameSequenceController _modeController = new GameSequenceController();
         private GameTriggerEventBus _triggerEventBus = new GameTriggerEventBus();
         private InputCoordinator _inputCoordinator = new InputCoordinator();
         private LevelSystem _leveling = new LevelSystem();
         private MoveRule _moveRule = new MoveRule();
         private RewardManager _rewardManager = new RewardManager();
-        private RouteBuilder _routeBuilder;
+        private RouteBuilder _routeBuilder = new RouteBuilder();
 
         private PlayerAbilityContext _playerAbilityContext = new PlayerAbilityContext();
 
@@ -90,19 +90,17 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
         private void ChildInit()
         {
             _playerAbilityContext.SetOwner(_playerController.Player);
-            _playerAbilityContext.Register<IMoveable>(_playerController.Moveable);
-            _playerAbilityContext.Register<IStatModifier>(_playerController.StatModifier);
             _playerAbilityContext.Register<ICombatantSensor>(_fieldCombatantManager);
-            _playerAbilityContext.Register<INextAttackEnhancer>(_playerController.NextAttackEnhancer);
             _playerAbilityContext.Register<IRouteService>(_routeBuilder);
 
             _abilitySystem.Init(_playerAbilityContext, _leveling);
   
-            _routeBuilder = new RouteBuilder(_mapManager);
+            _routeBuilder.Init(_mapManager);
 
             _gameSceneUIManager.Init(_playerController.Player, _leveling, _playerController.NextAttackEnhancer, _combatEventBus, _abilitySystem, _gameSceneManager);
 
             _playerController.InitializePlayer(_routeBuilder, _moveRule, _battleManager, _leveling, _abilitySystem);
+            _playerController.RegisterContext(_playerAbilityContext);
 
             _inputCoordinator.Init(_playerController.Moveable);
 
