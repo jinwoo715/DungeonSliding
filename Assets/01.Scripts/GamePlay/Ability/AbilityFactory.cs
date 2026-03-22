@@ -1,8 +1,19 @@
+using JW.DungeonSliding.GamePlay.Combat;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Ability
 {
+    public interface IPlayerAbilityCreater
+    {
+        IAbility CreateAbility(string abilityType, IAbilityContextService context);
+    }
+    public interface IEnemyAbilityCreater
+    {
+        List<IAbility> CreateAbility(List<EnemyAbilityData> datas, ICombatant owner, int section);
+    }
+
     public class AbilityFactory
     {
         public IAbility CreateAbility(AbilityDataBase data, IAbilityContextService context)
@@ -46,25 +57,6 @@ namespace JW.DungeonSliding.GamePlay.Ability
                 Debug.LogError("Not Exist Ability");
                 return null;
             }
-
-            //switch (data.RuleType)
-            //{
-            //    case ERuleAbilityType.Revive:               return new ReviveAbility(data, context);               
-            //    case ERuleAbilityType.Barrier:              return new BarrierAbility(data, context);              
-            //    case ERuleAbilityType.WallBounce:           return new WallBounceAbility(data, context);           
-            //    case ERuleAbilityType.SurroundEnemy:        return new SurroundEmpowerAbility(data, context);      
-            //    case ERuleAbilityType.DoubleAttack:         return new ExtraAttackChance(data, context);           
-            //    case ERuleAbilityType.CounterAttack:        return new CounterAttackAbility(data, context);        
-            //    case ERuleAbilityType.DistanceDamageBonus:  return new SlideTileDamageBounsAbility(data, context); 
-            //    case ERuleAbilityType.EnemyBind:            return new BindEnemyAbility(data, context);                    
-            //    case ERuleAbilityType.Berserker:            return new DoubleEdgedAbility(data, context);          
-            //    case ERuleAbilityType.ConvertHPToMoveCount: return new ConvertHpToMoveCount(data, context);        
-            //    case ERuleAbilityType.ConvertMoveCountToHp: return new ConvertMoveCountToHp(data, context);        
-            //    case ERuleAbilityType.RerollPlus:           return new RerollPlusAbility(data, context);           
-            //    default:
-            //        Debug.LogError($"Rule Ability Type Error {data.RuleType}");
-            //        return null;
-            //}
         }
     }
 }

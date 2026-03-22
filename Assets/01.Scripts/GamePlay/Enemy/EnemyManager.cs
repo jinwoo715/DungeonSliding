@@ -12,6 +12,9 @@ using JW.DungeonSliding.GamePlay.Ability;
 
 namespace JW.DungeonSliding.GamePlay.Entities
 {
+
+
+
     public class EnemyManager : MonoBehaviour, ICombatProvider
     {
         [SerializeField] private Enemy _enemyPrefabList;
@@ -31,15 +34,16 @@ namespace JW.DungeonSliding.GamePlay.Entities
         private IEnemyStatUIService _enemyStatUIService;
         private ICombatEventListener _combatEventListener;
         private IRequesterRegistry _requesterRegistry;
-
+        private IEnemyAbilityCreater _enemyAbilityCreater;
         public void WireInterfaces(IBoard board, IObstacleRequest obstacleRequest, IEnemyStatUIService enemyStatUIService,
-            ICombatEventListener combatEventListener, IRequesterRegistry requesterRegistry)
+            ICombatEventListener combatEventListener, IRequesterRegistry requesterRegistry, IEnemyAbilityCreater enemyAbilityCreater)
         {
             _board = board;
             _obstacleRequest = obstacleRequest;
             _enemyStatUIService = enemyStatUIService;
             _combatEventListener = combatEventListener;
             _requesterRegistry = requesterRegistry;
+            _enemyAbilityCreater = enemyAbilityCreater;
         }
         public void LoadData()
         {
@@ -57,6 +61,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             }
         }
 
+        public int spawnNum;
         internal void SpawnEnemy(List<Tile> NomalEnemyPos, List<Tile> BossEnemyPos, int act, int floor) 
         { 
             int maxNum = Mathf.Min(act, _nomalEnemyDatas.Count);
@@ -67,17 +72,22 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
                 Tile tile = NomalEnemyPos[i];
 
-                EnemyData data = _nomalEnemyDatas[ranNum];
+                EnemyData data = _nomalEnemyDatas[spawnNum];
 
-                Enemy boss = GetEnemy();
+                Enemy enemy = GetEnemy();
+                enemy.SetData(data, floor);
+                enemy.RegisterRequester(_requesterRegistry);
+                enemy.Tile.SetPosition(tile);
 
-                boss.SetData(data, floor);
-                
-                boss.RegisterRequester(_requesterRegistry);
+                var datas = GameManager.Data.EnemyAbilities(data.AbilityList);
 
-                boss.Tile.SetPosition(tile);
+                if (datas != null)
+                {
+                    var abilities = _enemyAbilityCreater.CreateAbility(datas, enemy, floor);
+                    enemy.AbilityRegister.RegisterAutoAllAbility(abilities);
+                }
 
-                _activeEnemyByTile.Add(tile, boss);
+                _activeEnemyByTile.Add(tile, enemy);
                 _board.RegisterEnemyTile(tile);
             }
 

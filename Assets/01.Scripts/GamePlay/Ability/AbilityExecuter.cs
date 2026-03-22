@@ -129,6 +129,8 @@ namespace JW.DungeonSliding.GamePlay.Ability
         {
             foreach (var ability in abilities)
             {
+                Debug.Log(ability.ToString());
+
                 if(ability.CreatureTrigger != ECreatureTrigger.None)
                     RegisterCreatureEventAbility(ability.CreatureTrigger, ability);
 

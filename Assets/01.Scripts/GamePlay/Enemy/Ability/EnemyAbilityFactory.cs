@@ -7,76 +7,45 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Ability
 {
-    public class EnemyAbilityFactory
+    public class EnemyAbilityFactory : IEnemyAbilityCreater
     {
-        public static EnemyAbilityFactory Instance { get; private set; }
+        IAbilityContextService _service;
 
-        private IEnemyAbilityGetter _getter;
-
-        private Dictionary<string, EnemyAbilityData> _enemyAbilityDataByType = new();
-        public EnemyAbilityFactory(IEnemyAbilityGetter getter)
+        public void Init(IAbilityContextService service)
         {
-            Instance = this;
-
-            _getter = getter;
-
-            var datas = GameManager.Data.EnemyAbilityDatas;
-
-            foreach (var ability in datas)
-            {
-                _enemyAbilityDataByType.Add(ability.Name, ability);
-            }
+            _service = service;
         }
-        public List<IAbility> GetAbility(string enemyAbilities, ICombatant host, int section)
+
+        public List<IAbility> CreateAbility(List<EnemyAbilityData> datas, ICombatant owner, int section)
         {
-            if (string.IsNullOrEmpty(enemyAbilities)) return null;
-
-            string[] abilities = enemyAbilities.Split('|');
-
             List<IAbility> abilityList = new List<IAbility>();
 
-            for (int i = 0; i < abilities.Length; i++)
+            for (int i = 0; i < datas.Count; i++)
             {
-                EnemyAbilityData data = _enemyAbilityDataByType[abilities[i]];
-
-                abilityList.Add(CreateAbility(data, host, section));
+                abilityList.Add(CreateAbility(datas[i], owner, section));
             }
 
             return abilityList;
         }
+
         private IAbility CreateAbility(EnemyAbilityData data, ICombatant host, int section)
         {
-            Type type = Type.GetType(data.EnemyAbilityType.ToString());
+            string abilityName = $"JW.DungeonSliding.GamePlay.Ability.Enemy.{data.EnemyAbilityType}";
+            
+            Type type = Type.GetType(abilityName);
 
             if (type != null)
             {
                 // 생성자 호출 (매개변수가 있는 경우 포함)
-                object[] args = new object[] { data, _getter };
+                object[] args = new object[] { data, _service, host, section };
 
                 return (IAbility)Activator.CreateInstance(type, args);
             }
             else
             {
-                Debug.LogError("Not Exist Ability");
+                Debug.LogError($"Not Exist Ability {abilityName}");
                 return null;
             }
-
-
-            //switch (data.EnemyAbilityType)
-            //{
-            //    case EEnemyAbilityType.HeavyGravity: return new HeavyGravityAbility(data, _getter, host, section);
-            //    case EEnemyAbilityType.AutoRotate: return new AutoRotateAbility(data, _getter, host, section);
-            //    case EEnemyAbilityType.MoveBanToDirection: return new FacingMoveBanAbility(data, _getter, host, section);
-            //    case EEnemyAbilityType.CopyPlayerStat: return new CopyAbility(data, _getter, host, section);
-            //    case EEnemyAbilityType.Blind: return new BlindAbility(data, _getter, host, section);
-            //    case EEnemyAbilityType.EnhanceAbility: return new EnemyEnhanceAbility(data, _getter, host, section);
-            //    case EEnemyAbilityType.Exaltation: return new ExaltationAbility(data, _getter, host, section);
-            //    case EEnemyAbilityType.CommandRotate: return new CommandRotateAbility(data, _getter, host, section);
-            //    case EEnemyAbilityType.CounterAbility: return new CounterAbility(data, _getter, host, section);
-            //    case EEnemyAbilityType.DefenceFrontAttack: return new DefenceFrontAttackAbility(data, _getter, host, section);
-            //    case EEnemyAbilityType.AutoRotateToPlayer: return new RotateToPlayerAbility(data, _getter, host, section);
-            //    default: return null;
-            //}
         }
     }
 }

@@ -11,9 +11,36 @@ namespace JW.DungeonSliding.Core.Data
         public List<EnemyData> EnemyData { get; private set; }
         public List<EnemyData> EnemyBossData { get; private set; }
 
-        public List<EnemyAbilityData> EnemyAbilityDatas { get; private set; }
+        public Dictionary<string, EnemyAbilityData> _enemyAbility = new Dictionary<string, EnemyAbilityData>();
+
         public List<AbilityDataBase> Abilities { get; private set; }
         public GameConfig Config { get; private set; }
+
+        #region Getter
+
+        public EnemyAbilityData EnemyAbility(string name)
+        {
+            return _enemyAbility[name];
+        }
+        public List<EnemyAbilityData> EnemyAbilities(string name)
+        {
+            if (string.IsNullOrEmpty(name)) return null;
+
+            string[] abilities = name.Split('|');
+
+            List<EnemyAbilityData> abilityList = new List<EnemyAbilityData>();
+
+            for (int i = 0; i < abilities.Length; i++)
+            {
+                EnemyAbilityData data = _enemyAbility[abilities[i]];
+
+                abilityList.Add(data);
+            }
+
+            return abilityList;
+        }
+
+        #endregion
 
         public void Initialize()
         {
@@ -30,9 +57,14 @@ namespace JW.DungeonSliding.Core.Data
             //Abilities.AddRange(JsonConvert.DeserializeObject<List<RuleAbilityData>>(rule, settings));
             Abilities.AddRange(JsonConvert.DeserializeObject<List<StatAbilityData>>(stat, settings));
 
-            EnemyAbilityDatas = new List<EnemyAbilityData>();
             string enemyAbility = GameManager.Resource.GetTextData(ConstDataKey.ENEMY_ABILITY_DATA);
-            //EnemyAbilityDatas.AddRange(JsonConvert.DeserializeObject<List<EnemyAbilityData>>(enemyAbility, settings));
+            var enemyAbilities = JsonConvert.DeserializeObject<List<EnemyAbilityData>>(enemyAbility, settings);
+
+            for (int i = 0; i < enemyAbilities.Count; i++)
+            {
+                var data = enemyAbilities[i];
+                _enemyAbility.Add(data.Name, data);
+            }
 
             EnemyData = new List<EnemyData>();
             string enemyDatas = GameManager.Resource.GetTextData(ConstDataKey.ENEMY_DATA);

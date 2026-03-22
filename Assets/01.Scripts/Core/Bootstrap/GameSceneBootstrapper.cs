@@ -17,15 +17,22 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
     {
         private AbilitySystem _abilitySystem = new AbilitySystem();
         private CombatEventBus _combatEventBus = new();
-        private EnemyAbilityManager _enemyAbilityManager;
-        private EnemyAbilityFactory _enemyAbilityFactory;
+
+        private EnemyAbilityContext _enemyAbilityContext = new EnemyAbilityContext();
+        private EnemyAbilityFactory _enemyAbilityFactory = new EnemyAbilityFactory();
+
         private FieldCombatantManager _fieldCombatantManager;
+
         private GameVisualController _visualContoller;
         private GameSequenceController _modeController = new GameSequenceController();
         private GameTriggerEventBus _triggerEventBus = new GameTriggerEventBus();
+
         private InputCoordinator _inputCoordinator = new InputCoordinator();
+
         private LevelSystem _leveling = new LevelSystem();
+
         private MoveRule _moveRule = new MoveRule();
+
         private RewardManager _rewardManager = new RewardManager();
         private RouteBuilder _routeBuilder = new RouteBuilder();
 
@@ -104,7 +111,7 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
 
             _inputCoordinator.Init(_playerController.Moveable);
 
-            _enemyManager.WireInterfaces(_mapManager, _obstacleController, _gameSceneUIManager.EnemyStatUIService, _combatEventBus, _battleManager);
+            _enemyManager.WireInterfaces(_mapManager, _obstacleController, _gameSceneUIManager.EnemyStatUIService, _combatEventBus, _battleManager, _enemyAbilityFactory);
             _enemyManager.LoadData();
 
             _mapManager.Init(_playerController.Tile);
@@ -118,8 +125,13 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
             _enemyTooltipClicker.Initialize(_gameSceneUIManager.EnemyTooltipService);
 
             _visualContoller = new GameVisualController(cam, dirLight, playerLight, _gameSceneUIManager.EnemyStatUIService);
-            _enemyAbilityManager = new EnemyAbilityManager(_fieldCombatantManager, _moveRule, _playerController.StatReadOnly, _visualContoller);
-            _enemyAbilityFactory = new EnemyAbilityFactory(_enemyAbilityManager);
+            _enemyAbilityContext.Register<ICombatantSensor>(_fieldCombatantManager);
+            _enemyAbilityContext.Register<IMoveRule>(_moveRule);
+            _enemyAbilityContext.Register<IStatReadOnly>(_playerController.StatReadOnly);
+            _enemyAbilityContext.Register<IVisualController>(_visualContoller);
+            _enemyAbilityContext.Register<IRouteService>(_routeBuilder);
+
+            _enemyAbilityFactory.Init(_enemyAbilityContext);
         }
 
         private void BindEvent()

@@ -4,28 +4,32 @@ using JW.DungeonSliding.Map;
 using System;
 using System.Collections;
 
-namespace JW.DungeonSliding.GamePlay.Rotate
+namespace JW.DungeonSliding.GamePlay.Ability.Enemy
 {
-    public class AutoRotateAbility : EnemyAbilityBase
+    public class AutoRotate : EnemyAbilityBase
     {
-        public AutoRotateAbility(EnemyAbilityData data, IAbilityContextService context, ICombatant owner, int section) : base(data, context, owner, section) { }
+        IRouteService _moveable;
+        public AutoRotate(EnemyAbilityData data, IAbilityContextService context, ICombatant owner, int section) : base(data, context, owner, section) { }
 
         public override IEnumerator Execute(AbilityArgs args)
         {
+            if (_moveable.LastMoveTileCount == 0)
+                yield break;
+
             EDirectionType nextDirection = DirectionUtility.GetRightRotateResultDirection(_owner.Rotate.Direction);
             yield return _owner.Rotate.CoRotateToDirection(nextDirection);
         }
-
+          
         protected override void BindService()
         {
+            BindService(ref _moveable);
         }
     }
-
-    public class RotateToPlayerAbility : EnemyAbilityBase
+    public class AutoRotateToPlayer : EnemyAbilityBase
     {
         ICombatantSensor _sensor;
 
-        public RotateToPlayerAbility(EnemyAbilityData data, IAbilityContextService context, ICombatant owner, int section) : base(data, context, owner, section) { }
+        public AutoRotateToPlayer(EnemyAbilityData data, IAbilityContextService context, ICombatant owner, int section) : base(data, context, owner, section) { }
 
         public override IEnumerator Execute(AbilityArgs args)
         {
@@ -40,11 +44,10 @@ namespace JW.DungeonSliding.GamePlay.Rotate
             BindService(ref _sensor);
         }
     }
-
-    public class CommandRotateAbility : EnemyAbilityBase
+    public class CommandRotate : EnemyAbilityBase
     {
         ICombatantSensor _sensor;
-        public CommandRotateAbility(EnemyAbilityData data, IAbilityContextService context, ICombatant owner, int section) : base(data, context, owner, section) { }
+        public CommandRotate(EnemyAbilityData data, IAbilityContextService context, ICombatant owner, int section) : base(data, context, owner, section) { }
 
         public override IEnumerator Execute(AbilityArgs args)
         {

@@ -47,11 +47,6 @@ namespace JW.DungeonSliding.GamePlay.Ability
             service = _owner as T;
             return service != null;
         }
-
-        internal void Register<T>(object nextAttackEnhancer)
-        {
-            throw new NotImplementedException();
-        }
     }
 
     //어빌리티 추가

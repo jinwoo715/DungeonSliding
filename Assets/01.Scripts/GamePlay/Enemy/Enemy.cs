@@ -12,14 +12,10 @@ namespace JW.DungeonSliding.GamePlay.Entities
     public abstract class Enemy : Creature, IRewardSender
     {
         [SerializeField] private Transform _statUITransform;
-        [SerializeField] private EnemyStat _enemyStat;
-
         [SerializeField] private EnemyData _enemyData;
 
-        public event Action<EEnemyStatType> OnStatChangedEvent;
         public string Name => _enemyData.Name;
         public string Description => _enemyData.Description;
-        public string EnemyUID => _enemyData.UID;
         public Transform StatUITransform => _statUITransform;
 
         public event Action<Enemy> OnEnemyReturnEvent;
@@ -47,10 +43,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
             CreatureBaseStat stat = new CreatureBaseStat(hp, dmg, 100);
             InitData(stat);
-
-            OnStatChangedEvent?.Invoke(EEnemyStatType.HP);
-            OnStatChangedEvent?.Invoke(EEnemyStatType.Damage);
         }
+        
 
         public override void OnDeath()
         {

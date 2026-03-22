@@ -138,6 +138,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
             OnDeathEvent?.Invoke();
 
+            _abilityExcuter.Clear();
+
             _unRegisterRequesterEvent?.Invoke(this._attackRequester, (int)_creatureType);
         }
         void CheckHPOut()

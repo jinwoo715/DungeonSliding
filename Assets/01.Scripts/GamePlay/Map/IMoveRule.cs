@@ -48,19 +48,23 @@ namespace JW.DungeonSliding
         }
     }
 
-    public class EnemyAbilityManager : IEnemyAbilityGetter
+    public class EnemyAbilityContext : IAbilityContextService
     {
-        public ICombatantSensor CombatantSensor { get; private set; }
-        public IMoveRule MoveRule { get; private set; }
-        public IStatReadOnly PlayerStatReader { get; private set; }
-        public IVisualController VisualController { get; private set; }
+        private readonly Dictionary<Type, object> _services = new();
 
-        public EnemyAbilityManager(ICombatantSensor sensor, IMoveRule rule, IStatReadOnly reader, IVisualController visualController)
+        public void Register<T>(T service) where T : class
+            => _services[typeof(T)] = service;
+
+        public bool TryGet<T>(out T service) where T : class
         {
-            CombatantSensor = sensor;
-            MoveRule = rule;
-            PlayerStatReader = reader;
-            VisualController = visualController;
+            if (_services.TryGetValue(typeof(T), out var obj))
+            {
+                service = (T)obj;
+                return true;
+            }
+
+            service = null;
+            return service != null;
         }
     }
 
@@ -70,10 +74,11 @@ namespace JW.DungeonSliding
         public string UID;
         public string Name;
         public string Description;
-        public EEnemyAbilityType EnemyAbilityType;
+        public string EnemyAbilityType;
         public EGameEventTrigger GameTriggerType;
         public ECreatureTrigger CretureTriggerType;
-        public bool IsReleaseOnDeath;
+        public EGameEventTrigger ReleaseGameTrigger;
+        public ECreatureTrigger ReleaseCretureTrigger;
         public float BaseP1;
         public float GrowthP1;
         public float BaseP2;

@@ -3120,6 +3120,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _enemyPrefabList: {fileID: 2697088117165034762, guid: be8b0c4d58ce6314393137331f25c7ce, type: 3}
+  spawnNum: 0
 --- !u!1 &671494460
 GameObject:
   m_ObjectHideFlags: 0
