@@ -3,6 +3,7 @@ using JW.DungeonSliding.GamePlay.Combat;
 using JW.DungeonSliding.Map;
 using System;
 using System.Collections;
+using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Ability.Enemy
 {
@@ -18,6 +19,8 @@ namespace JW.DungeonSliding.GamePlay.Ability.Enemy
 
             EDirectionType nextDirection = DirectionUtility.GetRightRotateResultDirection(_owner.Rotate.Direction);
             yield return _owner.Rotate.CoRotateToDirection(nextDirection);
+
+            Debug.Log("Rotate End");
         }
           
         protected override void BindService()

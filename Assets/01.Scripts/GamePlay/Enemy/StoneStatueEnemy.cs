@@ -36,6 +36,9 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public override void TakeDamage(DamageContext damageInfo)
         {
             if (IsActive == false) return;
+            base.TakeDamage(damageInfo);
+
+            if (damageInfo.AppliedFinalDamage == 0) return;
 
             Vector3 punchScale = new Vector3(0.02f, 0f, 0.02f);
             _avatar.transform.DOPunchPosition(punchScale, _rotateDelay, 20);
@@ -45,12 +48,9 @@ namespace JW.DungeonSliding.GamePlay.Entities
             var particle = ParticlePool.Instance.GetParticle("HitDust");
             particle.SetParticle(this.transform.position + Vector3.up * 0.65f + GetHitParticlePosition(toDir), 1.0f);
 
-            base.TakeDamage(damageInfo);
 
             if (IsActive == false) return;
 
-
-            //적 흔들림 -> 회전 -> 턴 종료
             float targetRotation = GetEulerYByDirection(toDir);
             particle.transform.rotation = Quaternion.Euler(-20, targetRotation, 0);
 

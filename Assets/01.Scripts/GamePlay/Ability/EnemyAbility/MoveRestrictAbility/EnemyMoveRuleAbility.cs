@@ -2,20 +2,27 @@ using JW.DungeonSliding.GamePlay.Combat;
 using System.Collections;
 using UnityEngine;
 
-namespace JW.DungeonSliding.GamePlay.Ability.MoveRule
+namespace JW.DungeonSliding.GamePlay.Ability.Enemy
 {
-    public class HeavyGravityAbility : EnemyAbilityBase
+    public class HeavyGravity : EnemyAbilityBase
     {
         IMoveRule _moveRule;
-        public HeavyGravityAbility(EnemyAbilityData data, IAbilityContextService context, ICombatant owner, int section) : base(data, context, owner, section) { }
+        public HeavyGravity(EnemyAbilityData data, IAbilityContextService context, ICombatant owner, int section) : base(data, context, owner, section) { }
         public override IEnumerator Execute(AbilityArgs args)
         {
-            _moveRule.AddMoveCost(Mathf.RoundToInt(P1));
+            Debug.Log($"{args.CreatureTrigger}");
+
+            if (args.CreatureTrigger == _data.ReleaseCreatureTrigger)
+                ReleaseAbility();
+
+            if(args.CreatureTrigger == _data.CretureTriggerType)
+                _moveRule.AddMoveCost(Mathf.RoundToInt(P1));
 
             yield break;
         }
         public override void ReleaseAbility()
         {
+            Debug.Log("Recovery");
             _moveRule.AddMoveCost(-Mathf.RoundToInt(P1));
         }
 
@@ -24,15 +31,20 @@ namespace JW.DungeonSliding.GamePlay.Ability.MoveRule
             BindService(ref _moveRule);
         }
     }
-    public class FacingMoveBanAbility : EnemyAbilityBase
+    public class MoveBanToDirection : EnemyAbilityBase
     {
         IMoveRule _moveRule;
 
-        public FacingMoveBanAbility(EnemyAbilityData data, IAbilityContextService context, ICombatant owner, int section) : base(data, context, owner, section) { }
+        public MoveBanToDirection(EnemyAbilityData data, IAbilityContextService context, ICombatant owner, int section) : base(data, context, owner, section) { }
 
         public override IEnumerator Execute(AbilityArgs args)
         {
-            _moveRule.SetMoveBanDirection(_owner.Rotate.Direction);
+            if (args.CreatureTrigger == _data.ReleaseCreatureTrigger)
+                ReleaseAbility();
+
+            if (args.CreatureTrigger == _data.CretureTriggerType)
+                _moveRule.SetMoveBanDirection(_owner.Rotate.Direction);
+
             yield break;
         }
         public override void ReleaseAbility()

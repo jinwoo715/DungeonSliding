@@ -74,11 +74,11 @@ namespace JW.DungeonSliding
         public string UID;
         public string Name;
         public string Description;
-        public string EnemyAbilityType;
+        public string AbilityType;
         public EGameEventTrigger GameTriggerType;
         public ECreatureTrigger CretureTriggerType;
         public EGameEventTrigger ReleaseGameTrigger;
-        public ECreatureTrigger ReleaseCretureTrigger;
+        public ECreatureTrigger ReleaseCreatureTrigger;
         public float BaseP1;
         public float GrowthP1;
         public float BaseP2;

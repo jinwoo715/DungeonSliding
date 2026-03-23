@@ -1,6 +1,7 @@
 using JW.DungeonSliding.GamePlay;
 using JW.DungeonSliding.GamePlay.Combat;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -23,6 +24,8 @@ namespace JW.DungeonSliding.GamePlay.Ability
         private Dictionary<EGameEventTrigger, List<IAbility>> _gameTriggerAbilities = new();
         private Dictionary<ECreatureTrigger, List<IAbility>> _creatureTriggerAbilities = new();
 
+        private int _workingAbilityCount = 0;
+
         public event Action OnEndCreatureAbility;
         public event Action OnEndGameEventAbility;
 
@@ -34,7 +37,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
                 AbilityArgs args = new AbilityArgs(EGameEventTrigger.None, trigger);
                 foreach (var ability in abilities)
                 {
-                    StartCoroutine(ability.Execute(args));
+                    StartCoroutine(RunAbilityWithCounter(ability, args));
                 }
             }
 
@@ -52,8 +55,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
                     {
                         receiver.ReceivePayload(data);
                     }
-
-                    StartCoroutine(ability.Execute(args));
+                    StartCoroutine(RunAbilityWithCounter(ability, args));
                 }
             }
 
@@ -67,7 +69,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
                 foreach (var ability in abilities)
                 {
-                    StartCoroutine(ability.Execute(args));
+                    StartCoroutine(RunAbilityWithCounter(ability, args));
                 }
             }
         }
@@ -83,10 +85,25 @@ namespace JW.DungeonSliding.GamePlay.Ability
                         receiver.ReceivePayload(data);
                     }
 
-                    StartCoroutine(ability.Execute(args));
+                    StartCoroutine(RunAbilityWithCounter(ability, args));
                 }
             }
         }
+
+        private IEnumerator RunAbilityWithCounter(IAbility ability, AbilityArgs args)
+        {
+            Debug.Log(ability.ToString());
+
+            _workingAbilityCount++;
+            AbilityBusyCounter.RegisterWorkAbility(); // 1. 카운터 증가
+
+            yield return StartCoroutine(ability.Execute(args));
+
+            AbilityBusyCounter.UnRegisterWorkAbility(); // 3. 완료 후 카운터 감소
+            _workingAbilityCount--;
+            Debug.Log(ability.ToString());
+        }
+
         #endregion
 
         #region Registration
@@ -131,11 +148,40 @@ namespace JW.DungeonSliding.GamePlay.Ability
             {
                 Debug.Log(ability.ToString());
 
-                if(ability.CreatureTrigger != ECreatureTrigger.None)
-                    RegisterCreatureEventAbility(ability.CreatureTrigger, ability);
+                if (ability.CreatureTrigger != ECreatureTrigger.None)
+                {
+                    // EGameEventTrigger에 정의된 모든 Enum 값을 순회
+                    foreach (ECreatureTrigger triggerFlag in Enum.GetValues(typeof(ECreatureTrigger)))
+                    {
+                        // None 값은 등록할 필요가 없으므로 패스
+                        if (triggerFlag == ECreatureTrigger.None)
+                            continue;
+
+                        // 합쳐진 GameTrigger 안에 현재 순회 중인 triggerFlag가 포함되어 있는지 검사
+                        if (ability.CreatureTrigger.HasFlag(triggerFlag))
+                        {
+                            RegisterCreatureEventAbility(triggerFlag, ability);
+                        }
+                    }
+                }
+
 
                 if (ability.GameTrigger != EGameEventTrigger.None)
-                    RegisterGameEventAbility(ability.GameTrigger, ability);
+                {
+                    // EGameEventTrigger에 정의된 모든 Enum 값을 순회
+                    foreach (EGameEventTrigger triggerFlag in Enum.GetValues(typeof(EGameEventTrigger)))
+                    {
+                        // None 값은 등록할 필요가 없으므로 패스
+                        if (triggerFlag == EGameEventTrigger.None)
+                            continue;
+
+                        // 합쳐진 GameTrigger 안에 현재 순회 중인 triggerFlag가 포함되어 있는지 검사
+                        if (ability.GameTrigger.HasFlag(triggerFlag))
+                        {
+                            RegisterGameEventAbility(triggerFlag, ability);
+                        }
+                    }
+                }
             }
         }
         #endregion
@@ -167,6 +213,13 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         public void Clear()
         {
+            for (int i = 0; i < _workingAbilityCount; i++)
+            {
+                AbilityBusyCounter.UnRegisterWorkAbility();
+            }
+
+            _workingAbilityCount = 0;
+
             _creatureTriggerAbilities.Clear();
 
             var keys = _gameTriggerAbilities.Keys;
@@ -193,7 +246,5 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
             _creatureTriggerAbilities.Clear();
         }
-
-
     }
 }

@@ -30,7 +30,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         private IAbility CreateAbility(EnemyAbilityData data, ICombatant host, int section)
         {
-            string abilityName = $"JW.DungeonSliding.GamePlay.Ability.Enemy.{data.EnemyAbilityType}";
+            string abilityName = $"JW.DungeonSliding.GamePlay.Ability.Enemy.{data.AbilityType}";
             
             Type type = Type.GetType(abilityName);
 

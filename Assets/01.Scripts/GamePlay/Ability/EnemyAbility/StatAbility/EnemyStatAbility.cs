@@ -3,14 +3,14 @@ using JW.DungeonSliding.GamePlay.Stats;
 using System.Collections;
 using UnityEngine;
 
-namespace JW.DungeonSliding.GamePlay.Ability.Stat
+namespace JW.DungeonSliding.GamePlay.Ability.Enemy
 {
-    public class StatCopyAbility : EnemyAbilityBase
+    public class CopyPlayerStat : EnemyAbilityBase
     {
         ICombatantSensor _sensor;
         IStatReadOnly _ownerStat;
         IStatModifier _ownerStatModifier;
-        public StatCopyAbility(EnemyAbilityData data, IAbilityContextService context, ICombatant owner, int section) : base(data, context, owner, section) { }
+        public CopyPlayerStat(EnemyAbilityData data, IAbilityContextService context, ICombatant owner, int section) : base(data, context, owner, section) { }
 
         public override IEnumerator Execute(AbilityArgs args)
         {
@@ -19,15 +19,26 @@ namespace JW.DungeonSliding.GamePlay.Ability.Stat
             int playerHP = playerStat.Get(ECreatureStatType.CurrentHP);
             int playerDamage = playerStat.Get(ECreatureStatType.Damage);
 
-            int copyHPValue = Mathf.RoundToInt(playerHP * P1);
-            int copyDamageValue = Mathf.RoundToInt(playerDamage * P2);
+            float hpRatio = P1 * 0.01f;
+            float damageRatio = P2 * 0.01f;
+
+            int copyHPValue = Mathf.RoundToInt(playerHP * hpRatio);
+            int copyDamageValue = Mathf.RoundToInt(playerDamage * damageRatio);
 
             int ownerHP = _ownerStat.Get(ECreatureStatType.CurrentHP);
             int ownerDamage = _ownerStat.Get(ECreatureStatType.Damage);
 
+            //현재가 40, 복사한 값이 20일 때,
+            //현재가 20, 복사한 값이 40일 때,
+
             int diffHP = copyHPValue - ownerHP;
             int diffDamage = copyDamageValue - ownerDamage;
-            
+
+            Debug.Log($"Copy HP : {copyHPValue}, Copy Dmg : {copyDamageValue}");
+            Debug.Log($"Current HP : {ownerHP}, Current Dmg : {ownerDamage}");
+
+            //TODO 수정중
+            _ownerStatModifier.ModifyStat(new StatModifierContext(ECreatureStatType.MaxHp, EApplyStatType.Add, diffHP));
             _ownerStatModifier.ModifyStat(new StatModifierContext(ECreatureStatType.CurrentHP, EApplyStatType.Add, diffHP));
             _ownerStatModifier.ModifyStat(new StatModifierContext(ECreatureStatType.Damage, EApplyStatType.Add, diffDamage));
 

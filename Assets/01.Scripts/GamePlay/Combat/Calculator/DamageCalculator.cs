@@ -41,7 +41,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
             int attackDir = (int)attacker.Rotate.Direction;
             int targetDir = (int)target.Rotate.Direction;
 
-            return (attackDir - targetDir) == 2;
+            return Mathf.Abs(attackDir - targetDir) == 2;
         }
         public static EDirectionType ReverseDirection(EDirectionType currentDir)
         {

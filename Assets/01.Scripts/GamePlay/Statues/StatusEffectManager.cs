@@ -21,6 +21,8 @@ namespace JW.DungeonSliding.GamePlay.Statues
         }
         public void ApplyStatus(ECreatureStatus status, int durationTurnCount)
         {
+            Debug.Log($"Add Status : {status}");
+
             _statusFlags |= status;
 
             if (_statusDurations.TryGetValue(status, out int value))

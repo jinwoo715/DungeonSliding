@@ -12,8 +12,8 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         public float P1 { get; private set; }
         public float P2 { get; private set; }
-        public EGameEventTrigger GameTrigger => _data.GameTriggerType;
-        public ECreatureTrigger CreatureTrigger => _data.CretureTriggerType;
+        public EGameEventTrigger GameTrigger => _data.GameTriggerType | _data.ReleaseGameTrigger;
+        public ECreatureTrigger CreatureTrigger => _data.CretureTriggerType | _data.ReleaseCreatureTrigger;
         public EnemyAbilityBase(EnemyAbilityData data, IAbilityContextService contextService, ICombatant owner, int section)
         {
             _data = data;
@@ -22,6 +22,8 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
             CalculateParam(section);
             BindService();
+
+
         }
         public abstract IEnumerator Execute(AbilityArgs args);
         public virtual void ReleaseAbility() { }

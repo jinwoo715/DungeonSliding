@@ -3,7 +3,7 @@ using JW.DungeonSliding.GamePlay.Entities;
 using System.Collections;
 using UnityEngine;
 
-namespace JW.DungeonSliding.GamePlay.Ability.Combat
+namespace JW.DungeonSliding.GamePlay.Ability.Enemy
 {
     public class ChanceCounterAbility : EnemyAbilityBase, IAbilityPayloadReceiver<HitResultPayload>
     {
@@ -34,17 +34,17 @@ namespace JW.DungeonSliding.GamePlay.Ability.Combat
             _attackRequester = _owner.AttackRequester;
         }
     }
-    public class DefenceFrontAttackAbility : EnemyAbilityBase, IAbilityPayloadReceiver<TakeAttackPayLoad>
+    public class DefenceFrontAttack : EnemyAbilityBase, IAbilityPayloadReceiver<TakeAttackPayLoad>
     {
         TakeAttackPayLoad _payload;
         IStatusModifier _statusModifier;
-        public DefenceFrontAttackAbility(EnemyAbilityData data, IAbilityContextService context, ICombatant owner, int section) : base(data, context, owner, section) { }
+        public DefenceFrontAttack(EnemyAbilityData data, IAbilityContextService context, ICombatant owner, int section) : base(data, context, owner, section) { }
 
         public override IEnumerator Execute(AbilityArgs args)
         {
-            if(DirectionUtility.IsFacingAttack(_payload.Attacker, _owner))
+            if (DirectionUtility.IsFacingAttack(_payload.Attacker, _owner))
             {
-                _statusModifier.ApplyStatus(Entities.ECreatureStatus.Barrier, 1);
+                _statusModifier.ApplyStatus(ECreatureStatus.Barrier, 1);
             }
 
             yield break;

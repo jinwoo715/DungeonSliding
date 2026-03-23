@@ -63,6 +63,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             _combatController.OnPerformedAttack += (value) => _abilityExcuter.ExecuteCreatureTrigger(ECreatureTrigger.OnAttackPerformed, value);
             _combatController.OnBackAttacked += () => Ability.ExecuteCreatureTrigger(ECreatureTrigger.OnBackAttacked);
             _combatController.OnHitted += (value) => Ability.ExecuteCreatureTrigger(ECreatureTrigger.OnAfterHitted, value);
+            _combatController.OnBeforeHit += (value) => Ability.ExecuteCreatureTrigger(ECreatureTrigger.OnBeforeHitted, value);
 
             _stat.OnStatChanged += (value) => { _attackEnhancer.CalculateFinalExtraDamage(); };
 
@@ -102,16 +103,15 @@ namespace JW.DungeonSliding.GamePlay.Entities
         #region Combat
         public virtual void TakeDamage(DamageContext damageInfo)
         {
-            if (StatusReadOnly.HasStatus(ECreatureStatus.Barrier))
+            if (_combatController.TryTakeDamage(damageInfo))
             {
-                StatusModifier.RemoveStatus(ECreatureStatus.Barrier);
-                EndHittedAnimation();
-                return;
+                _animatorController.SetAnimationTrigger(ConstString.HIT_ANIM);
+                CheckHPOut();
             }
-
-            _combatController.TakeDamage(damageInfo);
-            _animatorController.SetAnimationTrigger(ConstString.HIT_ANIM);
-            CheckHPOut();
+            else
+            {
+                EndHittedAnimation();
+            }
         }
         public virtual void ExcuteAttack(ActPair actPair)
         {
@@ -149,6 +149,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
             if (!IsOutOfHp()) return;
                 Ability.ExecuteCreatureTrigger(ECreatureTrigger.OnDeath);
+            Debug.Log($"{name} : OnDeath");
 
             if (!IsOutOfHp()) return;
 

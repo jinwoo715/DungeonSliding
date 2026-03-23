@@ -146,12 +146,19 @@ namespace JW.DungeonSliding.GamePlay.Combat
         }
 
         //TODO 피격 판정 수정
-        public void TakeDamage(DamageContext damageContext)
+        public bool TryTakeDamage(DamageContext damageContext)
         {
             _receivedDamageContext = damageContext;
             LastAttacker = _receivedDamageContext.Attacker;
 
             OnBeforeHit?.Invoke(new TakeAttackPayLoad(damageContext.Attacker, damageContext.Damage));
+
+            if (_owner.StatusReadOnly.HasStatus(ECreatureStatus.Barrier))
+            {
+                _owner.StatusModifier.RemoveStatus(ECreatureStatus.Barrier);
+                damageContext.AppliedFinalDamage = 0;
+                return false;
+            }
 
             int finalDamage = CalculateFinalDamage(damageContext.Damage);
             damageContext.AppliedFinalDamage = finalDamage;
@@ -162,7 +169,6 @@ namespace JW.DungeonSliding.GamePlay.Combat
             CombatEventBus.Excuter.RaiseDamageEvent(new DamageEvent(LastAttacker, _owner, finalDamage, damageContext.IsCritical));
 
             OnHitted?.Invoke(new HitResultPayload(damageContext.Attacker, finalDamage, damageContext.IsCounterAttack));
-
 
             if(damageContext.Status.TryGetValue(ECreatureStatus.Execution, out int value))
             {
@@ -187,6 +193,8 @@ namespace JW.DungeonSliding.GamePlay.Combat
             }
 
             _isHitted = true;
+
+            return true;
         }
         public int CalculateFinalDamage(int baseDamage)
         {

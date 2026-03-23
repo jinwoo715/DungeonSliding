@@ -20,7 +20,7 @@ namespace JW.DungeonSliding.Core.Flow
             GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameEventTrigger.OnBattleEnd, ExitStartBattle);
 
             AbilityBusyCounter.OnWorkingAbility += () => EnterGameMode(EGameModeType.WorkingAbility);
-            AbilityBusyCounter.OnWorkingAbility += () => ExitGameMode(EGameModeType.WorkingAbility);
+            AbilityBusyCounter.OnEndAllAbility += () => ExitGameMode(EGameModeType.WorkingAbility);
         }
 
         public void SubscribeModeEvent(EGameModeType mode, Action action)
@@ -43,10 +43,12 @@ namespace JW.DungeonSliding.Core.Flow
 
         public void EnterGameMode(EGameModeType flowType)
         {
+            if (flowType == EGameModeType.WorkingAbility) Debug.Log("Enter Work");
             _gameFlowType |= flowType;
         }
         public void ExitGameMode(EGameModeType flowType)
         {
+            if (flowType == EGameModeType.WorkingAbility) Debug.Log("Exit Work");
             _gameFlowType &= ~flowType;
         }
         public void Clear()
