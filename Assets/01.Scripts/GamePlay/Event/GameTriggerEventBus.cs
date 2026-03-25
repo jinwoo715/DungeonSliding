@@ -21,7 +21,7 @@ namespace JW.DungeonSliding.GamePlay
             if (Instance == this) Instance = null;
             _triggerEventsByTriggerType.Clear(); // 데이터도 함께 청소
         }
-        public void SubscribeTriggerEvent(EGameEventTrigger triggerType, Action bindAction)
+        public Action SubscribeTriggerEvent(EGameEventTrigger triggerType, Action bindAction)
         {
             if (!_triggerEventsByTriggerType.ContainsKey(triggerType))
             {
@@ -29,6 +29,8 @@ namespace JW.DungeonSliding.GamePlay
             }
 
             _triggerEventsByTriggerType[triggerType] += bindAction;
+
+            return bindAction;
         }
         public void UnSubscribeTriggerEvent(EGameEventTrigger triggerType, Action bindAction)
         {

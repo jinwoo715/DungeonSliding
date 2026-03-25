@@ -2,9 +2,9 @@ using JW.DungeonSliding.GamePlay.Combat;
 using System.Collections;
 using UnityEngine;
 
-namespace JW.DungeonSliding.GamePlay.Ability.Visual
+namespace JW.DungeonSliding.GamePlay.Ability.Enemy
 {
-    public class BlindAbility : EnemyAbilityBase
+    public class Blind : EnemyAbilityBase
     {
         IVisualController _visualController;
         bool isBlined = false;
@@ -12,7 +12,7 @@ namespace JW.DungeonSliding.GamePlay.Ability.Visual
         int _turnCount = 0;
         int _blindCount = 0;
 
-        public BlindAbility(EnemyAbilityData data, IAbilityContextService context, ICombatant owner, int section) : base(data, context, owner, section) { }
+        public Blind(EnemyAbilityData data, IAbilityContextService context, ICombatant owner, int section) : base(data, context, owner, section) { }
 
         public override IEnumerator Execute(AbilityArgs args)
         {

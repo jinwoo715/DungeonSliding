@@ -6,7 +6,21 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Combat 
 {
-    public class BattleManager : MonoBehaviour, IAttackRequestListener, IRequesterRegistry
+    public interface IBattleResult
+    {
+        BattleResultPayload GatBattleResult();
+        bool IsBattleTurn();
+    }
+    public struct BattleResultPayload
+    {
+        public int CombatCount;
+        public BattleResultPayload(int combatCount)
+        {
+            CombatCount = combatCount;
+        }
+    }
+
+    public class BattleManager : MonoBehaviour, IAttackRequestListener, IRequesterRegistry, IBattleResult
     {
         //TODO BattleManager
         private ICombatantSensor _combatSensor;
@@ -16,11 +30,12 @@ namespace JW.DungeonSliding.GamePlay.Combat
         private Queue<ActPair> _actPairs = new Queue<ActPair>();
         private Queue<ActPair> _counterActPairs = new Queue<ActPair>();
 
+        private int _combatCount = 0;
+
         public void Init(ICombatantSensor combatantSensor)
         {
             _combatSensor = combatantSensor;
         }
-
         public void StartBattleSequence()
         {
             GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTrigger.OnBattleStart);
@@ -41,6 +56,8 @@ namespace JW.DungeonSliding.GamePlay.Combat
         {
             while (_actPairs.Count > 0 || _counterActPairs.Count > 0)
             {
+                _combatCount++;
+
                 ActPair act;
                 if (_counterActPairs.Count > 0)
                 {
@@ -92,9 +109,10 @@ namespace JW.DungeonSliding.GamePlay.Combat
             }
 
             GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTrigger.OnBattleEnd);
-
+            
             _actPairs.Clear();
             _counterActPairs.Clear();
+            _combatCount = 0;
         }
         public void EnqueueActPair(ActPair pair)
         {
@@ -104,7 +122,6 @@ namespace JW.DungeonSliding.GamePlay.Combat
         {
             _counterActPairs.Enqueue(pair);
         }
-
         public void RegisterAttackRequester(IAttackRequester requester, int priority)
         {
             if (!_requesterByPriority.ContainsKey(priority))
@@ -126,6 +143,15 @@ namespace JW.DungeonSliding.GamePlay.Combat
                     requester.OnRequestCounterAttack -= EnqueueCounterActPair;
                 }
             }
+        }
+
+        public BattleResultPayload GatBattleResult()
+        {
+            return new BattleResultPayload(_combatCount);
+        }
+        public bool IsBattleTurn()
+        {
+            return _combatCount != 0;
         }
     }
 }

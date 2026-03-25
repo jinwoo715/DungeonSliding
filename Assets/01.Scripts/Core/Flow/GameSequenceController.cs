@@ -1,5 +1,6 @@
 using JW.DungeonSliding.GamePlay;
 using JW.DungeonSliding.GamePlay.Ability;
+using JW.DungeonSliding.GamePlay.Combat;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,15 +15,25 @@ namespace JW.DungeonSliding.Core.Flow
 
         public Dictionary<EGameModeType, Action> GameModeEvent = new();
 
-        public void Init()
+        IRouteService _routeService;
+        IBattleResult _battleResult;
+        public bool IsValidTurn()
         {
+            bool result = (_battleResult.IsBattleTurn() || _routeService.LastMoveTileCount != 0);
+            return result;
+        }
+
+        public void Init(IRouteService routeService, IBattleResult battleResult)
+        {
+            _routeService = routeService;
+            _battleResult = battleResult;
+
             GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameEventTrigger.OnBattleStart, EnterStartBattle);
             GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameEventTrigger.OnBattleEnd, ExitStartBattle);
 
             AbilityBusyCounter.OnWorkingAbility += () => EnterGameMode(EGameModeType.WorkingAbility);
             AbilityBusyCounter.OnEndAllAbility += () => ExitGameMode(EGameModeType.WorkingAbility);
         }
-
         public void SubscribeModeEvent(EGameModeType mode, Action action)
         {
             if (GameModeEvent.ContainsKey(mode))
@@ -32,15 +43,17 @@ namespace JW.DungeonSliding.Core.Flow
 
             GameModeEvent[mode] += action;
         }
-
         private void EnterStartBattle() => EnterGameMode(EGameModeType.Battle);
         private void ExitStartBattle() 
         {
             ExitGameMode(EGameModeType.Battle);
-            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTrigger.OnTurnEnd);
+
+            if (IsValidTurn())
+            {
+                GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTrigger.OnTurnEnd);
+            }
             GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTrigger.OnTurnStart);
         }
-
         public void EnterGameMode(EGameModeType flowType)
         {
             if (flowType == EGameModeType.WorkingAbility) Debug.Log("Enter Work");

@@ -131,13 +131,16 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
             _creatureTriggerAbilities[trigger].Add(ability);
         }
+
+        List<(EGameEventTrigger, Action)> GameActions = new List<(EGameEventTrigger, Action)>();
+
         public void RegisterGameEventAbility(EGameEventTrigger trigger, IAbility ability)
         {
             if (!_gameTriggerAbilities.ContainsKey(trigger))
             {
                 _gameTriggerAbilities.Add(trigger, new List<IAbility>());
 
-                GameTriggerEventBus.Instance.SubscribeTriggerEvent(trigger, () => ExecuteGameEventAbility(trigger));
+                GameActions.Add((trigger, GameTriggerEventBus.Instance.SubscribeTriggerEvent(trigger, () => ExecuteGameEventAbility(trigger))));
             }
 
             _gameTriggerAbilities[trigger].Add(ability);
@@ -231,8 +234,14 @@ namespace JW.DungeonSliding.GamePlay.Ability
                     ability.ReleaseAbility();
                 }
 
-                GameTriggerEventBus.Instance.SubscribeTriggerEvent(key, () => ExecuteGameEventAbility(key));
+//                GameTriggerEventBus.Instance.SubscribeTriggerEvent(key, () => ExecuteGameEventAbility(key));
             }
+
+            foreach (var ability in GameActions)
+            {
+                GameTriggerEventBus.Instance.UnSubscribeTriggerEvent(ability.Item1, ability.Item2);
+            }
+            GameActions.Clear();
 
             _gameTriggerAbilities.Clear();
 

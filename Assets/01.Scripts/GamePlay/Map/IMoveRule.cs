@@ -126,34 +126,34 @@ namespace JW.DungeonSliding
 
     public enum ECreatureTrigger
     {
-        None,
+        None = 0,
 
-        OnAdded,
+        OnAdded = 1 << 0,
 
-        OnRotate,
+        OnRotate = 1 << 1,
 
         // 공격 시퀀스
-        OnRegisterAttack,
-        OnAttackPrepared,   // 공격 직전 (버프 주입, 데미지 계산 전)
-        OnAttackPerformed,  // 공격 실행 완료 (흡혈, 처치 시 효과) - OnAttacked 대신 더 명확한 표현
-        OnBackAttacked,
-        OnKilled,
+        OnRegisterAttack = 1 << 2,
+        OnAttackPrepared = 1 << 3,   // 공격 직전 (버프 주입, 데미지 계산 전)
+        OnAttackPerformed = 1 << 4,  // 공격 실행 완료 (흡혈, 처치 시 효과) - OnAttacked 대신 더 명확한 표현
+        OnBackAttacked = 1 << 5,
+        OnKilled = 1 << 6,
 
         // 피격 시퀀스
-        OnBeforeHitted,     // 데미지 계산 전 (방어 버프, 회피 판정) - OnReceivedAttack 대응
-        OnAfterHitted,      // 데미지 계산 및 체력 감소 후 (반격, 피격 시 연출) - OnHitted 대응
-        OnHittedBackAttack,
+        OnBeforeHitted = 1 << 7,     // 데미지 계산 전 (방어 버프, 회피 판정) - OnReceivedAttack 대응
+        OnAfterHitted = 1 << 8,      // 데미지 계산 및 체력 감소 후 (반격, 피격 시 연출) - OnHitted 대응
+        OnHittedBackAttack = 1 << 9,
 
-        OnSlided,
+        OnSlided = 1 << 10,
 
-        OnSteppedEffectTile,
-        OnBlockedByWall,
-        OnLevelUp,
+        OnSteppedEffectTile = 1 << 11,
+        OnBlockedByWall = 1 << 12,
+        OnLevelUp = 1 << 13,
 
-        OnDeathByHp,
-        OnDeathByMoveCount,
+        OnDeathByHp = 1 << 14,
+        OnDeathByMoveCount = 1 << 15,
 
-        OnDeath
+        OnDeath = 1 << 16
     }
 
     

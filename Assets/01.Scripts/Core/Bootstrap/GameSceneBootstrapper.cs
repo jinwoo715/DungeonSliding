@@ -120,7 +120,7 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
 
             _rewardManager.Init(_combatEventBus);
 
-            _modeController.Init();
+            _modeController.Init(_routeBuilder, _battleManager);
 
             _enemyTooltipClicker.Initialize(_gameSceneUIManager.EnemyTooltipService);
 
