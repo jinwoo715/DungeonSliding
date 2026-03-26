@@ -15,7 +15,7 @@ namespace JW.DungeonSliding
             MapData mapData = ScriptableObject.CreateInstance<MapData>();
             mapData.Width = mapDataContext.XCount;
             mapData.Height = mapDataContext.ZCount;
-            mapData.MapTiles = (int[])mapDataContext.TileArray.Clone();
+            //mapData.MapTiles = (int[])mapDataContext.TileArray.Clone();
             mapData.CretureTempletes = mapDataContext.CreatureTempletes;
             if (!IsPlayerValid(mapData.CretureTempletes))
             {

@@ -8,7 +8,7 @@ namespace JW.DungeonSliding
     {
         public int Width;
         public int Height;
-        public int[] MapTiles;
+        public bool[] MapTiles;
 
         public List<CreatureTemplete> CretureTempletes;
         public EffectObjectData[] effectTileDatas;

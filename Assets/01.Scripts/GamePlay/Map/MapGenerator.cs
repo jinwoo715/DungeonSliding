@@ -107,7 +107,7 @@ namespace JW.DungeonSliding
                 var data = ScriptableObject.CreateInstance<MapData>();
                 data.Width = cfg.Width;
                 data.Height = cfg.Height;
-                data.MapTiles = tiles;
+                //data.MapTiles = tiles;
 
                 data.effectTileDatas = effects.ToArray();
                 return data;
@@ -887,7 +887,7 @@ namespace JW.DungeonSliding
             var data = ScriptableObject.CreateInstance<MapData>();
             data.Width = w;
             data.Height = h;
-            data.MapTiles = tiles;
+            //data.MapTiles = tiles;
            
             data.effectTileDatas = Array.Empty<EffectObjectData>();
             return data;

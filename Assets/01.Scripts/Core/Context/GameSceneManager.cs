@@ -11,6 +11,7 @@ using JW.DungeonSliding.UI;
 using UnityEngine.SceneManagement;
 using System;
 using JW.DungeonSliding.Core;
+using JW.DungeonSliding.GamePlay.Stage;
 
 namespace JW.DungeonSliding.GamePlay.Context
 {
@@ -30,7 +31,7 @@ namespace JW.DungeonSliding.GamePlay.Context
         private InputSystem _inputSystem;
         private GameSequenceController _gameModeController;
         private IUIFader _uiFader;
-        private IObstacleRequest _obstacleRequest;
+        private IFieldObstacleService _obstacleRequest;
 
         public event Action<int, int> OnChangeActEvent;
         public event Action<int, int> OnChangeFloorEvent;
@@ -42,10 +43,11 @@ namespace JW.DungeonSliding.GamePlay.Context
         private int _actCount;
         private bool _isGameStart = false;
 
+        IStageService _stageSerivce;
         public void Init(RewardManager reward, MapManager map,
             ICombatant player, EnemyManager enemyManager, BattleManager battleManager, 
             InputSystem input, GameSequenceController gameModeController, IUIFader uiFader
-            , IObstacleRequest obstacleRequest)
+            , IFieldObstacleService obstacleRequest, IStageService stageSerivce)
         {
             PlayerReward = reward;
             _mapManager = map;
@@ -56,9 +58,10 @@ namespace JW.DungeonSliding.GamePlay.Context
             _gameModeController = gameModeController;
             _uiFader = uiFader;
             _obstacleRequest = obstacleRequest;
+            _stageSerivce = stageSerivce;
 
             _floorPerAct = GameManager.Config.Act.ActPerFloor;
-            _actCount = GameManager.Config.Act.ActCount;
+            _actCount = GameManager.Config.Act.TotalFloor;
 
             GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameEventTrigger.OnClearStage, ClearFloor);
             GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameEventTrigger.OnTurnStart, CheckGameOver);
@@ -71,17 +74,17 @@ namespace JW.DungeonSliding.GamePlay.Context
 
         private void UpdateActFloor()
         {
-            Floor++;
+            //Floor++;
 
-            if (Floor > _floorPerAct-1)
-            {
-                Act++;
-                Floor -= _floorPerAct;
+            //if (Floor > _floorPerAct-1)
+            //{
+            //    Act++;
+            //    Floor -= _floorPerAct;
 
-            }
+            //}
 
-            OnChangeActEvent?.Invoke(Act, _actCount);
-            OnChangeFloorEvent?.Invoke(Floor, _floorPerAct);
+            //OnChangeActEvent?.Invoke(Act, _actCount);
+            //OnChangeFloorEvent?.Invoke(Floor, _floorPerAct);
         }
 
         public void ClearFloor()
@@ -99,10 +102,12 @@ namespace JW.DungeonSliding.GamePlay.Context
 
             yield return _uiFader.FadeOut();
 
-            _obstacleRequest.ClearObstacles();
 
-            _mapManager.SetMap(Act, Floor);
-            
+            _stageSerivce.StartStage();
+            //_obstacleRequest.ClearObstacles();
+
+            //_mapManager.SetMap(Floor);
+
             UpdateActFloor();
 
             yield return _uiFader.FadeIn();

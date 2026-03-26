@@ -11,5 +11,10 @@ namespace JW.DungeonSliding
             Debug.Log($"Ran : {ranNum}");
             return chance >= ranNum;
         }
+        public static int GetRandomNum(int excludeMax)
+        {
+            int ranNum = UnityEngine.Random.Range(0, excludeMax);
+            return ranNum;
+        }
     }
 }

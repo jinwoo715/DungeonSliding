@@ -137,7 +137,7 @@ namespace JW.DungeonSliding
             var data = ScriptableObject.CreateInstance<MapData>();
             data.Width = width;
             data.Height = height;
-            data.MapTiles = tiles;
+            //data.MapTiles = tiles;
             return data;
         }
 

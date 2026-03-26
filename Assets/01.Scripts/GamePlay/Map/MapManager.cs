@@ -6,10 +6,10 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace JW.DungeonSliding.Map 
 {
-    public class MapManager : MonoBehaviour, IBoard, IMoveContextProvider, ITileCheckService
+    public class MapManager : MonoBehaviour, IBoard, IMoveContextProvider, ITileCheckService, IMapService
     {
         [SerializeField] private TileGenerator _tileMap;
-        [SerializeField] private EffectObjectGenerator _effectObjectGenerator;
+        [SerializeField] private EffectTileGenerator _effectTileGenerator;
 
         [Header("Outer Wall")]
         [SerializeField] private Transform _upperWall;
@@ -26,57 +26,51 @@ namespace JW.DungeonSliding.Map
         private HashSet<Tile> _obstacleTiles = new HashSet<Tile>();
         private Dictionary<Tile, IEffectTile> _effectTileDic = new Dictionary<Tile, IEffectTile>();
 
-        private MapBundle MapData;
-        private ShuffleBag<MapData> _mapBag;
-        private MapData _currentMapData;
-        private ShuffleBag<CreatureTemplete> _creatureShuffleBag;
+        private int _height;
+        private int _width;
 
         private int[,] _dir = { { 0,1 }, {1,0 }, {0,-1 }, { -1, 0 } };
-        private ITileObject _player;
 
-        int _currentAct = 0;
-
-        public void Init(ITileObject player)
+        public void Init()
         {
-            _player = player;
-            MapData = GameManager.Resource.MapBundle;
-
-            _mapBag = new ShuffleBag<MapData>(MapData.GetActMapBundle(_currentAct).MapDatas);
-
             _tileMap.Init(this);
-            _effectObjectGenerator.SetBoard(this);
+            _effectTileGenerator.SetBoard(this);
         }
-        public void SetMap(int act, int floor)
+        public void SetMap(bool[] tiles, int height, int width, EffectObjectData[] effectObjects)
         {
-            _currentMapData = _mapBag.GetItem();
-            _creatureShuffleBag = new ShuffleBag<CreatureTemplete>(_currentMapData.CretureTempletes);
+            _height = height;
+            _width = width;
 
-            _tileMapData = new bool[_currentMapData.Height * _currentMapData.Width];
+            _tileMapData = new bool[height * width];
+            Debug.Log(_tileMapData);
+            _tileMap.SetMap(tiles, height, width);
+            _effectTileGenerator.SetMap(effectObjects);
 
-            _tileMap.SetMap(_currentMapData.MapTiles, _currentMapData.Height, _currentMapData.Width);
-            _effectObjectGenerator.SetMap(_currentMapData.effectTileDatas);
+            SetOutWallPositionAndScale();
 
-            var templete = _creatureShuffleBag.GetItem();
+            cameraController.SetCamera(_width, _height);
+        }
 
-            int actNum = floor % 3;
+        private void SetOutWallPositionAndScale()
+        {
+            float x = (_height / 2) - 0.5f;
 
-            RequestSpawnEnemyEvent?.Invoke(templete.NomalEnemyPos, templete.BossEnemyPos, act, floor);
-
-            _player.SetPosition(templete.PlayerPos);
-
-            float x = (_currentMapData.Height / 2) - 0.5f;
-
-            _leftWall.transform.localScale = new Vector3(1, 10, _currentMapData.Height);
+            _leftWall.transform.localScale = new Vector3(1, 10, _height);
             _leftWall.transform.transform.position = new Vector3(-1, 0, x);
 
-            _rightWall.transform.localScale = new Vector3(1, 10, _currentMapData.Height);
-            _rightWall.transform.transform.position = new Vector3(_currentMapData.Width, 0, x);
+            _rightWall.transform.localScale = new Vector3(1, 10, _height);
+            _rightWall.transform.transform.position = new Vector3(_width, 0, x);
 
-            _upperWall.transform.localScale = new Vector3(1, 10, _currentMapData.Width);
-            _upperWall.transform.transform.position = new Vector3(x, 0, _currentMapData.Height);
-
-            cameraController.SetCamera(_currentMapData.Width, _currentMapData.Height);
+            _upperWall.transform.localScale = new Vector3(1, 10, _width);
+            _upperWall.transform.transform.position = new Vector3(x, 0, _height);
         }
+
+        public void ClearMap()
+        {
+            _tileMap.ClearAllAcitveTile();
+            _effectTileGenerator.ClearEffectObjects();
+        }
+
         public MoveContext GetMoveContext(Tile startPoint, EDirectionType direction, ETileEnterType enterType)
         {
             MoveContext moveContext = new MoveContext(startPoint, direction, enterType);
@@ -117,7 +111,7 @@ namespace JW.DungeonSliding.Map
         }
         private bool IsInArea(Tile data)
         {
-            if (data.X < 0 || data.X >= _currentMapData.Width || data.Z < 0 || data.Z >= _currentMapData.Height)
+            if (data.X < 0 || data.X >= _width || data.Z < 0 || data.Z >= _height)
             {
                 return false;
             }
@@ -128,10 +122,12 @@ namespace JW.DungeonSliding.Map
         //interface
         public void RegisterTileBoard(Tile point, bool isWalkable)
         {
+            Debug.Log(_tileMapData);
+            Debug.Log(point);
             _tileMapData[GetTileIndex(point.X, point.Z)] = isWalkable;
         }
-        private int GetTileIndex(int x, int z) => _currentMapData.Width * z + x;
-        private int GetTileIndex(Tile point) => _currentMapData.Width * point.Z + point.X;
+        private int GetTileIndex(int x, int z) => _width * z + x;
+        private int GetTileIndex(Tile point) => _width * point.Z + point.X;
         public void RegisterEnemyTile(Tile point)
         {
             _enemyTiles.Add(point);

@@ -13,9 +13,13 @@ using JW.DungeonSliding.GamePlay.Ability;
 namespace JW.DungeonSliding.GamePlay.Entities
 {
 
+    public interface IEnemySpawnService
+    {
+        void SpawnNomalEnemies(List<Tile> spawnPositions, int act);
+        void SpawnBossEnemies(List<Tile> spawnPositions, int act);
+    }
 
-
-    public class EnemyManager : MonoBehaviour, ICombatProvider
+    public class EnemyManager : MonoBehaviour, ICombatProvider, IEnemySpawnService
     {
         [SerializeField] private Enemy _enemyPrefabList;
 
@@ -30,12 +34,12 @@ namespace JW.DungeonSliding.GamePlay.Entities
         private List<EnemyData> _bossEnemyDatas = new();
 
         private IBoard _board;
-        private IObstacleRequest _obstacleRequest;
+        private IFieldObstacleService _obstacleRequest;
         private IEnemyStatUIService _enemyStatUIService;
         private ICombatEventListener _combatEventListener;
         private IRequesterRegistry _requesterRegistry;
         private IEnemyAbilityCreater _enemyAbilityCreater;
-        public void WireInterfaces(IBoard board, IObstacleRequest obstacleRequest, IEnemyStatUIService enemyStatUIService,
+        public void WireInterfaces(IBoard board, IFieldObstacleService obstacleRequest, IEnemyStatUIService enemyStatUIService,
             ICombatEventListener combatEventListener, IRequesterRegistry requesterRegistry, IEnemyAbilityCreater enemyAbilityCreater)
         {
             _board = board;
@@ -64,33 +68,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public int spawnNum;
         internal void SpawnEnemy(List<Tile> NomalEnemyPos, List<Tile> BossEnemyPos, int act, int floor) 
         { 
-            int maxNum = Mathf.Min(act, _nomalEnemyDatas.Count);
-
-            for (int i = 0; i < NomalEnemyPos.Count; i++)
-            {
-                int ranNum = UnityEngine.Random.Range(0, maxNum);
-
-                Tile tile = NomalEnemyPos[i];
-
-                EnemyData data = _nomalEnemyDatas[spawnNum];
-
-                Enemy enemy = GetEnemy();
-                enemy.SetData(data, floor);
-                enemy.RegisterRequester(_requesterRegistry);
-                enemy.Tile.SetPosition(tile);
-
-                var datas = GameManager.Data.EnemyAbilities(data.AbilityList);
-
-                if (datas != null)
-                {
-                    var abilities = _enemyAbilityCreater.CreateAbility(datas, enemy, floor);
-                    enemy.AbilityRegister.RegisterAutoAllAbility(abilities);
-                }
-
-                _activeEnemyByTile.Add(tile, enemy);
-                _board.RegisterEnemyTile(tile);
-            }
-
             if (floor+1 % 3 != 0) return;
 
             for (int i = 0; i < BossEnemyPos.Count; i++)
@@ -182,6 +159,39 @@ namespace JW.DungeonSliding.GamePlay.Entities
                 activeList.Add(enemy.Value);
             }
             return activeList;
+        }
+        public void SpawnNomalEnemies(List<Tile> spawnPositions, int act)
+        {
+            int maxNum = Mathf.Min(act, _nomalEnemyDatas.Count);
+
+            for (int i = 0; i < spawnPositions.Count; i++)
+            {
+                int ranNum = UnityEngine.Random.Range(0, maxNum);
+
+                Tile tile = spawnPositions[i];
+
+                EnemyData data = _nomalEnemyDatas[spawnNum];
+
+                Enemy enemy = GetEnemy();
+                enemy.SetData(data, act);
+                enemy.RegisterRequester(_requesterRegistry);
+                enemy.Tile.SetPosition(tile);
+
+                var datas = GameManager.Data.EnemyAbilities(data.AbilityList);
+
+                if (datas != null)
+                {
+                    var abilities = _enemyAbilityCreater.CreateAbility(datas, enemy, act);
+                    enemy.AbilityRegister.RegisterAutoAllAbility(abilities);
+                }
+
+                _activeEnemyByTile.Add(tile, enemy);
+                _board.RegisterEnemyTile(tile);
+            }
+        }
+        public void SpawnBossEnemies(List<Tile> spawnPositions, int act)
+        {
+            
         }
     }
 }

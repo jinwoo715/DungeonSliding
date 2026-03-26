@@ -5,6 +5,7 @@ using JW.DungeonSliding.GamePlay.Ability;
 using JW.DungeonSliding.GamePlay.Combat;
 using JW.DungeonSliding.GamePlay.Context;
 using JW.DungeonSliding.GamePlay.Entities;
+using JW.DungeonSliding.GamePlay.Stage;
 using JW.DungeonSliding.GamePlay.Stats;
 using JW.DungeonSliding.Map;
 using JW.DungeonSliding.UI;
@@ -58,9 +59,9 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
         [SerializeField] private InputSystem _inputSystem;
         [SerializeField] private ObstacleObjectController _obstacleController;
         [SerializeField] private EnemyTooltipClicker _enemyTooltipClicker;
+        [SerializeField] private StageController _stageController;
 
-
-
+        [Header("Test")]
         public FunctionTester functionTester;
         private void Update()
         {
@@ -83,7 +84,7 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
         {
             AbilityBusyCounter.Clear();
 
-            _gameSceneManager.Init(_rewardManager, _mapManager, _playerController.Player, _enemyManager, _battleManager, _inputSystem, _modeController, _gameSceneUIManager, _obstacleController);
+            _gameSceneManager.Init(_rewardManager, _mapManager, _playerController.Player, _enemyManager, _battleManager, _inputSystem, _modeController, _gameSceneUIManager, _obstacleController, _stageController);
             _fieldCombatantManager = new FieldCombatantManager(_enemyManager, _playerController.Player);
             BindEvent();
             ChildInit();
@@ -114,8 +115,10 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
             _enemyManager.WireInterfaces(_mapManager, _obstacleController, _gameSceneUIManager.EnemyStatUIService, _combatEventBus, _battleManager, _enemyAbilityFactory);
             _enemyManager.LoadData();
 
-            _mapManager.Init(_playerController.Tile);
-            
+            _mapManager.Init();
+
+            _stageController.Init(_mapManager, _obstacleController, _playerController.Tile, _enemyManager);
+
             _battleManager.Init(_fieldCombatantManager);
 
             _rewardManager.Init(_combatEventBus);

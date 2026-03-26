@@ -13,14 +13,14 @@ namespace JW.DungeonSliding.Map
 
 
 
-    public interface IObstacleRequest
+    public interface IFieldObstacleService
     {
         public void SpawnObstacle(Tile tile, EObstacleObjectType obsType);
         public void SpawnRanObstacle(Tile tile);
         public void ClearObstacles();
     }
 
-    public class ObstacleObjectController : MonoBehaviour, IObstacleRequest
+    public class ObstacleObjectController : MonoBehaviour, IFieldObstacleService
     {
         [SerializeField] private ObstacleObject[] _obsObjects;
 

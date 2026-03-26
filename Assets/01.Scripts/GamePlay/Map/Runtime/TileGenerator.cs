@@ -9,7 +9,7 @@ namespace JW.DungeonSliding.Map
         [SerializeField] private TileObject _routeTilePrefab;
         [SerializeField] private TileObject _wallTilePrefab;
 
-        private int[] _tileArrayInfo;
+        private bool[] _tileArrayInfo;
         private int _width;
         private int _height;
 
@@ -26,17 +26,17 @@ namespace JW.DungeonSliding.Map
             _tilePoolDic.CreatePool(ETileType.Wall.ToString(), _wallTilePrefab, this.transform);
         }
 
-        public void SetMap(int[] tileArrayInfo, int height, int width)
+        public void SetMap(bool[] tileArrayInfo, int height, int width)
         {
+            _tileArrayInfo = new bool[tileArrayInfo.Length];
             _tileArrayInfo = tileArrayInfo;
             _width = width;
             _height = height;
 
-            ClearAllAcitveTile();
             SetAllTile();
         }
 
-        private void ClearAllAcitveTile()
+        public void ClearAllAcitveTile()
         {
             for (int i = 0; i < _activeTiles.Count; i++)
             {
@@ -52,14 +52,14 @@ namespace JW.DungeonSliding.Map
             {
                 for (int x = 0; x < _width; x++)
                 {
-                    ETileType tileType = (ETileType)_tileArrayInfo[z * _width + x];
+//                    ETileType tileType = (ETileType)_tileArrayInfo[z * _width + x];
 
                     Tile tilePoint = new Tile(x, z);
 
-                    if (tileType == ETileType.Route)
+                    if (_tileArrayInfo[z * _width + x])
                     {
                         _board.RegisterTileBoard(tilePoint, true);
-                        TileObject tile = _tilePoolDic.GetObject(tileType.ToString());
+                        TileObject tile = _tilePoolDic.GetObject("Route");
                         _activeTiles.Add(tile);
                         tile.transform.localPosition = tilePoint.GetPosition;
                     }

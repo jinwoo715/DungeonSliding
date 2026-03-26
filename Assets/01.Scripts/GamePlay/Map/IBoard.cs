@@ -2,6 +2,12 @@ using JW.DungeonSliding.GamePlay.Combat;
 
 namespace JW.DungeonSliding.Map
 {
+    public interface IMapService
+    {
+        void SetMap(bool[] tiles, int height, int width, EffectObjectData[] effectObjects);
+        void ClearMap();
+    }
+
     public interface IBoard
     {
         public void RegisterTileBoard(Tile point, bool isWalkable);
@@ -12,11 +18,6 @@ namespace JW.DungeonSliding.Map
         public void RegisterObstacleTile(Tile point);
         public void UnRegisterObstacleTile(Tile point);
         public void ClearEnemyBoard();
-    }
-
-    public interface IBoardCreatureRegister
-    {
-
     }
 
     public interface ITileCheckService

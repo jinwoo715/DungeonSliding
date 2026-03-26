@@ -74,9 +74,9 @@ namespace JW.DungeonSliding.GamePlay
         public class ActConfig
         {
             [SerializeField] private int _actPerFloorCount;
-            [SerializeField] private int _actCount;
+            [SerializeField] private int _totalFloor;
             public int ActPerFloor => _actPerFloorCount;
-            public int ActCount => _actCount;
+            public int TotalFloor => _totalFloor;
         }
 
         public CombatConfig Combat;

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.Map
 {
-    public class EffectObjectGenerator : MonoBehaviour
+    public class EffectTileGenerator : MonoBehaviour
     {
         [SerializeField] private List<EffectObjectBase> _effectObjectPrefabs;
 
@@ -19,11 +19,6 @@ namespace JW.DungeonSliding.Map
 
         public void SetMap(EffectObjectData[] effectTileDatas)
         {
-            for (int i = 0; i < _activeEffectObject.Count; i++)
-            {
-                ReturnEffectObject(_activeEffectObject[i]);
-            }
-
             for (int i = 0; i < effectTileDatas.Length; i++)
             {
                 EffectObjectBase obj = GetEffectObject(effectTileDatas[i].EffectObjectType);
@@ -32,6 +27,14 @@ namespace JW.DungeonSliding.Map
                 obj.SetPosition(effectTileDatas[i].Point);
                 _activeEffectObject.Add(obj);
                 _board.RegisterEffectObject(effectTileDatas[i].Point, obj);
+            }
+        }
+
+        public void ClearEffectObjects()
+        {
+            for (int i = 0; i < _activeEffectObject.Count; i++)
+            {
+                ReturnEffectObject(_activeEffectObject[i]);
             }
         }
 
