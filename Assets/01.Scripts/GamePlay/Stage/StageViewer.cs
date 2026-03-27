@@ -28,7 +28,7 @@ namespace JW.DungeonSliding
         [ContextMenu("Test")]
         public void Test()
         {
-            Init(totalCount, bossCount);
+            //Init(totalCount, bossCount);
         }
 
         public int floor = 0;
@@ -39,25 +39,23 @@ namespace JW.DungeonSliding
             UpdateFloor(floor);
         }
 
-        public void Init(int totalFloorCount, int bossTerm)
+        public void Init(int totalFloorCount, List<int> bossTerm)
         {
             _floorYOffset = _rectTransform.sizeDelta.y / (totalFloorCount-1);
             _startYOffset = _rectTransform.position.y - (_rectTransform.sizeDelta.y / 2);
 
-            Debug.Log(_rectTransform.sizeDelta.y);  //100
-            Debug.Log(_rectTransform.position.y);   //540
-            Debug.Log(_startYOffset);               //540 - 50 => 490
-            Debug.Log(_floorYOffset);
+            int index = 0;
 
             for (int i = 1; i <= totalFloorCount; i++)
             {
                 var line = Instantiate(_dividLine, _dividLineParent);
                 line.transform.position = new Vector3(_rectTransform.position.x, _startYOffset + _floorYOffset * (i-1));
 
-                if (i % bossTerm == 0)
+                if (i == bossTerm[index])
                 {
                     var mark = Instantiate(_bossMarkObject, _bossMarkParent);
                     mark.transform.position = new Vector3(_rectTransform.position.x, _startYOffset + _floorYOffset * (i-1));
+                    index++;
                 }
             }
         }

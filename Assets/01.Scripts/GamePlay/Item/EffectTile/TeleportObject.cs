@@ -3,8 +3,6 @@ namespace JW.DungeonSliding
 {
     public class TeleportObject : EffectObjectBase, IEffectTile
     {
-        private Tile deltaPoint;
-
         public override MoveContext OnEnterTile(ref MoveContext moveContext)
         {
             if (moveContext.EnterType != ETileEnterType.Slide)

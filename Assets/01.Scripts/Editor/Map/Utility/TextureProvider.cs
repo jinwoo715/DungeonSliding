@@ -33,20 +33,6 @@ namespace JW.DungeonSliding
                 _creatureTextureDic.Add((EEditorCretureType)i, LoadLocalAsset.GetSingleTexture(path));
             }
 
-
-            //string jsonName = "EnemyData.json";
-            //string jsonPath = Path.Combine("00.Resources/Data/", jsonName);
-            //string data = LoadLocalAsset.GetJsonData(jsonPath);
-
-            //var enemyDatas = JsonConvert.DeserializeObject<List<EnemyDataSheet>>(data);
-
-            //for (int i = 0; i < enemyDatas.Count; i++)
-            //{
-            //    string imageName = enemyDatas[i].EnemyName + ".png";
-            //    string imagePath = Path.Combine("00.Resources/Sprites/Editor/Enemy", imageName);
-            //    _creatureTextureDic.Add(enemyDatas[i].EnemyName, LoadLocalAsset.GetSingleTexture(imagePath));
-            //}
-
             string[] effectObjectNames = Enum.GetNames(typeof(EEffectObjectType));
             string effectPath = Path.Combine("00.Resources/Sprites/Editor/EffectObject/");
 

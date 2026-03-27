@@ -4,22 +4,23 @@ using UnityEngine;
 namespace JW.DungeonSliding
 {
     [System.Serializable]
-    public class MapDataBundle
+    public class ActMapDataBundle
     {
         public string BundleName;
+        public int ActFloorCount;
         public List<MapData> MapDatas;
     }
 
     public class MapProvider
     {
-        [SerializeField] private List<MapDataBundle> Bundles;
+        [SerializeField] private List<ActMapDataBundle> Bundles;
 
-        public MapProvider(List<MapDataBundle> bundles)
+        public MapProvider(List<ActMapDataBundle> bundles)
         {
             Bundles = bundles;
         }
 
-        public MapDataBundle GetActMapBundle(int actNum)
+        public ActMapDataBundle GetActMapBundle(int actNum)
         {
             if (Bundles.Count < actNum) return null;
 

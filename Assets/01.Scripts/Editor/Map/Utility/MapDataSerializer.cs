@@ -15,7 +15,7 @@ namespace JW.DungeonSliding
             MapData mapData = ScriptableObject.CreateInstance<MapData>();
             mapData.Width = mapDataContext.XCount;
             mapData.Height = mapDataContext.ZCount;
-            //mapData.MapTiles = (int[])mapDataContext.TileArray.Clone();
+            mapData.MapTiles = (bool[])mapDataContext.TileArray.Clone();
             mapData.CretureTempletes = mapDataContext.CreatureTempletes;
             if (!IsPlayerValid(mapData.CretureTempletes))
             {
@@ -73,6 +73,16 @@ namespace JW.DungeonSliding
                 if (!ok) return;
             }
 
+            if (string.IsNullOrEmpty(mapDataContext.MapName))
+            {
+                bool ok = UnityEditor.EditorUtility.DisplayDialog(
+                "맵 저장",
+                $"파일 이름을 지정해주세요.",
+                "확인"
+                );
+
+                return;
+            }
             SaveMapData(mapData, mapDataContext.MapName);
         }
 

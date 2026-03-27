@@ -4,9 +4,9 @@
     "Name": "석상",
     "Description": "",
     "BaseDamage": 3,
-    "BaseHP": 20,
+    "BaseHP": 5,
     "BaseXP": 1,
-    "AbilityList": "실명",
+    "AbilityList": "",
     "EnemyAbilityType": ""
   },
   {

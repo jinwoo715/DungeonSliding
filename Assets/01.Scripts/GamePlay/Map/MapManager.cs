@@ -18,8 +18,6 @@ namespace JW.DungeonSliding.Map
 
         [Header("Camera Controller")]
         [SerializeField] private CameraController cameraController;
-
-        public Action<List<Tile>,List<Tile>, int, int> RequestSpawnEnemyEvent;
         
         private bool[] _tileMapData;
         private HashSet<Tile> _enemyTiles = new HashSet<Tile>();
@@ -42,7 +40,6 @@ namespace JW.DungeonSliding.Map
             _width = width;
 
             _tileMapData = new bool[height * width];
-            Debug.Log(_tileMapData);
             _tileMap.SetMap(tiles, height, width);
             _effectTileGenerator.SetMap(effectObjects);
 
@@ -77,13 +74,16 @@ namespace JW.DungeonSliding.Map
 
             if(enterType == ETileEnterType.Slide && _effectTileDic.TryGetValue(startPoint, out IEffectTile effectTile))
             {
-                effectTile.OnEnterTile(ref moveContext);
-
-                ESlideResultType slideResultType = moveContext.ResultType;
-
-                if (slideResultType == ESlideResultType.Stop || slideResultType == ESlideResultType.Teleport)
+                if(!effectTile.IsStepped)
                 {
-                    return moveContext;
+                    effectTile.OnEnterTile(ref moveContext);
+
+                    ESlideResultType slideResultType = moveContext.ResultType;
+
+                    if (slideResultType == ESlideResultType.Stop || slideResultType == ESlideResultType.Teleport)
+                    {
+                        return moveContext;
+                    }
                 }
             }
 
@@ -122,8 +122,6 @@ namespace JW.DungeonSliding.Map
         //interface
         public void RegisterTileBoard(Tile point, bool isWalkable)
         {
-            Debug.Log(_tileMapData);
-            Debug.Log(point);
             _tileMapData[GetTileIndex(point.X, point.Z)] = isWalkable;
         }
         private int GetTileIndex(int x, int z) => _width * z + x;

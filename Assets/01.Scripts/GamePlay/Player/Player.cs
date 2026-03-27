@@ -1,4 +1,5 @@
 using JW.DungeonSliding.GamePlay.Combat;
+using JW.DungeonSliding.GamePlay.Move;
 using JW.DungeonSliding.GamePlay.Stats;
 using JW.DungeonSliding.Map;
 using JW.Utility;
@@ -77,7 +78,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
         }
         public void AddReward(RewardData rewardData)
         {
-            Debug.Log(rewardData.Xp);
             OnGetXp?.Invoke(rewardData.Xp);
 
             if (rewardData.RewardType == ERewardType.KillReward)

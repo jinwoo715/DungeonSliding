@@ -8,7 +8,7 @@ namespace JW.DungeonSliding
     public struct MapDataContext
     {
         public readonly string MapName;
-        public readonly int[] TileArray;
+        public readonly bool[] TileArray;
         public readonly int XCount;
         public readonly int ZCount;
 
@@ -16,7 +16,7 @@ namespace JW.DungeonSliding
         public readonly List<CreatureTemplete> CreatureTempletes;
 
         public MapDataContext
-            (string name, int[] tiles, int xCount, int zCount, 
+            (string name, bool[] tiles, int xCount, int zCount, 
             IReadOnlyDictionary<Tile, EffectObjectData> effectData, List<CreatureTemplete> creatureTempletes
             )
         {
@@ -44,7 +44,7 @@ namespace JW.DungeonSliding
 
         private float _gridFieldX;
 
-        private int[] _tileMap;
+        private bool[] _tileMap;
         private Dictionary<Tile, EffectObjectData> _effectObjData = new Dictionary<Tile, EffectObjectData>();
         private List<CreatureTemplete> _creatureTempletes = new List<CreatureTemplete>();
 
@@ -74,18 +74,23 @@ namespace JW.DungeonSliding
         {
             xCount = x;
             zCount = z;
-            _tileMap = new int[zCount * xCount];
+            _tileMap = new bool[zCount * xCount];
+
+            for (int i = 0; i < zCount * xCount; i++)
+            {
+                _tileMap[i] = true;
+            }
         }
         public void SetTileType(Tile point)
         {
-            int value = (_tileMap[(xCount * point.Z) + point.X] + 1) % 2;
+            bool value =_tileMap[(xCount * point.Z) + point.X];
 
-            if((ETileType)value == ETileType.Wall)
+            if(value == false)
             {
                 if (IsSettedCreatureTile(point) || IsSettedEffectTile(point)) return;
             }
 
-            _tileMap[(xCount * point.Z) + point.X] = value;
+            _tileMap[(xCount * point.Z) + point.X] = !value;
         }
 
         public bool IsSettedCreatureTile(Tile point)
@@ -119,14 +124,14 @@ namespace JW.DungeonSliding
             if (_tileMap == null ||_tileMap.Length == 0) return 0;
             if (!IsBounds(x, z)) return 0;
 
-            return _tileMap[ToIndex(x, z)];
+            return _tileMap[ToIndex(x, z)] == true ? 0 : 1;
         }
         public bool IsRoute(Tile point)
         {
             if (_tileMap == null) return false;
             if (!IsBounds(point)) return false;
 
-            return _tileMap[ToIndex(point)] == (int)ETileType.Route;
+            return _tileMap[ToIndex(point)];
         }
 
         public bool IsEffectTile(Tile point) => _effectObjData.ContainsKey(point);
@@ -226,15 +231,18 @@ namespace JW.DungeonSliding
             InitTileMap(data.Width, data.Height);
 
             // 타일 복사
-            _tileMap = (int[])data.MapTiles.Clone(); // 내부 필드 접근 가능하게 하거나 SetTileMap 메서드 추가
-
+            _tileMap = (bool[])data.MapTiles.Clone(); // 내부 필드 접근 가능하게 하거나 SetTileMap 메서드 추가
 
             // effect
             _effectObjData.Clear();
 
             if (data.effectTileDatas == null) return;
+
             foreach (var e in data.effectTileDatas)
                 _effectObjData[e.Point] = e;
+
+            // creature 로드
+            _creatureTempletes = data.CretureTempletes;
         }
 
         internal CreatureTemplete GetCretureTemplete(int templeteNum)

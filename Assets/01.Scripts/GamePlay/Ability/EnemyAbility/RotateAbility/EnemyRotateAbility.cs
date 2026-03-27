@@ -1,5 +1,6 @@
 using JW.DungeonSliding.GamePlay.Ability;
 using JW.DungeonSliding.GamePlay.Combat;
+using JW.DungeonSliding.GamePlay.Move;
 using JW.DungeonSliding.Map;
 using System;
 using System.Collections;
@@ -16,6 +17,8 @@ namespace JW.DungeonSliding.GamePlay.Ability.Enemy
         {
             if (_moveable.LastMoveTileCount == 0)
                 yield break;
+
+            Debug.Log("?S????SD??SFD?SDF");
 
             EDirectionType nextDirection = DirectionUtility.GetRightRotateResultDirection(_owner.Rotate.Direction);
             yield return _owner.Rotate.CoRotateToDirection(nextDirection);
@@ -67,7 +70,8 @@ namespace JW.DungeonSliding.GamePlay.Ability.Enemy
                 enemy.Rotate.OnRotateEnd += OnEndRotate;
 
                 EDirectionType dir = DirectionUtility.GetDirFromTileToTile(enemy.Tile.TilePosition, playerTile.Tile.TilePosition);
-                enemy.Rotate.CoRotateToDirection(dir);
+
+                enemy.Rotate.RotateToDirection(dir);
             }
 
             while (remain > 0)

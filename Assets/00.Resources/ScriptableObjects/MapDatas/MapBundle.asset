@@ -13,6 +13,18 @@ MonoBehaviour:
   m_Name: MapBundle
   m_EditorClassIdentifier: 
   Bundles:
-  - BundleName: Act1
+  - BundleName: 
+    ActFloorCount: 2
     MapDatas:
-    - {fileID: 11400000, guid: f9ba95cb659f1cc44b42763e00441fa8, type: 2}
+    - {fileID: 11400000, guid: 2f7f9b0ba6316c0409c0d9c04fae81a8, type: 2}
+    - {fileID: 11400000, guid: 04d357bdb0644ca4f9f0b652fdbd393e, type: 2}
+  - BundleName: 
+    ActFloorCount: 2
+    MapDatas:
+    - {fileID: 11400000, guid: 8ff6c913eaa61134e9d2b799eaeafac3, type: 2}
+    - {fileID: 11400000, guid: 8ff6c913eaa61134e9d2b799eaeafac3, type: 2}
+  - BundleName: 
+    ActFloorCount: 2
+    MapDatas:
+    - {fileID: 11400000, guid: 52c05066f4bf36047bc3c4a64131a458, type: 2}
+    - {fileID: 11400000, guid: 52c05066f4bf36047bc3c4a64131a458, type: 2}

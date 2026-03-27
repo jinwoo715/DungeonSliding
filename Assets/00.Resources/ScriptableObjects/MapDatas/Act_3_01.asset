@@ -10,34 +10,43 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8eac70b88e92ce441a1c22b488ad3dd2, type: 3}
-  m_Name: TestMap2
+  m_Name: Act_3_01
   m_EditorClassIdentifier: 
-  Width: 5
-  Height: 5
-  MapTiles: 01010101010101010101010101010101010101010101010101
+  Width: 6
+  Height: 6
+  MapTiles: 010101010000010100010101010101010101010101010101010101010100010101010100
   CretureTempletes:
   - NomalEnemyPos:
-    - X: 2
-      Z: 4
     - X: 3
       Z: 3
-    BossEnemyPos:
-    - X: 3
+    - X: 1
+      Z: 5
+    - X: 4
       Z: 1
+    BossEnemyPos:
+    - X: 1
+      Z: 2
     PlayerPos:
       X: 1
       Z: 0
   effectTileDatas:
-  - EffectObjectType: 0
+  - EffectObjectType: 2
     Point:
-      X: 0
-      Z: 1
+      X: 3
+      Z: 0
     TeleportPoint:
       X: -1
       Z: -1
-  - EffectObjectType: 2
+  - EffectObjectType: 1
     Point:
       X: 0
+      Z: 0
+    TeleportPoint:
+      X: -1
+      Z: -1
+  - EffectObjectType: 0
+    Point:
+      X: 2
       Z: 3
     TeleportPoint:
       X: -1

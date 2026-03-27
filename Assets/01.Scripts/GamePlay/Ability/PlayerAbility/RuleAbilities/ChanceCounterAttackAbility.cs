@@ -1,5 +1,6 @@
 using JW.DungeonSliding.GamePlay.Combat;
 using JW.DungeonSliding.GamePlay.Entities;
+using JW.DungeonSliding.GamePlay.Move;
 using JW.DungeonSliding.GamePlay.Stats;
 using JW.DungeonSliding.Map;
 using System.Collections;

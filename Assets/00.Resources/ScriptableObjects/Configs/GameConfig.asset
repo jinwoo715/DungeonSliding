@@ -38,5 +38,5 @@ MonoBehaviour:
     _fadeInTime: 0
     _fadeOutWaitTime: 0
   Act:
-    _actPerFloorCount: 3
-    _actCount: 5
+    _actPerFloorCount: 4
+    _totalFloor: 20

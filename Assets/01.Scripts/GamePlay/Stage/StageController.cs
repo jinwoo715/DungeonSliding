@@ -18,22 +18,32 @@ namespace JW.DungeonSliding.GamePlay.Stage
     {
         [SerializeField] private StageViewer _viewer;
 
-        private MapBundle _mapDataBundle;
-
+        private MapBundle _currentMapBundle;
         private ShuffleBag<MapData> _actMapBag;
 
-        private int _currentFloor = 0;
-        private int _act = 0;
-        private int _actOffset = 0;
+        private int _currentFloor;
+        private int _currentAct;
+
+        private int _currentActProgress = 1;
+        private int _requireProgress;
 
         public event Action OnClearAllFloor;
         public event Action OnClearFloor;
         public event Action OnFinishSetStage;
+        public int Act => _currentAct + 1;
+        public int Floor => _currentFloor + 1;
 
         IMapService _mapService;
         IFieldObstacleService _obstacleService;
         ITileObject _player;
         IEnemySpawnService _enemySpawnService;
+
+        // 3 floor에 보스
+
+        // 0 1 2 -> index 2에서 보스
+
+        // 3에서 change, reset
+
 
         public void Init(IMapService mapService, IFieldObstacleService obstacleService, ITileObject player, IEnemySpawnService enemySpawnService)
         {
@@ -42,47 +52,69 @@ namespace JW.DungeonSliding.GamePlay.Stage
             _player = player;
             _enemySpawnService = enemySpawnService;
 
-            _mapDataBundle = GameManager.Resource.MapBundle;
-            _actOffset = GameManager.Config.Act.ActPerFloor;
+            _currentMapBundle = GameManager.Resource.MapBundle;
+
+            _viewer.Init(_currentMapBundle.TotalFloorCount(), _currentMapBundle.GetBossStages());
 
             UpdateMapData();
         }
-
-        //stage start -> update floor
-        
-        //IMapService에 넘겨줘야 할 데이터 : 타일 정보, 효과타일 정보
-
         public void StartStage()
         {
+            ClearField();
+
             UpdateFloorAndAct();
 
-            _mapService.ClearMap();
-            _obstacleService.ClearObstacles();
-
+            Debug.Log(_actMapBag);
             MapData map = _actMapBag.GetItem();
             var effectTileData = map.effectTileDatas;
 
-            _mapService.SetMap(map.MapTiles, map.Height, map.Width, map.effectTileDatas);
-
+            Debug.Log(map);
             CreatureTemplete templete = GetTemplete(map);
 
-            _enemySpawnService.SpawnNomalEnemies(templete.NomalEnemyPos, _act);
+            _mapService.SetMap(map.MapTiles, map.Height, map.Width, map.effectTileDatas);
+
+            _enemySpawnService.ReceiveNomalEnemySpawnList(templete.NomalEnemyPos, Act);
+
+            if(IsBossFloor())
+                _enemySpawnService.ReceiveBossEnemySpawnList(templete.BossEnemyPos, Act);
 
             _player.SetPosition(templete.PlayerPos);
 
             OnFinishSetStage?.Invoke();
         }
+        private void ClearField()
+        {
+            _mapService.ClearMap();
+            _obstacleService.ClearObstacles();
+        }
 
         private void UpdateFloorAndAct()
         {
-            _viewer.UpdateFloor(_currentFloor);
-
+            _currentActProgress++;
             _currentFloor++;
 
-            bool boss = _currentFloor % _actOffset == 0;
-            int act = _currentFloor / _actOffset;
-        }
+            if (TryUpdateAct())
+            {
+                UpdateMapData();
+            }
 
+            _viewer.UpdateFloor(_currentFloor-1);
+        }
+        private bool TryUpdateAct()
+        {
+            if(_currentActProgress > _requireProgress)
+            {
+                _currentAct++;
+                return true;
+            }
+
+            return false;
+        }
+        private bool IsBossFloor()
+        {
+            Debug.Log($"{_currentActProgress} : {_requireProgress}");
+            return _currentActProgress == _requireProgress;
+        }
         private CreatureTemplete GetTemplete(MapData map)
         {
             var enemyTemplete = map.CretureTempletes;
@@ -90,21 +122,13 @@ namespace JW.DungeonSliding.GamePlay.Stage
             CreatureTemplete templete = enemyTemplete[ranNum];
             return templete;
         }
-
         private void UpdateMapData()
         {
-            var data = _mapDataBundle.GetActMapBundle(_act);
+            var data = _currentMapBundle.GetActMapBundle(_currentAct);
             _actMapBag = new ShuffleBag<MapData>(data.MapDatas);
-        }
 
-        private bool IsActChange()
-        {
-            return false;
-        }
-
-        private bool IsBossFloor()
-        {
-            return false;
+            _currentActProgress--;
+            _requireProgress = data.ActFloorCount;
         }
     }
 }

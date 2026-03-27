@@ -1,6 +1,7 @@
 using JW.DungeonSliding.GamePlay;
 using JW.DungeonSliding.GamePlay.Ability;
 using JW.DungeonSliding.GamePlay.Combat;
+using JW.DungeonSliding.GamePlay.Move;
 using System;
 using System.Collections.Generic;
 using UnityEngine;

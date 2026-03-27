@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2697088117165034762}
   - component: {fileID: 4672965507736980945}
   - component: {fileID: 3603138434048580624}
+  - component: {fileID: -2014301561964345779}
   m_Layer: 3
   m_Name: StoneStatueEnemy
   m_TagString: Untagged
@@ -51,11 +52,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _animatorController: {fileID: 5750647025204057581}
   _abilityExcuter: {fileID: 3603138434048580624}
+  _objectRotator: {fileID: -2014301561964345779}
   _statUITransform: {fileID: 2005910865401609367}
-  _enemyStat:
-    HP: 0
-    Damage: 0
-    XP: 0
   _enemyData:
     UID: 
     Name: 
@@ -97,6 +95,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d62fa2fb2a7d4ad4fbc924d584fde91f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &-2014301561964345779
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 588495070571079937}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0b29191dd62daf45bdc98e8fdb0eb0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1822302849482869574

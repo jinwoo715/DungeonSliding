@@ -23,45 +23,21 @@ namespace JW.DungeonSliding.GamePlay.Context
 
     public class GameSceneManager : MonoBehaviour, IActService
     {
-        private RewardManager PlayerReward { get; set; }
-        private MapManager _mapManager;
         private ICombatant _player;
-        private EnemyManager _enemyManager;
-        private BattleManager _battleManager;
-        private InputSystem _inputSystem;
         private GameSequenceController _gameModeController;
         private IUIFader _uiFader;
-        private IFieldObstacleService _obstacleRequest;
 
         public event Action<int, int> OnChangeActEvent;
         public event Action<int, int> OnChangeFloorEvent;
 
-        public int Floor { get; private set; } = 0;
-        public int Act { get; private set; } = 0;
-
-        private int _floorPerAct;
-        private int _actCount;
-        private bool _isGameStart = false;
-
         IStageService _stageSerivce;
-        public void Init(RewardManager reward, MapManager map,
-            ICombatant player, EnemyManager enemyManager, BattleManager battleManager, 
-            InputSystem input, GameSequenceController gameModeController, IUIFader uiFader
-            , IFieldObstacleService obstacleRequest, IStageService stageSerivce)
+        public void Init(ICombatant player, GameSequenceController gameModeController, IUIFader uiFader, IStageService stageSerivce)
         {
-            PlayerReward = reward;
-            _mapManager = map;
             _player = player;
-            _enemyManager = enemyManager;
-            _battleManager = battleManager;
-            _inputSystem = input;
+
             _gameModeController = gameModeController;
             _uiFader = uiFader;
-            _obstacleRequest = obstacleRequest;
             _stageSerivce = stageSerivce;
-
-            _floorPerAct = GameManager.Config.Act.ActPerFloor;
-            _actCount = GameManager.Config.Act.TotalFloor;
 
             GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameEventTrigger.OnClearStage, ClearFloor);
             GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameEventTrigger.OnTurnStart, CheckGameOver);
@@ -70,21 +46,6 @@ namespace JW.DungeonSliding.GamePlay.Context
         public void PrepareStage() 
         {
             StartCoroutine(CoWaitStartStage());
-        }
-
-        private void UpdateActFloor()
-        {
-            //Floor++;
-
-            //if (Floor > _floorPerAct-1)
-            //{
-            //    Act++;
-            //    Floor -= _floorPerAct;
-
-            //}
-
-            //OnChangeActEvent?.Invoke(Act, _actCount);
-            //OnChangeFloorEvent?.Invoke(Floor, _floorPerAct);
         }
 
         public void ClearFloor()
@@ -102,13 +63,7 @@ namespace JW.DungeonSliding.GamePlay.Context
 
             yield return _uiFader.FadeOut();
 
-
             _stageSerivce.StartStage();
-            //_obstacleRequest.ClearObstacles();
-
-            //_mapManager.SetMap(Floor);
-
-            UpdateActFloor();
 
             yield return _uiFader.FadeIn();
 

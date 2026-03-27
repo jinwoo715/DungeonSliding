@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay
@@ -73,10 +74,12 @@ namespace JW.DungeonSliding.GamePlay
         [System.Serializable]
         public class ActConfig
         {
+            [SerializeField] private List<int> _bossStages;
             [SerializeField] private int _actPerFloorCount;
             [SerializeField] private int _totalFloor;
             public int ActPerFloor => _actPerFloorCount;
             public int TotalFloor => _totalFloor;
+            public List<int> BossStages => _bossStages;
         }
 
         public CombatConfig Combat;

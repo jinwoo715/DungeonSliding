@@ -4,12 +4,12 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Entities
 {
-    public class ObjectRotator :  IRotateObject
+    public class ObjectRotator : MonoBehaviour, IRotateObject
     {
         private Transform _owner;
 
         public event Action OnRotateEnd;
-        public ObjectRotator(Transform owner)
+        public void SetOwner(Transform owner)
         {
             _owner = owner;
         }
@@ -37,6 +37,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
                 float startRotationY = _owner.rotation.eulerAngles.y;
                 float targetRotationY = GetEulerYByDirection(directionType);
+                Debug.Log("?S????SD??SFD?SDF132312213213");
 
                 while (timer < 1f)
                 {
@@ -45,6 +46,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
                     // LerpAngle을 써야 270도에서 0(360)도로 갈 때 최단 거리로 회전함
                     float rotationValue = Mathf.LerpAngle(startRotationY, targetRotationY, timer);
                     _owner.rotation = Quaternion.Euler(0, rotationValue, 0);
+
+                    Debug.Log("asasdaaaaaaa");
 
                     yield return null;
                 }
@@ -62,6 +65,11 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
             float rotation = GetEulerYByDirection(directionType);
             _owner.rotation = Quaternion.Euler(0, rotation, 0);
+        }
+
+        public void RotateToDirection(EDirectionType directionType)
+        {
+            StartCoroutine(CoRotateToDirection(directionType));
         }
     }
 }

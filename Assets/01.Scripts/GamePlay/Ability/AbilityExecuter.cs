@@ -92,8 +92,6 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         private IEnumerator RunAbilityWithCounter(IAbility ability, AbilityArgs args)
         {
-            Debug.Log(ability.ToString());
-
             _workingAbilityCount++;
             AbilityBusyCounter.RegisterWorkAbility(); // 1. 카운터 증가
 
@@ -101,7 +99,6 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
             AbilityBusyCounter.UnRegisterWorkAbility(); // 3. 완료 후 카운터 감소
             _workingAbilityCount--;
-            Debug.Log(ability.ToString());
         }
 
         #endregion

@@ -32,6 +32,7 @@ namespace JW.DungeonSliding
 
             Vector3 position = Camera.main.WorldToScreenPoint(_transform.position);
             position.z = 0;
+            position.y += 50;
 
             this.transform.position = position;
         }

@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using JW.DungeonSliding.GamePlay.Move;
 
 namespace JW.DungeonSliding
 {

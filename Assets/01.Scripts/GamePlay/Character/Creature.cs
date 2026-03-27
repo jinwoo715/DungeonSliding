@@ -13,6 +13,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
     {
         [SerializeField] protected AnimatorController _animatorController;
         [SerializeField] private AbilityExecuter _abilityExcuter;
+        [SerializeField] private ObjectRotator _objectRotator;
+
         private ECreatureType _creatureType;
         
         private AttackRequester _attackRequester;
@@ -20,7 +22,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
         private CreatureStat _stat = new CreatureStat();
         private CombatController _combatController;
         private GridPositioner _gridTransform;
-        private ObjectRotator _objectRotator;
         private StatusEffectManager _status;
 
         public bool IsActive { get; protected set; } = true;
@@ -51,8 +52,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
         {
             IsActive = true;
             _creatureType = cretureType;
+            _objectRotator.SetOwner(this.transform);
 
-            _objectRotator = new ObjectRotator(this.transform);
             _gridTransform = new GridPositioner(this.transform);
             _attackRequester = new AttackRequester(this, _creatureType);
             _combatController = new CombatController(this);
@@ -149,7 +150,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
             if (!IsOutOfHp()) return;
                 Ability.ExecuteCreatureTrigger(ECreatureTrigger.OnDeath);
-            Debug.Log($"{name} : OnDeath");
 
             if (!IsOutOfHp()) return;
 

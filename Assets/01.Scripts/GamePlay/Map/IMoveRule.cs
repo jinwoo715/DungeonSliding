@@ -119,6 +119,7 @@ namespace JW.DungeonSliding
         public EDirectionType Direction { get; }
         public EDirectionType ReverseDirection(EDirectionType directionType);
         public IEnumerator CoRotateToDirection(EDirectionType directionType);
+        public void RotateToDirection(EDirectionType directionType);
         public void SetRotation(EDirectionType directionType);
     }
 

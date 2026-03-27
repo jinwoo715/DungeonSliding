@@ -5,6 +5,7 @@ using JW.DungeonSliding.GamePlay.Ability;
 using JW.DungeonSliding.GamePlay.Combat;
 using JW.DungeonSliding.GamePlay.Context;
 using JW.DungeonSliding.GamePlay.Entities;
+using JW.DungeonSliding.GamePlay.Move;
 using JW.DungeonSliding.GamePlay.Stage;
 using JW.DungeonSliding.GamePlay.Stats;
 using JW.DungeonSliding.Map;
@@ -84,7 +85,7 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
         {
             AbilityBusyCounter.Clear();
 
-            _gameSceneManager.Init(_rewardManager, _mapManager, _playerController.Player, _enemyManager, _battleManager, _inputSystem, _modeController, _gameSceneUIManager, _obstacleController, _stageController);
+            _gameSceneManager.Init(_playerController.Player, _modeController, _gameSceneUIManager, _stageController);
             _fieldCombatantManager = new FieldCombatantManager(_enemyManager, _playerController.Player);
             BindEvent();
             ChildInit();
@@ -112,8 +113,7 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
 
             _inputCoordinator.Init(_playerController.Moveable);
 
-            _enemyManager.WireInterfaces(_mapManager, _obstacleController, _gameSceneUIManager.EnemyStatUIService, _combatEventBus, _battleManager, _enemyAbilityFactory);
-            _enemyManager.LoadData();
+            _enemyManager.Init(_mapManager, _obstacleController, _gameSceneUIManager.EnemyStatUIService, _battleManager, _enemyAbilityFactory);
 
             _mapManager.Init();
 
@@ -145,8 +145,6 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
             
             _inputCoordinator.IsMoveableFlowFunc += () => _modeController.IsCanMove;
             
-            _mapManager.RequestSpawnEnemyEvent += _enemyManager.SpawnEnemy;
-
             _playerController.Moveable.OnMoveEnd += _battleManager.StartBattleSequence;
 
             _abilitySystem.OnExcuteAbilitySelection += _ => { _modeController.EnterGameMode(EGameModeType.AbilityUI); };

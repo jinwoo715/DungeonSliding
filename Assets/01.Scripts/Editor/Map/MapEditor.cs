@@ -68,8 +68,6 @@ namespace JW.DungeonSliding
             _effectTileNames = Enum.GetNames(typeof(EEffectObjectType));
             _tileNames = Enum.GetNames(typeof(ETileType));
             _editModeNames = Enum.GetNames(typeof(EEditModeType));
-
-            
         }
         private void OnGUI()
         {
@@ -111,9 +109,6 @@ namespace JW.DungeonSliding
             DrawLoadMapField();
 
             EditorGUILayout.Space(10);
-
-            //CreateRandomMap();
-            //EditorGUILayout.Space(10);
 
             DrawEditModeToolbar();
 
@@ -181,6 +176,7 @@ namespace JW.DungeonSliding
             {
                 if (_loadedMapAsset != null)
                 {
+                    Debug.Log("·Îµå");
                     _mapEditState.LoadFromMapData(_loadedMapAsset);
                     xCountField = _loadedMapAsset.Width;
                     zCountField = _loadedMapAsset.Height;

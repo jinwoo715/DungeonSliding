@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System;
 using JW.DungeonSliding.Map;
 
-namespace JW.DungeonSliding
+namespace JW.DungeonSliding.GamePlay.Move
 {
     public interface IRouteService
     {
