@@ -11,7 +11,7 @@ namespace JW.DungeonSliding.UI
         ITooltipService _tooltipService;
         IAbilityEventService _abilityService;
 
-        public void Initialize(ITooltipService tooltipService, IAbilityEventService abilityService)
+        public void Init(ITooltipService tooltipService, IAbilityEventService abilityService)
         {
             _tooltipService = tooltipService;
             _abilityService = abilityService;

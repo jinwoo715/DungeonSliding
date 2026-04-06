@@ -8,13 +8,13 @@ namespace JW.DungeonSliding
 {
     public class FunctionTester : MonoBehaviour
     {
-        public AbilitySystem _abilitySystem;
+        public PlayerAbilitySystem _abilitySystem;
 
         public List<AbilityDataBase> datas = GameManager.Data.Abilities;
 
         public int GetAbilityIndex;
 
-        public void Init(AbilitySystem abilitySystem)
+        public void Init(PlayerAbilitySystem abilitySystem)
         {
             _abilitySystem = abilitySystem;
         }

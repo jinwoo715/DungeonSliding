@@ -10,10 +10,42 @@ using static JW.DungeonSliding.GamePlay.GameConfig;
 
 namespace JW.DungeonSliding.GamePlay.Entities
 {
-    public class PlayerController : MonoBehaviour
+    public struct PlayerInfo
+    {
+        public readonly IStatReadOnly PlayerStatReader;
+        public readonly IStatModifier PlayerStatModifier;
+        public readonly ILevelProgress Level;
+        public readonly INextAttackEnhancer NextAttackEnhancer;
+
+        public PlayerInfo(IStatReadOnly playerStatReader, IStatModifier playerStatModifier, ILevelProgress level, INextAttackEnhancer nextAttackEnhancer)
+        {
+            PlayerStatReader = playerStatReader;
+            PlayerStatModifier = playerStatModifier;
+            Level = level;
+            NextAttackEnhancer = nextAttackEnhancer;
+        }
+    }
+
+    public interface IPlayerInfoViewer
+    {
+        PlayerInfo GetPlayerInfo();
+    }
+
+    public class PlayerController : MonoBehaviour, IPlayerInfoViewer
     {
         [SerializeField] private Player _player;
 
+        private LevelSystem _levelSystem = new LevelSystem();
+
+        public event Action OnPlayerDie;
+
+        private bool _isCanMove;
+
+        public void Init()
+        {
+            _levelSystem.Initialize();
+        }
+        public ILevelProgress Level => _levelSystem;
         public ICombatant Player => _player;
         public IStatReadOnly StatReadOnly => _player.StatReadOnly;
         public IStatModifier StatModifier => _player.StatModifier;
@@ -22,7 +54,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public IAbilityRegister AbilityRegister => _player.AbilityRegister;
         public INextAttackEnhancer NextAttackEnhancer => _player.NextAttackEnhancer;
 
-        public void InitializePlayer(IRouteService routeService, IMoveRule moveRule, IRequesterRegistry requesterRegistry, ILevelProgress levelProgress, IAbilityEventService abilityEventService)
+        public void Init(IRouteService routeService, IMoveRule moveRule, IAttackRegister requesterRegistry, IAbilityEventService abilityEventService)
         {
             _player.Initialize(ECreatureType.Player);
 
@@ -35,8 +67,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
             abilityEventService.OnSelectAbility += _player.AbilityRegister.RegisterAbility;
 
-            _player.OnGetXp += levelProgress.AddXp;
-            levelProgress.OnLevelUp += _player.HandleLevelUp;
+            _player.OnGetXp += _levelSystem.AddXp;
+            _levelSystem.OnLevelUp += _player.HandleLevelUp;
         }
         public void RegisterContext(IAbilityContextService abilityContextService)
         {
@@ -49,13 +81,32 @@ namespace JW.DungeonSliding.GamePlay.Entities
             abilityContextService.Register<ITileObject>(_player.Tile);
             abilityContextService.Register<IAttackRequester>(_player.AttackRequester);
         }
-
         private CreatureBaseStat CreatePlayerBaseStat()
         {
             PlayerConfig playerConfig = GameManager.Config.Player;
             return new CreatureBaseStat(playerConfig.HP, playerConfig.DMG, playerConfig.MVCount);
         }
+        
+        public void OnPlayerMove(EDirectionType directionType)
+        {
+            if (_isCanMove)
+                Moveable.SlideRoute(directionType);
+        }
 
- 
+        public void OnChangeMoveState(bool isMoveable)
+        {
+            _isCanMove = isMoveable;
+        }
+
+        private void CheckPlayerAlive()
+        {
+            if (!_player.IsActive)
+                OnPlayerDie?.Invoke();
+        }
+
+        public PlayerInfo GetPlayerInfo()
+        {
+            return new PlayerInfo(StatReadOnly, StatModifier, Level, NextAttackEnhancer);
+        }
     }
 }

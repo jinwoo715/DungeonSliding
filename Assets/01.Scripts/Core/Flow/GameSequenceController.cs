@@ -8,16 +8,28 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.Core.Flow
 {
-    public class GameSequenceController : IGameModeReader
+    public interface IGameModeModifier
+    {
+        void EnterGameMode(EGameModeType flowType);
+        void ExitGameMode(EGameModeType flowType);
+
+        event Action<bool> OnChangeMoveState;
+    }
+
+    public class GameSequenceController : IGameModeReader, IGameModeModifier
     {
         private EGameModeType _gameFlowType = EGameModeType.Play;
         public bool IsCanMove => GameMode == 0;
         public EGameModeType GameMode => _gameFlowType;
 
+        public event Action<bool> OnChangeMoveState;
+
         public Dictionary<EGameModeType, Action> GameModeEvent = new();
 
         IRouteService _routeService;
         IBattleResult _battleResult;
+
+
         public bool IsValidTurn()
         {
             bool result = (_battleResult.IsBattleTurn() || _routeService.LastMoveTileCount != 0);
@@ -59,11 +71,15 @@ namespace JW.DungeonSliding.Core.Flow
         {
             if (flowType == EGameModeType.WorkingAbility) Debug.Log("Enter Work");
             _gameFlowType |= flowType;
+
+            OnChangeMoveState?.Invoke(_gameFlowType == 0);
         }
         public void ExitGameMode(EGameModeType flowType)
         {
             if (flowType == EGameModeType.WorkingAbility) Debug.Log("Exit Work");
             _gameFlowType &= ~flowType;
+
+            OnChangeMoveState?.Invoke(_gameFlowType == 0);
         }
         public void Clear()
         {

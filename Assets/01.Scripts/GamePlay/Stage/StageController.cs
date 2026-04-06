@@ -3,6 +3,7 @@ using JW.DungeonSliding.GamePlay.Entities;
 using JW.DungeonSliding.Map;
 using JW.Utility;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Stage
@@ -11,13 +12,20 @@ namespace JW.DungeonSliding.GamePlay.Stage
     {
         event Action OnClearAllFloor;
         event Action OnClearFloor;
+        event Action<int> OnChangeActEvent;
+        event Action<int> OnChangeFloorEvent;
         void StartStage();
     }
 
-    public class StageController : MonoBehaviour, IStageService
+    public interface IStageViewer
     {
-        [SerializeField] private StageViewer _viewer;
+        public int CurrentFloor { get; }
+        public int TotalFloor { get; }
+        public List<int> BossFloors { get; }
+    }
 
+    public class StageController : MonoBehaviour, IStageService, IStageViewer
+    {
         private MapBundle _currentMapBundle;
         private ShuffleBag<MapData> _actMapBag;
 
@@ -30,20 +38,18 @@ namespace JW.DungeonSliding.GamePlay.Stage
         public event Action OnClearAllFloor;
         public event Action OnClearFloor;
         public event Action OnFinishSetStage;
+        public event Action<int> OnChangeActEvent;
+        public event Action<int> OnChangeFloorEvent;
+
         public int Act => _currentAct + 1;
-        public int Floor => _currentFloor + 1;
+        public int CurrentFloor => _currentFloor;
+        public List<int> BossFloors => _currentMapBundle.GetBossStages();
+        public int TotalFloor => _currentMapBundle.TotalFloorCount();
 
         IMapService _mapService;
         IFieldObstacleService _obstacleService;
         ITileObject _player;
         IEnemySpawnService _enemySpawnService;
-
-        // 3 floor에 보스
-
-        // 0 1 2 -> index 2에서 보스
-
-        // 3에서 change, reset
-
 
         public void Init(IMapService mapService, IFieldObstacleService obstacleService, ITileObject player, IEnemySpawnService enemySpawnService)
         {
@@ -54,8 +60,6 @@ namespace JW.DungeonSliding.GamePlay.Stage
 
             _currentMapBundle = GameManager.Resource.MapBundle;
 
-            _viewer.Init(_currentMapBundle.TotalFloorCount(), _currentMapBundle.GetBossStages());
-
             UpdateMapData();
         }
         public void StartStage()
@@ -64,11 +68,9 @@ namespace JW.DungeonSliding.GamePlay.Stage
 
             UpdateFloorAndAct();
 
-            Debug.Log(_actMapBag);
             MapData map = _actMapBag.GetItem();
             var effectTileData = map.effectTileDatas;
 
-            Debug.Log(map);
             CreatureTemplete templete = GetTemplete(map);
 
             _mapService.SetMap(map.MapTiles, map.Height, map.Width, map.effectTileDatas);
@@ -97,8 +99,7 @@ namespace JW.DungeonSliding.GamePlay.Stage
             {
                 UpdateMapData();
             }
-
-            _viewer.UpdateFloor(_currentFloor-1);
+            OnChangeFloorEvent?.Invoke(_currentAct - 1);
         }
         private bool TryUpdateAct()
         {

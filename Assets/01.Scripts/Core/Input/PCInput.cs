@@ -4,9 +4,14 @@ using System;
 
 namespace JW.DungeonSliding.Core.Inputs
 {
-    public class InputSystem : MonoBehaviour
+    public interface IInputService
     {
-        public event Action<EDirectionType> OnInputEvnet;
+        public event Action<EDirectionType> OnMoveInput;
+    }
+
+    public class PCInput : MonoBehaviour, IInputService
+    {
+        public event Action<EDirectionType> OnMoveInput;
 
         private void Update()
         {
@@ -17,7 +22,9 @@ namespace JW.DungeonSliding.Core.Inputs
             if (Input.GetKeyDown(KeyCode.DownArrow)) dir = EDirectionType.Down;
 
             if (dir != EDirectionType.None)
-                OnInputEvnet?.Invoke(dir);
+                OnMoveInput?.Invoke(dir);
         }
     }
+
+
 }

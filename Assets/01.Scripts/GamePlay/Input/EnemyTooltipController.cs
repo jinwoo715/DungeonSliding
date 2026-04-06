@@ -4,11 +4,11 @@ using UnityEngine;
 
 namespace JW.DungeonSliding
 {
-    public class EnemyTooltipClicker : MonoBehaviour
+    public class EnemyTooltipController : MonoBehaviour
     {
         private ITooltipService _tooltipService;
 
-        public void Initialize(ITooltipService service)
+        public void Init(ITooltipService service)
         {
             _tooltipService = service;
         }

@@ -7,6 +7,15 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Ability
 {
+    public interface IAbilityFactory
+    {
+        public void SetContext(IAbilityContextService context);
+    }
+    public interface IEnemyAbilityCreater
+    {
+        List<IAbility> CreateAbility(List<EnemyAbilityData> datas, ICombatant owner, int section);
+    }
+
     public class EnemyAbilityFactory : IEnemyAbilityCreater
     {
         IAbilityContextService _service;

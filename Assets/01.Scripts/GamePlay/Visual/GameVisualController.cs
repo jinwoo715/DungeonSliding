@@ -3,21 +3,16 @@ using UnityEngine;
 
 namespace JW.DungeonSliding
 {
-    public class GameVisualController : IVisualController
+    public class GameVisualController : MonoBehaviour, IVisualController
     {
-        private Camera _camera;
-        
-        private GameObject _directionLight;
-        
-        private GameObject _playerSpotLight;
-        
+        [SerializeField] private Camera _camera;
+        [SerializeField] private GameObject _directionLight;
+        [SerializeField] private GameObject _playerSpotLight;
+
         private IEnemyStatUIService _enemyStatUIService;
 
-        public GameVisualController(Camera cam, GameObject dirLight, GameObject playerLight, IEnemyStatUIService enemyStatUIService)
+        public void Init(IEnemyStatUIService enemyStatUIService)
         {
-            _camera = cam;
-            _directionLight = dirLight;
-            _playerSpotLight = playerLight;
             _enemyStatUIService = enemyStatUIService;
         }
 

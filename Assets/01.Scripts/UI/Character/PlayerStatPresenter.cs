@@ -1,5 +1,6 @@
 using JW.DungeonSliding.GamePlay;
 using JW.DungeonSliding.GamePlay.Combat;
+using JW.DungeonSliding.GamePlay.Entities;
 using JW.DungeonSliding.GamePlay.Stats;
 using System;
 using UnityEngine;
@@ -14,9 +15,9 @@ namespace JW.DungeonSliding.UI
 
         private Action OnUnBind;
 
-        public void Init(IStatReadOnly statReadOnly, IStatModifier statModifier, ILevelProgress levelProgress, INextAttackEnhancer nextAttackEnhancer)
+        public void Init(PlayerInfo playerInfo)
         {
-            Bind(statReadOnly, statModifier, levelProgress, nextAttackEnhancer);
+            Bind(playerInfo.PlayerStatReader, playerInfo.PlayerStatModifier, playerInfo.Level, playerInfo.NextAttackEnhancer);
         }
         private void Bind(IStatReadOnly statReadOnly, IStatModifier statModifier, ILevelProgress levelProgress, INextAttackEnhancer nextAttackEnhancer)
         {

@@ -28,7 +28,7 @@ namespace JW.DungeonSliding.Map
         private Dictionary<EObstacleObjectType, Stack<ObstacleObject>> _obsObjPoolByType = new Dictionary<EObstacleObjectType, Stack<ObstacleObject>>();
         private List<ObstacleObject> _activeObsList = new List<ObstacleObject>();
 
-        public void Wire(IBoard board)
+        public void Init(IBoard board)
         {
             _board = board;
         }

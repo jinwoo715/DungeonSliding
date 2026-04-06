@@ -58,11 +58,11 @@ namespace JW.DungeonSliding.GamePlay.Ability
         event Action<AbilitySelectSession> OnExcuteAbilitySelection;
     }
 
-    public class AbilitySystem : IRerollService, IAbilityRandomGetter, IAbilityEventService
+    public class PlayerAbilitySystem : IRerollService, IAbilityRandomGetter, IAbilityEventService
     {
         private ShuffleBag<AbilityDataBase> _abilityBag;
         private Dictionary<string, AbilityDataBase> _abilityDataByUID = new();
-        private AbilityFactory _abilityFactory = new AbilityFactory();
+        private PlayerAbilityFactory _abilityFactory = new PlayerAbilityFactory();
 
         public event Action<AbilityDataBase> OnAddedAbilityData;
         public event Action<IAbility> OnSelectAbility;
@@ -70,16 +70,13 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         public event Action OnExcuteAbility;
 
-        private IAbilityContextService _playerAbilityContext;
+        private int _rerollCount = 1;
 
-        private int _rerollCount = 100;
-
-        public void Init(IAbilityContextService abilityHost, ILevelProgress playerLevel)
+        public void Init(IAbilityContextService abilityContext, ILevelProgress playerLevel)
         {
-            _playerAbilityContext = abilityHost;
-            _playerAbilityContext.Register<IRerollService>(this);
-            _playerAbilityContext.Register<IAbilityRandomGetter>(this);
-
+            abilityContext.Register<IRerollService>(this);
+            abilityContext.Register<IAbilityRandomGetter>(this);
+            _abilityFactory.SetContext(abilityContext);
             LoadData();
 
             playerLevel.OnLevelUp += ProcessAbilityLevel;
@@ -130,7 +127,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
         }
         public void SelectAbility(AbilityDataBase _abilityData)
         {
-            IAbility ability = _abilityFactory.CreateAbility(_abilityData, _playerAbilityContext);
+            IAbility ability = _abilityFactory.CreateAbility(_abilityData);
 
             OnAddedAbilityData?.Invoke(_abilityData);
             OnSelectAbility?.Invoke(ability);

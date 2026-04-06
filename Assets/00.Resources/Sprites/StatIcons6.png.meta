@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: d2e0e6b30e2011e44b5987135e92a58e
+guid: 740aea33627ee274aab41ac7725de073
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -97,23 +97,89 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: "ChatGPT_Image_2026\uB144_1\uC6D4_29\uC77C_\uC624\uD6C4_04_58_01-removebg-preview_0"
+      name: StatIcons6_0
       rect:
         serializedVersion: 2
-        x: 91
-        y: 16
-        width: 318
-        height: 474
+        x: 0
+        y: 279
+        width: 93
+        height: 77
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 59146ab34fe47994c8e90d1954574f69
-      internalID: -526782964
+      spriteID: 2a2cc6c4440ff524aba76e0c630dac1e
+      internalID: 9685786
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StatIcons6_1
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 190
+        width: 77
+        height: 76
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 430f5fc540b07ed41b87d8a399f0e058
+      internalID: -1510908860
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StatIcons6_2
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 96
+        width: 69
+        height: 81
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 303cd44cda28f414ab5ba89582fd0897
+      internalID: -734810896
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StatIcons6_3
+      rect:
+        serializedVersion: 2
+        x: 4
+        y: 0
+        width: 72
+        height: 71
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dc8fc29eed4e36f48ab6c6fd2548e221
+      internalID: -1710145195
       vertices: []
       indices: 
       edges: []
@@ -122,7 +188,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 76ef3c74aff83d74882dcdd9ca95657e
     internalID: 0
     vertices: []
     indices: 
@@ -132,7 +198,10 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      "ChatGPT_Image_2026\uB144_1\uC6D4_29\uC77C_\uC624\uD6C4_04_58_01-removebg-preview_0": -526782964
+      StatIcons6_0: 9685786
+      StatIcons6_1: -1510908860
+      StatIcons6_2: -734810896
+      StatIcons6_3: -1710145195
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

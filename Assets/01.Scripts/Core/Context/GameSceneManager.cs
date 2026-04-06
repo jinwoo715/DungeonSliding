@@ -15,44 +15,58 @@ using JW.DungeonSliding.GamePlay.Stage;
 
 namespace JW.DungeonSliding.GamePlay.Context
 {
-    public interface IActService
+    public class EventBus<T> where T : Enum
     {
-        event Action<int, int> OnChangeActEvent;
-        event Action<int, int> OnChangeFloorEvent;
+        private Dictionary<T, Action> _events = new Dictionary<T, Action>();
+        public void SubscribeEvent(T key, Action handler)
+        {
+            if(!_events.ContainsKey(key))
+                _events[key] = handler;
+            else
+                _events[key] += handler;
+        }
+        public void UnSubscribe(T key, Action handler)
+        {
+            _events[key] -= handler;
+        }
+        public void Excute(T key)
+        {
+            _events[key].Invoke();
+        }
+        public void Clear()
+        {
+            _events.Clear();
+        }
     }
 
-    public class GameSceneManager : MonoBehaviour, IActService
+    public class GameSceneManager : MonoBehaviour
     {
-        private ICombatant _player;
+        private CombatEventBus _combatEventBus = new();
+        private RewardManager _rewardManager = new ();
+
         private GameSequenceController _gameModeController;
         private IUIFader _uiFader;
 
-        public event Action<int, int> OnChangeActEvent;
-        public event Action<int, int> OnChangeFloorEvent;
-
         IStageService _stageSerivce;
-        public void Init(ICombatant player, GameSequenceController gameModeController, IUIFader uiFader, IStageService stageSerivce)
+        public void Init(GameSequenceController gameModeController, IUIFader uiFader, IStageService stageSerivce)
         {
-            _player = player;
-
             _gameModeController = gameModeController;
             _uiFader = uiFader;
             _stageSerivce = stageSerivce;
 
             GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameEventTrigger.OnClearStage, ClearFloor);
-            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameEventTrigger.OnTurnStart, CheckGameOver);
+
+            _rewardManager.Init(_combatEventBus);
         }
 
         public void PrepareStage() 
         {
             StartCoroutine(CoWaitStartStage());
         }
-
         public void ClearFloor()
         {
             PrepareStage();
         }
-
         public IEnumerator CoWaitStartStage()
         {
             yield return null;
@@ -70,11 +84,7 @@ namespace JW.DungeonSliding.GamePlay.Context
             _gameModeController.ExitGameMode(EGameModeType.PrepareStage);
             GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTrigger.OnEnterRoom);
         }
-        public void CheckGameOver()
-        {
-            if (!_player.IsActive)
-                StartCoroutine(FailGame());
-        }
+
         public IEnumerator FailGame()
         {
             //TODO UI 팝업이 먼저 나와야하나?
@@ -85,6 +95,12 @@ namespace JW.DungeonSliding.GamePlay.Context
 
             SceneManager.LoadScene("LobbyScene");
         }
+
+        public void OnPlayerDie() 
+        { 
+
+        }
+
         public void VictoryGame() { }
     }
 }

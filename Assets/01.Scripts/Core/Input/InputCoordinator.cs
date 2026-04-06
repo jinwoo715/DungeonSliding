@@ -5,22 +5,31 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.Core.Inputs
 {
-    public class InputCoordinator
+    public class InputCoordinator : MonoBehaviour, IInputService
     {
-        public event Func<bool> IsMoveableFlowFunc;
-        private IMoveable _moveable;
+        [SerializeField] PCInput _pcInput;
+        [SerializeField] MobileInput _mobileInput;
+        private IInputService _currentInput;
 
-        public void Init(IMoveable moveable)
-        {
-            _moveable = moveable;
-        }
+        public event Action<EDirectionType> OnMoveInput;
 
-        public void OnInputHandle(EDirectionType directionType)
+        public void Init()
         {
-            if(IsMoveableFlowFunc?.Invoke() == true)
-            {
-                _moveable.SlideRoute(directionType);
-            }
+#if UNITY_STANDALONE
+
+            Debug.Log("StandAlone");
+
+            _pcInput.gameObject.SetActive(true);
+            _mobileInput.gameObject.SetActive(false);
+            _currentInput = _pcInput;
+#else
+            Debug.Log("Mobile");
+
+            _pcInput.gameObject.SetActive(false);
+            _mobileInput.gameObject.SetActive(true);
+            _currentInput = _mobileInput;
+#endif
+            _currentInput.OnMoveInput += OnMoveInput;
         }
     }
 }

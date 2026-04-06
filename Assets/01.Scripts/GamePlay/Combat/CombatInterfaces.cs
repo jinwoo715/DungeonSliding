@@ -92,7 +92,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
     {
         public ICombatant PlayerCombatant { get; }
         public List<ICombatant> AllEnemyCombatants { get; }
-        public bool GetCombatant(Tile tile, ECreatureType targetType, out ICombatant combatant);
+        public bool TryGetCombatant(Tile tile, ECreatureType targetType, out ICombatant combatant);
         public int GetNearEnemyCount(Tile pivot);
     }
 

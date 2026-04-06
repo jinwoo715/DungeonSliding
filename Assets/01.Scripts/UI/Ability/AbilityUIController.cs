@@ -10,7 +10,7 @@ namespace JW.DungeonSliding.UI
 
         [SerializeField] private AbilitySelectView _abilitySelectView;
 
-        public void Initialize(IAbilityEventService abilityService)
+        public void Init(IAbilityEventService abilityService)
         {
             _abilitySelectView.Init();
             _abilitySelectView.Bind(SelectAbility, Reroll);

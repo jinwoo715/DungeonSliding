@@ -19,8 +19,12 @@ namespace JW.DungeonSliding.GamePlay.Combat
             CombatCount = combatCount;
         }
     }
-
-    public class BattleManager : MonoBehaviour, IAttackRequestListener, IRequesterRegistry, IBattleResult
+    public interface IAttackRegister
+    {
+        public void RegisterAttackRequester(IAttackRequester requester, int priority);
+        public void UnRegisterAttackRequester(IAttackRequester requester, int priority);
+    }
+    public class BattleManager : MonoBehaviour, IAttackRequestListener, IAttackRegister, IBattleResult
     {
         //TODO BattleManager
         private ICombatantSensor _combatSensor;

@@ -79,7 +79,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         {
             _stat.Init(baseStat);
         }
-        public void RegisterRequester(IRequesterRegistry requesterRegistry)
+        public void RegisterRequester(IAttackRegister requesterRegistry)
         {
             requesterRegistry.RegisterAttackRequester(_attackRequester, (int)_creatureType);
             _unRegisterRequesterEvent += requesterRegistry.UnRegisterAttackRequester;

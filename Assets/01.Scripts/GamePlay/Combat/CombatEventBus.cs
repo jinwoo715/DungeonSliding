@@ -26,7 +26,6 @@ namespace JW.DungeonSliding.GamePlay.Combat
                 return _instance;
             }
         }
-
         public static ICombatEventPresenter Register
         {
             get
@@ -45,10 +44,8 @@ namespace JW.DungeonSliding.GamePlay.Combat
             Debug.Log("Init Combat Event Bus");
             _instance = this;
         }
-
         public void RaiseDamageEvent(DamageEvent e) { OnDamageEvent?.Invoke(e); }
         public void RaiseDeathEvent(DeathEvent e) => OnDeathEvent?.Invoke(e);
-
         public void Clear()
         {
             OnDamageEvent = null;
