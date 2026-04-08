@@ -44,11 +44,11 @@ namespace JW.DungeonSliding.GamePlay.Context
         private CombatEventBus _combatEventBus = new();
         private RewardManager _rewardManager = new ();
 
-        private GameSequenceController _gameModeController;
+        private GameStateController _gameModeController;
         private IUIFader _uiFader;
 
         IStageService _stageSerivce;
-        public void Init(GameSequenceController gameModeController, IUIFader uiFader, IStageService stageSerivce)
+        public void Init(GameStateController gameModeController, IUIFader uiFader, IStageService stageSerivce)
         {
             _gameModeController = gameModeController;
             _uiFader = uiFader;
@@ -71,9 +71,9 @@ namespace JW.DungeonSliding.GamePlay.Context
         {
             yield return null;
 
-            yield return new WaitUntil(() => _gameModeController.GameMode == EGameModeType.Play);
+            yield return new WaitUntil(() => _gameModeController.GameState == EGameStateType.Play);
             
-            _gameModeController.EnterGameMode(EGameModeType.PrepareStage);
+            _gameModeController.EnterGameState(EGameStateType.PrepareStage);
 
             yield return _uiFader.FadeOut();
 
@@ -81,7 +81,7 @@ namespace JW.DungeonSliding.GamePlay.Context
 
             yield return _uiFader.FadeIn();
 
-            _gameModeController.ExitGameMode(EGameModeType.PrepareStage);
+            _gameModeController.ExitGameState(EGameStateType.PrepareStage);
             GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTrigger.OnEnterRoom);
         }
 

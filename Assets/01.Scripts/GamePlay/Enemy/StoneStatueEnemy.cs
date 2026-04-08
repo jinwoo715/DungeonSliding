@@ -43,7 +43,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             Vector3 punchScale = new Vector3(0.02f, 0f, 0.02f);
             _avatar.transform.DOPunchPosition(punchScale, _rotateDelay, 20);
 
-            EDirectionType toDir = DirectionUtility.GetDirFromTileToTile(Tile.TilePosition, damageInfo.Attacker.Tile.TilePosition);
+            EDirectionType toDir = DirectionUtility.GetDirFromTileToTile(TileObject.TilePosition, damageInfo.Attacker.TileObject.TilePosition);
 
             var particle = ParticlePool.Instance.GetParticle("HitDust");
             particle.SetParticle(this.transform.position + Vector3.up * 0.65f + GetHitParticlePosition(toDir), 1.0f);

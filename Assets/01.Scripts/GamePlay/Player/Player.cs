@@ -19,9 +19,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
         private ECharacterStateType _characterState = ECharacterStateType.Idle;
         public ESlideResultType SlideResultType { get; private set; }
 
-        private IRouteService _routeService;
-        private IMoveRule _moveRule;
-
         public event Action OnMoveEnd;
         public event Action OnSlideEnd;
 
@@ -41,12 +38,9 @@ namespace JW.DungeonSliding.GamePlay.Entities
             base.Initialize(cretureType);
             _objectFader.Init();
         }
-        public void Wire(IRouteService routeService, IMoveRule moveRule)
+        public void Wire(IRouteService routeService)
         {
-            _routeService = routeService;
-            _moveRule = moveRule;
-
-            _moveController.Wire(_routeService, this);
+            _moveController.Init(routeService, this);
             Bind();
         }
         private void Bind() 
@@ -93,8 +87,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
         
         public void SlideRoute(EDirectionType inputDirection)
         {
-            if (!_moveRule.IsCanMove(inputDirection)) return;
-
             if (_moveController.IsMoving) return;
 
             if (_characterState != ECharacterStateType.Idle) return;
@@ -107,7 +99,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         }
         private void HandleSlideEnd()
         {
-            StatModifier.ModifyStat(new StatModifierContext(ECreatureStatType.CurrentMoveCount, EApplyStatType.Add, -_moveRule.MoveCost));
+            OnSlideEnd?.Invoke();
             ChangeCharacterState(ECharacterStateType.Idle);
             SlideResultType = ESlideResultType.None;
             Ability.ExecuteCreatureTrigger(ECreatureTrigger.OnSlided);
@@ -123,7 +115,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         }
         public int SlideTileCount()
         {
-            return _routeService.LastMoveTileCount;
+            return _moveController.GetMoveDistance;
         }
         public void KnockBack(EDirectionType dir)
         {
@@ -135,12 +127,12 @@ namespace JW.DungeonSliding.GamePlay.Entities
         #region Combat
         public override void TakeDamage(DamageContext damageInfo)
         {
-            EDirectionType dir = DirectionUtility.GetDirFromTileToTile(Tile.TilePosition, damageInfo.Attacker.Tile.TilePosition);
+            EDirectionType dir = DirectionUtility.GetDirFromTileToTile(TileObject.TilePosition, damageInfo.Attacker.TileObject.TilePosition);
             Rotate.SetRotation(dir);
 
             if(damageInfo.Status.ContainsKey(ECreatureStatus.Knockback))
             {
-                EDirectionType toAttackDir = DirectionUtility.GetDirFromTileToTile(Tile.TilePosition, damageInfo.Attacker.Tile.TilePosition);
+                EDirectionType toAttackDir = DirectionUtility.GetDirFromTileToTile(TileObject.TilePosition, damageInfo.Attacker.TileObject.TilePosition);
                 EDirectionType backDirection = DirectionUtility.GetReverseDirection(toAttackDir);
 
                 KnockBack(backDirection);

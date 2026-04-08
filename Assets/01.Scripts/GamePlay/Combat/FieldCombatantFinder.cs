@@ -23,7 +23,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
             switch (targetType)
             {
                 case ECreatureType.Player:
-                    if (_playerCombatant.Tile.TilePosition == tile && !_playerCombatant.StatusReadOnly.HasStatus(ECreatureStatus.Hide))
+                    if (_playerCombatant.TileObject.TilePosition == tile && !_playerCombatant.StatusReadOnly.HasStatus(ECreatureStatus.Hide))
                     {
                         combatant = _playerCombatant;
                         return true;

@@ -41,18 +41,13 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
         private bool _isCanMove;
 
-        public void Init()
-        {
-            _levelSystem.Initialize();
-        }
         public ILevelProgress Level => _levelSystem;
         public ICombatant Player => _player;
         public IStatReadOnly StatReadOnly => _player.StatReadOnly;
         public IStatModifier StatModifier => _player.StatModifier;
-        public ITileObject Tile => _player.Tile;
         public IMoveable Moveable => _player;
-        public IAbilityRegister AbilityRegister => _player.AbilityRegister;
         public INextAttackEnhancer NextAttackEnhancer => _player.NextAttackEnhancer;
+        public IMoveRule _moveRule;
 
         public void Init(IRouteService routeService, IMoveRule moveRule, IAttackRegister requesterRegistry, IAbilityEventService abilityEventService)
         {
@@ -61,7 +56,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             CreatureBaseStat baseStat = CreatePlayerBaseStat();
             _player.InitData(baseStat);
 
-            _player.Wire(routeService, moveRule);
+            _player.Wire(routeService);
 
             _player.RegisterRequester(requesterRegistry);
 
@@ -69,6 +64,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
             _player.OnGetXp += _levelSystem.AddXp;
             _levelSystem.OnLevelUp += _player.HandleLevelUp;
+
+            _player.OnMoveEnd += PayMoveCost;
         }
         public void RegisterContext(IAbilityContextService abilityContextService)
         {
@@ -78,7 +75,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             abilityContextService.Register<IStatusModifier>(_player.StatusModifier);
             abilityContextService.Register<INextAttackEnhancer>(NextAttackEnhancer);
             abilityContextService.Register<IRotateObject>(_player.Rotate);
-            abilityContextService.Register<ITileObject>(_player.Tile);
+            abilityContextService.Register<ITileObject>(_player.TileObject);
             abilityContextService.Register<IAttackRequester>(_player.AttackRequester);
         }
         private CreatureBaseStat CreatePlayerBaseStat()
@@ -89,13 +86,18 @@ namespace JW.DungeonSliding.GamePlay.Entities
         
         public void OnPlayerMove(EDirectionType directionType)
         {
-            if (_isCanMove)
+            if (_isCanMove && _moveRule.IsCanMove(directionType))
                 Moveable.SlideRoute(directionType);
         }
 
         public void OnChangeMoveState(bool isMoveable)
         {
             _isCanMove = isMoveable;
+        }
+
+        private void PayMoveCost()
+        {
+            StatModifier.ModifyStat(new StatModifierContext(ECreatureStatType.CurrentMoveCount, EApplyStatType.Add, -_moveRule.MoveCost));
         }
 
         private void CheckPlayerAlive()

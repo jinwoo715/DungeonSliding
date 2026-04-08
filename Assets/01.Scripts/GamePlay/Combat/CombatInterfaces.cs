@@ -74,7 +74,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
         IStatusModifier StatusModifier { get; }
         IStatusReadOnly StatusReadOnly { get; }
 
-        ITileObject Tile { get; }
+        ITileObject TileObject { get; }
         IRotateObject Rotate { get; }
 
         IAbilityExcuter Ability {get;}

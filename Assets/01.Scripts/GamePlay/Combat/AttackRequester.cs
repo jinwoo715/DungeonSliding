@@ -31,7 +31,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
             ECreatureType searchType = _ownerType == ECreatureType.Player ? ECreatureType.Enemy : ECreatureType.Player;
 
-            if (sensor.TryGetCombatant(_owner.Tile.TilePosition.GetNextTileByDir(_owner.Rotate.Direction), searchType, out var target))
+            if (sensor.TryGetCombatant(_owner.TileObject.TilePosition.GetNextTileByDir(_owner.Rotate.Direction), searchType, out var target))
             {
                 OnRegisterAttack?.Invoke();
                 OnRequestAttack?.Invoke(new ActPair(_owner, target, EAttackType.Nomal));

@@ -48,8 +48,8 @@ namespace JW.DungeonSliding.GamePlay.Stage
 
         IMapService _mapService;
         IFieldObstacleService _obstacleService;
-        ITileObject _player;
         IEnemySpawnService _enemySpawnService;
+        ITileObject _player;
 
         public void Init(IMapService mapService, IFieldObstacleService obstacleService, ITileObject player, IEnemySpawnService enemySpawnService)
         {
@@ -62,6 +62,13 @@ namespace JW.DungeonSliding.GamePlay.Stage
 
             UpdateMapData();
         }
+
+        public void CheckStageClear()
+        {
+            if (_enemySpawnService.ActiveEnemyCount == 0)
+                OnClearFloor?.Invoke();
+        }
+
         public void StartStage()
         {
             ClearField();
@@ -89,7 +96,6 @@ namespace JW.DungeonSliding.GamePlay.Stage
             _mapService.ClearMap();
             _obstacleService.ClearObstacles();
         }
-
         private void UpdateFloorAndAct()
         {
             _currentActProgress++;

@@ -9,6 +9,11 @@ using JW.DungeonSliding.GamePlay.Move;
 
 namespace JW.DungeonSliding
 {
+    public interface IMoveResultReader
+    {
+        int LastMoveCount { get; }
+    }
+
     public class MoveController : MonoBehaviour
     {
         private IRouteService _routeService;
@@ -24,8 +29,9 @@ namespace JW.DungeonSliding
         public event Action OnPushedStart;
         public event Action OnPushedEnd;
         public bool IsMoving { get; private set; }
+        public int GetMoveDistance => _routeService.LastMoveTileCount;
 
-        public void Wire(IRouteService routeService, IMoveable moveable)
+        public void Init(IRouteService routeService, IMoveable moveable)
         {
             _routeService = routeService;
             _moveable = moveable;
@@ -35,7 +41,7 @@ namespace JW.DungeonSliding
         {
             IsMoving = true;
 
-            Queue<MoveContext> moveQueue = _routeService.BuildRoute(_moveable.Tile.TilePosition, inputDirection, 100);
+            Queue<MoveContext> moveQueue = _routeService.BuildRoute(_moveable.TileObject.TilePosition, inputDirection, 100);
 
             if (moveQueue.Count == 1)
             {
@@ -73,7 +79,7 @@ namespace JW.DungeonSliding
                     case ESlideResultType.EnemyStop:
                         break;
                     case ESlideResultType.Teleport:
-                        _moveable.Tile.SetPosition(moveContext.DestTile);
+                        _moveable.TileObject.SetPosition(moveContext.DestTile);
                         break;
                 }
 
@@ -100,7 +106,7 @@ namespace JW.DungeonSliding
                 yield return null;
             }
 
-            _moveable.Tile.SetPosition(moveContext.DestTile);
+            _moveable.TileObject.SetPosition(moveContext.DestTile);
         }
         private void FinishMove()
         {
@@ -115,7 +121,7 @@ namespace JW.DungeonSliding
         {
             IsMoving = true;
 
-            Queue<MoveContext> moveQueue = _routeService.BuildRoute(_moveable.Tile.TilePosition, dir, 2);
+            Queue<MoveContext> moveQueue = _routeService.BuildRoute(_moveable.TileObject.TilePosition, dir, 2);
 
             if (moveQueue.Count > 1)
             {
@@ -127,7 +133,7 @@ namespace JW.DungeonSliding
                 yield return StartCoroutine(CoPushed(first.DestTile));
 
                 if (second.ResultType == ESlideResultType.Teleport)
-                    _moveable.Tile.SetPosition(second.DestTile);
+                    _moveable.TileObject.SetPosition(second.DestTile);
             }
             IsMoving = false;
         }
@@ -136,7 +142,7 @@ namespace JW.DungeonSliding
             float elapsed = 0f;
             float duration = 0.45f;
 
-            Vector3 startPosition = _moveable.Tile.TilePosition.GetPosition;
+            Vector3 startPosition = _moveable.TileObject.TilePosition.GetPosition;
             Vector3 endPosition = backTile.GetPosition;
 
             while (elapsed < duration)
@@ -152,7 +158,7 @@ namespace JW.DungeonSliding
                 yield return null;
             }
 
-            _moveable.Tile.SetPosition(backTile);
+            _moveable.TileObject.SetPosition(backTile);
 
             IsMoving = false;
             OnPushedEnd?.Invoke();

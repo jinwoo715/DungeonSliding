@@ -41,7 +41,7 @@ namespace JW.DungeonSliding.GamePlay.Ability.Enemy
         {
             var playerTile = _sensor.PlayerCombatant;
 
-            EDirectionType dir = DirectionUtility.GetDirFromTileToTile(_owner.Tile.TilePosition, playerTile.Tile.TilePosition);
+            EDirectionType dir = DirectionUtility.GetDirFromTileToTile(_owner.TileObject.TilePosition, playerTile.TileObject.TilePosition);
             yield return _owner.Rotate.CoRotateToDirection(dir);
         }
 
@@ -69,7 +69,7 @@ namespace JW.DungeonSliding.GamePlay.Ability.Enemy
 
                 enemy.Rotate.OnRotateEnd += OnEndRotate;
 
-                EDirectionType dir = DirectionUtility.GetDirFromTileToTile(enemy.Tile.TilePosition, playerTile.Tile.TilePosition);
+                EDirectionType dir = DirectionUtility.GetDirFromTileToTile(enemy.TileObject.TilePosition, playerTile.TileObject.TilePosition);
 
                 enemy.Rotate.RotateToDirection(dir);
             }

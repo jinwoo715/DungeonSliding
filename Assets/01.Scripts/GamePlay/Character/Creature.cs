@@ -37,7 +37,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public IStatReadOnly StatReadOnly => _stat;
         public IStatusModifier StatusModifier => _status;
         public IStatusReadOnly StatusReadOnly => _status;
-        public ITileObject Tile => _gridTransform;
+        public ITileObject TileObject => _gridTransform;
         public IRotateObject Rotate => _objectRotator;
         public IAbilityRegister AbilityRegister => _abilityExcuter;
         public IAbilityExcuter Ability => _abilityExcuter;

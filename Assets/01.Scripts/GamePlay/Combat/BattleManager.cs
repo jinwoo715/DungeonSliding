@@ -28,6 +28,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
     {
         //TODO BattleManager
         private ICombatantSensor _combatSensor;
+        private IGameStateModifier _gameStateModifier;
 
         private SortedDictionary<int, List<IAttackRequester>> _requesterByPriority = new();
 
@@ -36,12 +37,14 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
         private int _combatCount = 0;
 
-        public void Init(ICombatantSensor combatantSensor)
+        public void Init(ICombatantSensor combatantSensor, IGameStateModifier gameStateModifier)
         {
             _combatSensor = combatantSensor;
+            _gameStateModifier = gameStateModifier;
         }
         public void StartBattleSequence()
         {
+            _gameStateModifier.EnterGameState(EGameStateType.Battle);
             GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTrigger.OnBattleStart);
 
             foreach (var requesters in _requesterByPriority)
@@ -113,7 +116,8 @@ namespace JW.DungeonSliding.GamePlay.Combat
             }
 
             GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTrigger.OnBattleEnd);
-            
+            _gameStateModifier.ExitGameState(EGameStateType.Battle);
+
             _actPairs.Clear();
             _counterActPairs.Clear();
             _combatCount = 0;

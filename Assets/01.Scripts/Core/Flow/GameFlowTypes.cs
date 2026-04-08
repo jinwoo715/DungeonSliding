@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.Core.Flow
 {
-    public enum EGameModeType
+    public enum EGameStateType
     {
         Play = 0,
         PrepareStage = 1 << 1,

@@ -19,7 +19,7 @@ namespace JW.DungeonSliding.GamePlay
 
     public class LevelSystem : ILevelProgress
     {
-        public int CurrentLevel { get; private set; } = 1;
+        public int CurrentLevel { get; private set; }
         public int CurrentXp { get; private set; }
         public int RequiredXp { get; private set; }
 

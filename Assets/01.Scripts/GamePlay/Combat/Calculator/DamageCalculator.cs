@@ -18,9 +18,9 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
             var victimDir = victim.Rotate.Direction;
             var reverseDir = victim.Rotate.ReverseDirection(victimDir);
-            var behindTile = victim.Tile.TilePosition.GetNextTileByDir(reverseDir);
+            var behindTile = victim.TileObject.TilePosition.GetNextTileByDir(reverseDir);
 
-            return attacker.Tile.TilePosition == behindTile;
+            return attacker.TileObject.TilePosition == behindTile;
         }
         public static bool IsSideAttack(ICombatant attacker, ICombatant target)
         {

@@ -7,7 +7,7 @@ namespace JW.DungeonSliding.Map
         event Action OnMoveEnd;
         event Action OnSlideEnd;
 
-        public ITileObject Tile { get; }
+        public ITileObject TileObject { get; }
         public int SlideTileCount();
         public ESlideResultType SlideResultType { get; }
         public void SetMoveResult(ESlideResultType result);

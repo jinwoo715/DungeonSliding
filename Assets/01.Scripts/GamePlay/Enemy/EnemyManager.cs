@@ -14,8 +14,9 @@ namespace JW.DungeonSliding.GamePlay.Entities
 {
     public interface IEnemySpawnService
     {
+        int ActiveEnemyCount { get; }
         event Action<Tile, Enemy> OnSpawnEnemy;
-        event Action<Tile, Enemy> OnDespawnEnemy;
+        event Action<Tile, Enemy> OnEnemyDeath;
         void ReceiveNomalEnemySpawnList(List<Tile> spawnPositions, int act);
         void ReceiveBossEnemySpawnList(List<Tile> spawnPositions, int act);
     }
@@ -31,15 +32,15 @@ namespace JW.DungeonSliding.GamePlay.Entities
         private List<EnemyData> _nomalEnemyDatas = new();
         private List<EnemyData> _bossEnemyDatas = new();
 
-        private IFieldObstacleService _obstacleRequest;
         private IEnemyAbilityCreater _enemyAbilityCreater;
 
-        public event Action<Tile, Enemy> OnSpawnEnemy;
-        public event Action<Tile, Enemy> OnDespawnEnemy;
+        public int ActiveEnemyCount => _activeEnemyByTile.Count;
 
-        public void Init(IFieldObstacleService obstacleRequest, IEnemyAbilityCreater enemyAbilityCreater)
+        public event Action<Tile, Enemy> OnSpawnEnemy;
+        public event Action<Tile, Enemy> OnEnemyDeath;
+
+        public void Init(IEnemyAbilityCreater enemyAbilityCreater)
         {
-            _obstacleRequest = obstacleRequest;
             _enemyAbilityCreater = enemyAbilityCreater;
 
             LoadData();
@@ -60,7 +61,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
                 enemy = InstantiateEnemy();
 
             enemy.gameObject.SetActive(true);
-            enemy.OnEnemyReturnEvent += OnEnemyDeath;
+            enemy.OnEnemyReturnEvent += DeathEnemy;
 
             return enemy;
         }
@@ -71,17 +72,16 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
             return enemy;
         }
-        private void OnEnemyDeath(Enemy enemy)
+        private void DeathEnemy(Enemy enemy)
         {
             ReturnEnemy(enemy);
 
             GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTrigger.OnEnemyDeath);
 
-            Tile tile = enemy.Tile.TilePosition;
+            Tile tile = enemy.TileObject.TilePosition;
 
             _activeEnemyByTile.Remove(tile);
-            _obstacleRequest.SpawnObstacle(tile, EObstacleObjectType.Rubble);
-            OnDespawnEnemy?.Invoke(tile, enemy);
+            OnEnemyDeath?.Invoke(tile, enemy);
 
             if (_activeEnemyByTile.Count == 0)
             {
@@ -91,7 +91,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         }
         public void ReturnEnemy(Enemy enemy)
         {
-            enemy.OnEnemyReturnEvent -= OnEnemyDeath;
+            enemy.OnEnemyReturnEvent -= DeathEnemy;
             enemy.gameObject.SetActive(false);
             _enemyPoolByUID.Push(enemy);
         }
@@ -162,7 +162,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         }
         private void SetEnemyOnTile(Enemy enemy, Tile tile)
         {
-            enemy.Tile.SetPosition(tile);
+            enemy.TileObject.SetPosition(tile);
             _activeEnemyByTile.Add(tile, enemy);
         }
         private void SetEnemySkill(EnemyData data, Enemy enemy, int act)
