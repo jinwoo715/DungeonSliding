@@ -1,3 +1,5 @@
+using JW.DungeonSliding.Core;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,6 +10,7 @@ namespace JW.DungeonSliding
         [SerializeField] private Button _infoButton;
         [SerializeField] private StartButton _startButton;
         [SerializeField] private GameGuidePresenter _gameGuidePresenter;
+        [SerializeField] private Fader _fader;
 
         private void Start()
         {
@@ -23,6 +26,8 @@ namespace JW.DungeonSliding
 
         public void StartGame()
         {
+            Action callback = () => GameManager.Scene.LoadScene(SceneType.GameScene);
+            _fader.FadeOut(callback);
             Debug.Log("Game Start!");
         }
     }

@@ -92,6 +92,8 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         private IEnumerator RunAbilityWithCounter(IAbility ability, AbilityArgs args)
         {
+            Console.WriteLine(ability);
+
             _workingAbilityCount++;
             AbilityBusyCounter.RegisterWorkAbility(); // 1. 카운터 증가
 

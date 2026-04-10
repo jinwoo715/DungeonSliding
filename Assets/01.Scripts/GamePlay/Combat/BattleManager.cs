@@ -121,6 +121,8 @@ namespace JW.DungeonSliding.GamePlay.Combat
             _actPairs.Clear();
             _counterActPairs.Clear();
             _combatCount = 0;
+            
+            yield break;
         }
         public void EnqueueActPair(ActPair pair)
         {
@@ -142,6 +144,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
         }
         public void UnRegisterAttackRequester(IAttackRequester requester, int priority)
         {
+            Debug.Log($"UnRegister : {requester} / {priority}");
             if (_requesterByPriority.TryGetValue(priority, out var list))
             {
                 if (list.Contains(requester))

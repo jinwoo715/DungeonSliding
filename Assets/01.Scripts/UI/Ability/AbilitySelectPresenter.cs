@@ -4,7 +4,7 @@ using JW.DungeonSliding.GamePlay.Ability;
 
 namespace JW.DungeonSliding.UI
 {
-    public class AbilityUIController : MonoBehaviour
+    public class AbilitySelectPresenter : MonoBehaviour
     {
         private AbilitySelectSession _currentSession;
 
@@ -21,24 +21,29 @@ namespace JW.DungeonSliding.UI
         public void OpenSelectAbilityView(AbilitySelectSession session)
         {
             _currentSession = session;
-            _abilitySelectView.SetAilityDatas(_currentSession.SelectableAbilities, _currentSession.RerollCount);
+
+            SetAbilityData();
 
             _abilitySelectView.gameObject.SetActive(true);
+        }
+
+        private void SetAbilityData()
+        {
+            _abilitySelectView.SetAilityDatas(_currentSession.SelectableAbilities, _currentSession.RerollCount);
         }
 
         public void Reroll()
         {
             if (_currentSession.TryRerollAbilities())
             {
-                _abilitySelectView.SetAilityDatas(_currentSession.SelectableAbilities, _currentSession.RerollCount);
+                SetAbilityData();
             }
         }
-
         public void SelectAbility(AbilityDataBase abilityData)
         {
-            _currentSession.SelectAbiltyUIDEvent(abilityData);
             _abilitySelectView.gameObject.SetActive(false);
-            _currentSession = null;
+            _currentSession.SelectAbiltyUIDEvent(abilityData);
+            _currentSession.Clear();
         }
     }
 }

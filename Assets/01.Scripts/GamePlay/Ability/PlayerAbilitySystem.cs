@@ -14,7 +14,8 @@ namespace JW.DungeonSliding.GamePlay.Ability
     }
     public interface IAbilityRandomGetter
     {
-        void GetRandomAbility(int count);
+        void ObtainRandomRuleAbility(int count);
+        void ObtainRandomStatAbility(int count);
     }
 
     public interface IAbilityContextService
@@ -49,59 +50,78 @@ namespace JW.DungeonSliding.GamePlay.Ability
         }
     }
 
-    //어빌리티 추가
-    //
     public interface IAbilityEventService
     {
-        event Action<AbilityDataBase> OnAddedAbilityData;
+        event Action<AbilityDataBase> OnAddedRuleAbility;
         event Action<IAbility> OnSelectAbility;
         event Action<AbilitySelectSession> OnExcuteAbilitySelection;
+        void GrantAbilityPoint(int currentLevel);
     }
+
 
     public class PlayerAbilitySystem : IRerollService, IAbilityRandomGetter, IAbilityEventService
     {
-        private ShuffleBag<AbilityDataBase> _abilityBag;
-        private Dictionary<string, AbilityDataBase> _abilityDataByUID = new();
-        private PlayerAbilityFactory _abilityFactory = new PlayerAbilityFactory();
+        private ShuffleBag<AbilityDataBase> _ruleAbilityBag;
+        private ShuffleBag<AbilityDataBase> _statAbilityBag;
 
-        public event Action<AbilityDataBase> OnAddedAbilityData;
+        private Dictionary<string, AbilityDataBase> _statAbilityDatas = new();
+        private Dictionary<string, AbilityDataBase> _ruleAbilityDatas = new();
+
+        private IPlayerAbilityFactory _playerAbilityFactory;
+
+        public event Action<AbilityDataBase> OnAddedRuleAbility;
         public event Action<IAbility> OnSelectAbility;
         public event Action<AbilitySelectSession> OnExcuteAbilitySelection;
 
-        public event Action OnExcuteAbility;
-
         private int _rerollCount = 1;
 
-        public void Init(IAbilityContextService abilityContext, ILevelProgress playerLevel)
+        Queue<AbilitySelectSession> abilitySelectSessions = new Queue<AbilitySelectSession>();
+
+        public void Init(IPlayerAbilityFactory playerAbilityFactory, IAbilityContextService abilityContext)
         {
             abilityContext.Register<IRerollService>(this);
             abilityContext.Register<IAbilityRandomGetter>(this);
-            _abilityFactory.SetContext(abilityContext);
+            _playerAbilityFactory = playerAbilityFactory;
+
             LoadData();
 
-            playerLevel.OnLevelUp += ProcessAbilityLevel;
+            var session2 = new AbilitySelectSession(GetRandomRuleAbilities(3), SelectAbility, () => GetRandomRuleAbilities(3), _rerollCount);
+            abilitySelectSessions.Enqueue(session2);
 
-            GameTriggerEventBus.Instance.EnqueueInstanceTriggerEvent(EGameEventTrigger.OnEnterRoom, RequestAbilitySelect);
+            GameTriggerEventBus.Instance.EnqueueInstanceTriggerEvent(EGameEventTrigger.OnEnterRoom, ProgressAbilitySelect);
         }
         private void LoadData()
         {
-            List<AbilityDataBase> datas = GameManager.Data.Abilities;
+            List<AbilityDataBase> sDatas = GameManager.Data.StatAbilities;
+            List<AbilityDataBase> rDatas = GameManager.Data.RuleAbilities;
 
-            _abilityBag = new ShuffleBag<AbilityDataBase>(datas);
-
-            for (int i = 0; i < datas.Count; i++)
+            _statAbilityBag = new ShuffleBag<AbilityDataBase>(sDatas);
+            for (int i = 0; i < sDatas.Count; i++)
             {
-                _abilityDataByUID.Add(datas[i].UID, datas[i]);
+                _statAbilityDatas.Add(sDatas[i].UID, sDatas[i]);
+            }
+
+            _ruleAbilityBag = new ShuffleBag<AbilityDataBase>(rDatas);
+            for (int i = 0; i < rDatas.Count; i++)
+            {
+                _ruleAbilityDatas.Add(rDatas[i].UID, rDatas[i]);
             }
         }
-        private void ProcessAbilityLevel(int currentLevel)
+        public void GrantAbilityPoint(int currentLevel)
         {
-            if(IsAchieveAbilityLevel(currentLevel))
+            Debug.Log($"GrantAbilityPoint : {currentLevel}");
+            var session = new AbilitySelectSession(GetRandomStatAbilites(3), SelectAbility, () => GetRandomStatAbilites(3), _rerollCount);
+            abilitySelectSessions.Enqueue(session);
+
+            if (IsAbilityLevel(currentLevel))
             {
-                GameTriggerEventBus.Instance.EnqueueInstanceTriggerEvent(EGameEventTrigger.OnTurnEnd, RequestAbilitySelect);
+                var session2 = new AbilitySelectSession(GetRandomRuleAbilities(3), SelectAbility, () => GetRandomRuleAbilities(3), _rerollCount);
+                abilitySelectSessions.Enqueue(session2);
             }
+
+            GameTriggerEventBus.Instance.EnqueueInstanceTriggerEvent(EGameEventTrigger.OnTurnEnd, ProgressAbilitySelect);
         }
-        private bool IsAchieveAbilityLevel(int currentLevel)
+        private bool IsAbilityLevel(int currentLevel)
         {
             int abilityLevel = GameManager.Config.Ability.AbilityLevel;
 
@@ -109,50 +129,71 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
             return achive == 0;
         }
-        public void RequestAbilitySelect()
+        public void ProgressAbilitySelect()
         {
-            var session = new AbilitySelectSession(GetRandomAbilities(3), SelectAbility, () => GetRandomAbilities(3), _rerollCount);
-            OnExcuteAbilitySelection?.Invoke(session);
+            Debug.Log(abilitySelectSessions.Count);
+            if (IsExistGetAbility())
+            {
+                var session = abilitySelectSessions.Dequeue();
+                session.OnEndSession += ProgressAbilitySelect;
+
+                OnExcuteAbilitySelection?.Invoke(session);
+            }
         }
 
-        public AbilityDataBase[] GetRandomAbilities(int count)
+        private bool IsExistGetAbility()
+        {
+            return abilitySelectSessions.Count > 0;
+        }
+
+        public void SelectAbility(AbilityDataBase _abilityData)
+        {
+            IAbility ability = _playerAbilityFactory.CreateAbility(_abilityData);
+
+            OnAddedRuleAbility?.Invoke(_abilityData);
+            OnSelectAbility?.Invoke(ability);
+        }
+        public AbilityDataBase[] GetRandomRuleAbilities(int count)
         {
             AbilityDataBase[] abilityDatas = new AbilityDataBase[count];
             for (int i = 0; i < count; i++)
             {
-                abilityDatas[i] = _abilityBag.GetItem();
+                abilityDatas[i] = _ruleAbilityBag.GetItem();
             }
 
             return abilityDatas;
         }
-        public void SelectAbility(AbilityDataBase _abilityData)
+        public AbilityDataBase[] GetRandomStatAbilites(int count)
         {
-            IAbility ability = _abilityFactory.CreateAbility(_abilityData);
+            AbilityDataBase[] abilityDatas = new AbilityDataBase[count];
+            for (int i = 0; i < count; i++)
+            {
+                abilityDatas[i] = _statAbilityBag.GetItem();
+            }
 
-            OnAddedAbilityData?.Invoke(_abilityData);
-            OnSelectAbility?.Invoke(ability);
+            return abilityDatas;
         }
-        public void AddReroll(int amount = 1)
+        public void ObtainRandomRuleAbility(int count)
         {
-            _rerollCount += amount;
-        }
-        public void GetRandomAbility(int count)
-        {
-            AbilityDataBase[] abilities = new AbilityDataBase[count];
-            abilities = GetRandomAbilities(count);
+            var abilities = GetRandomRuleAbilities(count);
 
             for (int i = 0; i < count; i++)
             {
                 SelectAbility(abilities[i]);
             }
         }
-
-        /// <summary>
-        /// Ability Test Function
-        /// </summary>
-        public void GetSpecificAbility(AbilityDataBase abilityDataBase)
+        public void ObtainRandomStatAbility(int count)
         {
-            SelectAbility(abilityDataBase);
+            var abilities = GetRandomStatAbilites(count);
+
+            for (int i = 0; i < count; i++)
+            {
+                SelectAbility(abilities[i]);
+            }
+        }
+        public void AddReroll(int amount = 1)
+        {
+            _rerollCount += amount;
         }
     }
 }

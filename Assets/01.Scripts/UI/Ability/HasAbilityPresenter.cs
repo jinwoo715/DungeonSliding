@@ -16,7 +16,7 @@ namespace JW.DungeonSliding.UI
             _tooltipService = tooltipService;
             _abilityService = abilityService;
 
-            _abilityService.OnAddedAbilityData += AddAbility;
+            _abilityService.OnAddedRuleAbility += AddAbility;
         }
 
         public void AddAbility(AbilityDataBase data)

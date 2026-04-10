@@ -10,6 +10,10 @@ namespace JW.DungeonSliding.UI
     {
         [SerializeField] private CanvasGroup _fadeImage;
 
+        public void SetAlpha(int alpha)
+        {
+            _fadeImage.alpha = alpha;
+        }
         public IEnumerator CoFadeIn() 
         {
             float timer = _fadeImage.alpha;

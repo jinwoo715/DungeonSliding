@@ -8,6 +8,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
         public Func<AbilityDataBase[]> GetRerollAbilityEvent;
         public Action<AbilityDataBase> SelectAbiltyUIDEvent;
         public AbilityDataBase[] SelectableAbilities;
+        public event Action OnEndSession;
         public int RerollCount;
 
         public AbilitySelectSession(AbilityDataBase[] abilities, Action<AbilityDataBase> selectEvent, Func<AbilityDataBase[]> rerollEvent, int rerollCount)
@@ -29,6 +30,11 @@ namespace JW.DungeonSliding.GamePlay.Ability
                 return true;
             }
             else return false;
+        }
+
+        public void Clear()
+        {
+            OnEndSession?.Invoke();
         }
     }
 }

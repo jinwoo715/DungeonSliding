@@ -5,7 +5,11 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Ability
 {
-    public class PlayerAbilityFactory : IAbilityFactory
+    public interface IPlayerAbilityFactory : IAbilityFactory
+    {
+        public IAbility CreateAbility(AbilityDataBase data);
+    }
+    public class PlayerAbilityFactory : IPlayerAbilityFactory
     {
         private IAbilityContextService _context;
 

@@ -22,9 +22,15 @@ MonoBehaviour:
     ActFloorCount: 2
     MapDatas:
     - {fileID: 11400000, guid: 8ff6c913eaa61134e9d2b799eaeafac3, type: 2}
-    - {fileID: 11400000, guid: 8ff6c913eaa61134e9d2b799eaeafac3, type: 2}
   - BundleName: 
     ActFloorCount: 2
     MapDatas:
     - {fileID: 11400000, guid: 52c05066f4bf36047bc3c4a64131a458, type: 2}
-    - {fileID: 11400000, guid: 52c05066f4bf36047bc3c4a64131a458, type: 2}
+  - BundleName: 
+    ActFloorCount: 2
+    MapDatas:
+    - {fileID: 11400000, guid: 208cabf18fc73c2498059d5412222b01, type: 2}
+  - BundleName: 
+    ActFloorCount: 2
+    MapDatas:
+    - {fileID: 11400000, guid: ef698d03e9d502b4f95bc66525029cc4, type: 2}

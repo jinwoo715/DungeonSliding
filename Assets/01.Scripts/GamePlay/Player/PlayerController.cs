@@ -35,13 +35,12 @@ namespace JW.DungeonSliding.GamePlay.Entities
     {
         [SerializeField] private Player _player;
 
-        private LevelSystem _levelSystem = new LevelSystem();
+        private LevelSystem _levelSystem;
 
         public event Action OnPlayerDie;
 
         private bool _isCanMove;
 
-        public ILevelProgress Level => _levelSystem;
         public ICombatant Player => _player;
         public IStatReadOnly StatReadOnly => _player.StatReadOnly;
         public IStatModifier StatModifier => _player.StatModifier;
@@ -51,21 +50,26 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
         public void Init(IRouteService routeService, IMoveRule moveRule, IAttackRegister requesterRegistry, IAbilityEventService abilityEventService)
         {
-            _player.Initialize(ECreatureType.Player);
+            _levelSystem = new LevelSystem();
+            _levelSystem.Initialize();
 
-            CreatureBaseStat baseStat = CreatePlayerBaseStat();
-            _player.InitData(baseStat);
+            _player.Initialize(ECreatureType.Player);
+            _moveRule = moveRule;
+            _player.InitData(CreatePlayerBaseStat());
 
             _player.Wire(routeService);
-
             _player.RegisterRequester(requesterRegistry);
 
             abilityEventService.OnSelectAbility += _player.AbilityRegister.RegisterAbility;
-
+            
             _player.OnGetXp += _levelSystem.AddXp;
+            
+            _levelSystem.OnLevelUp += abilityEventService.GrantAbilityPoint;
             _levelSystem.OnLevelUp += _player.HandleLevelUp;
 
             _player.OnMoveEnd += PayMoveCost;
+
+            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameEventTrigger.OnTurnEnd, CheckPlayerAlive);
         }
         public void RegisterContext(IAbilityContextService abilityContextService)
         {
@@ -108,7 +112,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
         public PlayerInfo GetPlayerInfo()
         {
-            return new PlayerInfo(StatReadOnly, StatModifier, Level, NextAttackEnhancer);
+            return new PlayerInfo(StatReadOnly, StatModifier, _levelSystem, NextAttackEnhancer);
         }
     }
 }

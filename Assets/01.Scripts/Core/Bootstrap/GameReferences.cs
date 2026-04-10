@@ -21,6 +21,7 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
     {
         public PlayerController Controller;
         public InputCoordinator InputCoordinator;
+        public LevelSystem Level;
     }
 
     [System.Serializable]
@@ -29,7 +30,7 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
         public GameSceneUIManager UIManager;
 
         [Header("Controller")]
-        public AbilityUIController AbilityUIController;
+        public AbilitySelectPresenter AbilityUIController;
         public EnemyTooltipController EnemyTooltipClicker;
 
         [Header("Presenter")]

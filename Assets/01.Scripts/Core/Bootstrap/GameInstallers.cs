@@ -8,6 +8,7 @@ using JW.DungeonSliding.GamePlay.Move;
 using JW.DungeonSliding.GamePlay.Stage;
 using JW.DungeonSliding.GamePlay.Stats;
 using JW.DungeonSliding.UI;
+using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Bootstrap
 {
@@ -16,7 +17,7 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
         public static void Install(WorldReferences world, ICombatant player, EnemyAbilityFactory enemyAbilityFactory)
         {
             world.MapManager.Init();
-            world.StageController.Init(world.MapManager, world.ObstacleController, player.TileObject, world.EnemyManager);
+            world.StageController.Init(world.MapManager, world.ObstacleController, player, world.EnemyManager);
             world.ObstacleController.Init(world.MapManager);
             world.EnemyManager.Init(enemyAbilityFactory);
         }
@@ -28,6 +29,8 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
         {
             player.InputCoordinator.Init();
             player.Controller.Init(routeService, moveRule, requesterRegistry, abilityEventService);
+            player.Level = new LevelSystem();
+            player.Level.Initialize();
         }
     }
 
@@ -35,6 +38,7 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
     {
         public void InstallPlayerAbility(
             PlayerAbilitySystem abilitySystem,
+            PlayerAbilityFactory abilityFactory,
             PlayerAbilityContext context,
             PlayerController player,
             FieldCombatantFinder finder,
@@ -45,7 +49,8 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
             context.Register<ICombatantSensor>(finder);
             context.Register<IRouteService>(routeBuilder);
 
-            abilitySystem.Init(context, player.Level);
+            abilityFactory.SetContext(context);
+            abilitySystem.Init(abilityFactory, context);
         }
 
         public void InstallEnemyAbility(
@@ -63,7 +68,7 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
             context.Register<IVisualController>(visualController);
             context.Register<IRouteService>(routeBuilder);
 
-            factory.Init(context);
+            factory.SetContext(context);
         }
     }
 
@@ -76,6 +81,7 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
             ui.StageViewer.Init(stageViewer.TotalFloor, stageViewer.BossFloors);
             ui.AbilityUIController.Init(abilityService);
             ui.PlayerStatPresenter.Init(playerInfoViewer.GetPlayerInfo());
+            ui.EnemyStatPresenter.Init();
             ui.EnemyTooltipClicker.Init(ui.EnemyTooltipPresenter);
         }
     }

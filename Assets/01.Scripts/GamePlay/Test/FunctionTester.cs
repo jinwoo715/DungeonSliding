@@ -10,7 +10,7 @@ namespace JW.DungeonSliding
     {
         public PlayerAbilitySystem _abilitySystem;
 
-        public List<AbilityDataBase> datas = GameManager.Data.Abilities;
+        public List<AbilityDataBase> datas = GameManager.Data.StatAbilities;
 
         public int GetAbilityIndex;
 
@@ -23,7 +23,7 @@ namespace JW.DungeonSliding
         {
             yield return null;
 
-            datas = GameManager.Data.Abilities;
+            datas = GameManager.Data.StatAbilities;
         }
         private void Update()
         {

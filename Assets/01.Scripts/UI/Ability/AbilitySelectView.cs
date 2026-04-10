@@ -26,7 +26,6 @@ namespace JW.DungeonSliding.UI
                 _abilityCards[i].SelectAbilityEvent += OnClickAbilityCard;
             }
         }
-
         internal void Bind(Action<AbilityDataBase> selectAbility, Action reroll)
         {
             SelectCardEvent = selectAbility;

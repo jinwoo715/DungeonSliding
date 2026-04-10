@@ -15,6 +15,8 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
         [SerializeField] private WorldReferences _world;
         [SerializeField] private PlayerReferences _player;
         [SerializeField] private UIReferences _ui;
+        [SerializeField] private BattleManager _battleManager;
+
 
         [Header("Managers")]
         [SerializeField] private GameSceneManager _gameSceneManager;
@@ -23,6 +25,7 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
         // 시스템 인스턴스
         private readonly PlayerAbilitySystem _abilitySystem = new();
         private readonly PlayerAbilityContext _playerAbilityContext = new();
+        private readonly PlayerAbilityFactory _playerAbilityFactory = new();
         private readonly EnemyAbilityContext _enemyAbilityContext = new();
         private readonly EnemyAbilityFactory _enemyAbilityFactory = new();
 
@@ -31,7 +34,6 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
         private readonly GameTriggerEventBus _triggerEventBus = new();
         private readonly MoveRule _moveRule = new();
         private readonly RouteBuilder _routeBuilder = new();
-        private readonly BattleManager _battleManager = new();
 
         private GameEventBinder _eventBinder;
 
@@ -48,7 +50,7 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
             _fieldCombatantFinder.Init(_world.EnemyManager, _player.Controller.Player);
             _battleManager.Init(_fieldCombatantFinder, _gameStateController);
             _visualController.Init(_ui.EnemyStatPresenter);
-            _gameSceneManager.Init(_gameStateController, _ui.UIManager, _world.StageController);
+            _gameSceneManager.Init(_gameStateController, _ui.UIManager, _world.StageController,_player.Controller, _ui.UIManager);
             _routeBuilder.Init(_world.MapManager);
             _gameStateController.Init(_routeBuilder, _battleManager);
 
@@ -64,7 +66,8 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
 
             var abilityInstaller = new AbilityInstaller();
             abilityInstaller.InstallPlayerAbility(
-                _abilitySystem, 
+                _abilitySystem,
+                _playerAbilityFactory,
                 _playerAbilityContext, 
                 _player.Controller, 
                 _fieldCombatantFinder, 

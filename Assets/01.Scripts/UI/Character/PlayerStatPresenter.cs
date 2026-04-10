@@ -28,6 +28,9 @@ namespace JW.DungeonSliding.UI
             levelProgress.OnLevelUp += ChangePlayerLevel;
             levelProgress.OnChangedXp += ChangePlayerLevelProgress;
 
+            ChangePlayerLevelProgress(levelProgress.CurrentXp,levelProgress.RequiredXp);
+            ChangePlayerLevel(levelProgress.CurrentLevel);
+
             statModifier.OnStatChanged += ChangePlayerStat;
 
             nextAttackEnhancer.OnChangedNextAttackCount += UpdateExraAttackCount;

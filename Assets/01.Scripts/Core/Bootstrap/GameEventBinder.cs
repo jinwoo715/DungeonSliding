@@ -21,6 +21,7 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
         private IGameStateModifier _gameModeModifier;
         private IStageService _stageViewer;
 
+
         private IBoard _board;
         private IEnemyStatUIService _enemyStatUI;
         private IAttackRegister _attackRegister;
@@ -28,10 +29,13 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
         private PlayerController _playerController;
         private StageViewer _viewer;
 
-        public void Bind(IEnemySpawnService enemySpawnService, IBoard board,
+        public void Bind(IEnemySpawnService enemySpawnService, 
+            IBoard board,
             IEnemyStatUIService enemyStatUI,
-            IMoveable moveable, BattleManager battleManager,
-            IAbilityEventService abilityEventService, IGameStateModifier gameModeModifier,
+            IMoveable moveable, 
+            BattleManager battleManager,
+            IAbilityEventService abilityEventService, 
+            IGameStateModifier gameModeModifier,
             IInputService inputService, PlayerController playerController,
             IStageService stageViewer, StageViewer viewer)
         {

@@ -3,11 +3,13 @@ using JW.DungeonSliding.GamePlay.Stats;
 using UnityEngine;
 using JW.Utility;
 using JW.DungeonSliding.GamePlay.Combat;
+using TMPro;
 
 namespace JW.DungeonSliding 
 {
     public class EnemyStatViewItem : PoolObject
     {
+        [SerializeField] private TMP_Text _nameText;
         [SerializeField] private CretureStat_UI _hpUI;
         [SerializeField] private CretureStat_UI _damageUI;
 

@@ -1,4 +1,5 @@
 using JW.DungeonSliding.Core;
+using JW.DungeonSliding.GamePlay.Combat;
 using JW.DungeonSliding.GamePlay.Entities;
 using JW.DungeonSliding.Map;
 using JW.Utility;
@@ -49,9 +50,9 @@ namespace JW.DungeonSliding.GamePlay.Stage
         IMapService _mapService;
         IFieldObstacleService _obstacleService;
         IEnemySpawnService _enemySpawnService;
-        ITileObject _player;
+        ICombatant _player;
 
-        public void Init(IMapService mapService, IFieldObstacleService obstacleService, ITileObject player, IEnemySpawnService enemySpawnService)
+        public void Init(IMapService mapService, IFieldObstacleService obstacleService, ICombatant player, IEnemySpawnService enemySpawnService)
         {
             _mapService = mapService;
             _obstacleService = obstacleService;
@@ -87,7 +88,7 @@ namespace JW.DungeonSliding.GamePlay.Stage
             if(IsBossFloor())
                 _enemySpawnService.ReceiveBossEnemySpawnList(templete.BossEnemyPos, Act);
 
-            _player.SetPosition(templete.PlayerPos);
+            _player.TileObject.SetPosition(templete.PlayerPos);
 
             OnFinishSetStage?.Invoke();
         }
@@ -119,7 +120,6 @@ namespace JW.DungeonSliding.GamePlay.Stage
         }
         private bool IsBossFloor()
         {
-            Debug.Log($"{_currentActProgress} : {_requireProgress}");
             return _currentActProgress == _requireProgress;
         }
         private CreatureTemplete GetTemplete(MapData map)

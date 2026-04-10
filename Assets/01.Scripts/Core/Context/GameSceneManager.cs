@@ -39,6 +39,17 @@ namespace JW.DungeonSliding.GamePlay.Context
         }
     }
 
+    public interface IPopupService
+    {
+        void ShowOneButtonPopup(string name, string desc, ButtonSet buttonSet);
+    }
+
+    public struct ButtonSet
+    {
+        public string ButtonName;
+        public Action ButtonEvent;
+    }
+
     public class GameSceneManager : MonoBehaviour
     {
         private CombatEventBus _combatEventBus = new();
@@ -47,12 +58,20 @@ namespace JW.DungeonSliding.GamePlay.Context
         private GameStateController _gameModeController;
         private IUIFader _uiFader;
 
+        public event Action OnFailGame;
+        public event Action OnVictoryGame;
+
         IStageService _stageSerivce;
-        public void Init(GameStateController gameModeController, IUIFader uiFader, IStageService stageSerivce)
+        IPopupService _popupService;
+
+        public void Init(GameStateController gameModeController, IUIFader uiFader, IStageService stageSerivce, PlayerController playerController, IPopupService popupService)
         {
             _gameModeController = gameModeController;
             _uiFader = uiFader;
             _stageSerivce = stageSerivce;
+            _popupService = popupService;
+
+            playerController.OnPlayerDie += FailGame;
 
             GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameEventTrigger.OnClearStage, ClearFloor);
 
@@ -85,22 +104,19 @@ namespace JW.DungeonSliding.GamePlay.Context
             GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTrigger.OnEnterRoom);
         }
 
-        public IEnumerator FailGame()
+        public void FailGame()
         {
-            //TODO UI 팝업이 먼저 나와야하나?
-
-            Debug.Log("졌다!");
-
-            yield return _uiFader.FadeOut();
-
-            SceneManager.LoadScene("LobbyScene");
+            ButtonSet buttonSet = new ButtonSet();
+            buttonSet.ButtonName = "로비";
+            buttonSet.ButtonEvent = () => { GameManager.Scene.LoadScene(SceneType.LobbyScene); };
+            _popupService.ShowOneButtonPopup("패배", "게임에 패배하였습니다.", buttonSet);
         }
-
-        public void OnPlayerDie() 
-        { 
-
+        public void VictoryGame() 
+        {
+            ButtonSet buttonSet = new ButtonSet();
+            buttonSet.ButtonName = "로비";
+            buttonSet.ButtonEvent = () => { GameManager.Scene.LoadScene(SceneType.LobbyScene); };
+            _popupService.ShowOneButtonPopup("패배", "게임에 패배하였습니다.", buttonSet);
         }
-
-        public void VictoryGame() { }
     }
 }

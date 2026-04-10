@@ -17,8 +17,6 @@ namespace JW.DungeonSliding.Core.Inputs
         {
 #if UNITY_STANDALONE
 
-            Debug.Log("StandAlone");
-
             _pcInput.gameObject.SetActive(true);
             _mobileInput.gameObject.SetActive(false);
             _currentInput = _pcInput;
@@ -29,7 +27,11 @@ namespace JW.DungeonSliding.Core.Inputs
             _mobileInput.gameObject.SetActive(true);
             _currentInput = _mobileInput;
 #endif
-            _currentInput.OnMoveInput += OnMoveInput;
+            _currentInput.OnMoveInput += Input;
+        }
+        public void Input(EDirectionType directionType)
+        {
+            OnMoveInput?.Invoke(directionType);
         }
     }
 }

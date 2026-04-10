@@ -615,7 +615,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         public override IEnumerator Execute(AbilityArgs args)
         {
-            _abilityRandomGetter.GetRandomAbility(2);
+            _abilityRandomGetter.ObtainRandomRuleAbility(2);
 
             yield break;
         }

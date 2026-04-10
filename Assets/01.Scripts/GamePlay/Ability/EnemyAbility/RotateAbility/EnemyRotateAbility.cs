@@ -18,12 +18,8 @@ namespace JW.DungeonSliding.GamePlay.Ability.Enemy
             if (_moveable.LastMoveTileCount == 0)
                 yield break;
 
-            Debug.Log("?S????SD??SFD?SDF");
-
             EDirectionType nextDirection = DirectionUtility.GetRightRotateResultDirection(_owner.Rotate.Direction);
             yield return _owner.Rotate.CoRotateToDirection(nextDirection);
-
-            Debug.Log("Rotate End");
         }
           
         protected override void BindService()

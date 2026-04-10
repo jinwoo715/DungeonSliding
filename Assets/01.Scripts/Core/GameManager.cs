@@ -11,7 +11,9 @@ namespace JW.DungeonSliding.Core
         public static GameManager Instance => _instance;
 
         [SerializeField] private ResourceManager _resource;
+        private SceneManagerEx _scene;
 
+        public static SceneManagerEx Scene => _instance._scene;
         public static DataManager Data { get; } = new DataManager();
         public static ResourceManager Resource => _instance._resource;
         public static GameConfig Config => Resource.GameConfig;
@@ -34,6 +36,7 @@ namespace JW.DungeonSliding.Core
         {
             Resource.Init();
             Data.Initialize();
+            _scene = new SceneManagerEx();
         }
     }
 }

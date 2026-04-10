@@ -17,20 +17,22 @@ namespace JW.DungeonSliding.UI
         IEnumerator FadeIn();
     }
 
-    public class GameSceneUIManager : MonoBehaviour, IUIFader, IAbilitySelectService
+    public class GameSceneUIManager : MonoBehaviour, IUIFader, IAbilitySelectService, IPopupService
     {
         [SerializeField] private FadeController _fadeController;
-        [SerializeField] private AbilityUIController _abilityUIController;
+        [SerializeField] private AbilitySelectPresenter _abilityUIController;
         [SerializeField] private HitDamageViewer _hitDamageViewer;
 
         [Header("Presenter")]
-        
+        [SerializeField] private GamePopupPresenter _gamePopupPresenter;
 
         [SerializeField] private HasAbilityPresenter _hasAbilityPresenter;
 
         public void Init()
         {
             _hitDamageViewer.Init();
+            _fadeController.SetAlpha(1);
+            _gamePopupPresenter.Init();
         }
 
         public IEnumerator FadeIn()
@@ -44,6 +46,12 @@ namespace JW.DungeonSliding.UI
         public void SetAbilitySession(AbilitySelectSession session)
         {
             _abilityUIController.OpenSelectAbilityView(session);
+        }
+
+        public void ShowOneButtonPopup(string name, string desc, ButtonSet buttonSet)
+        {
+            Debug.Log("Á³´Ù! ÆË¾÷!");
+            _gamePopupPresenter.ShowOneButtonPopup(name, desc, buttonSet);
         }
     }
 }

@@ -11,7 +11,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
     {
         public void SetContext(IAbilityContextService context);
     }
-    public interface IEnemyAbilityCreater
+    public interface IEnemyAbilityCreater : IAbilityFactory
     {
         List<IAbility> CreateAbility(List<EnemyAbilityData> datas, ICombatant owner, int section);
     }
@@ -20,11 +20,10 @@ namespace JW.DungeonSliding.GamePlay.Ability
     {
         IAbilityContextService _service;
 
-        public void Init(IAbilityContextService service)
+        public void SetContext(IAbilityContextService context)
         {
-            _service = service;
+            _service = context;
         }
-
         public List<IAbility> CreateAbility(List<EnemyAbilityData> datas, ICombatant owner, int section)
         {
             List<IAbility> abilityList = new List<IAbility>();
@@ -56,5 +55,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
                 return null;
             }
         }
+
+
     }
 }

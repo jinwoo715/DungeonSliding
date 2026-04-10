@@ -45,24 +45,28 @@ namespace JW.DungeonSliding.Core.Flow
         }
         private void TurnEndProcess(EGameStateType stateType) 
         {
-            if (IsValidTurn())
+            if (stateType == EGameStateType.Battle)
             {
-                GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTrigger.OnTurnEnd);
+                if (IsValidTurn())
+                {
+                    GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTrigger.OnTurnEnd);
+                }
+                GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTrigger.OnTurnStart);
             }
-            GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTrigger.OnTurnStart);
         }
         public void EnterGameState(EGameStateType flowType)
         {
-            if (flowType == EGameStateType.WorkingAbility) Debug.Log("Enter Work");
-            
             _gameFlowType |= flowType;
+
+            Debug.Log($"Enter : {flowType}");
 
             OnChangeMoveState?.Invoke(_gameFlowType == 0);
         }
         public void ExitGameState(EGameStateType flowType)
         {
-            if (flowType == EGameStateType.WorkingAbility) Debug.Log("Exit Work");
             _gameFlowType &= ~flowType;
+
+            Debug.Log($"Exit : {flowType}");
 
             OnChangeMoveState?.Invoke(_gameFlowType == 0);
             OnExitState?.Invoke(flowType);
