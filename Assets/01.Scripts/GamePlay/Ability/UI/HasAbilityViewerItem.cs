@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 
 namespace JW.DungeonSliding.UI
 {
-    public class HasAbilityItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+    public class HasAbilityViewerItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         private AbilityDataBase _abilityData;
 

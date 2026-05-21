@@ -29,7 +29,7 @@ namespace JW.DungeonSliding
         {
             if(Input.GetKeyDown(KeyCode.A))
             {
-                _abilitySystem.SelectAbility(datas[GetAbilityIndex]);
+                _abilitySystem.SelectRuleAbility(datas[GetAbilityIndex]);
             }
         }
     }

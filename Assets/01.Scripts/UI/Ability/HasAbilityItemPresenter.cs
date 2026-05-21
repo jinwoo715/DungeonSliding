@@ -1,12 +1,14 @@
 using JW.DungeonSliding.GamePlay.Ability;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace JW.DungeonSliding.UI
 {
-    public class HasAbilityPresenter : MonoBehaviour
+    public class HasAbilityItemPresenter : MonoBehaviour
     {
-        [SerializeField] private HasAbilityItem _abilityItemPrefab;
-        [SerializeField] private Transform _abilityParentTransform;
+        [SerializeField] private List<HasAbilityViewerItem> _abilityItems;
+
+        private int _currentIndex = 0;
 
         ITooltipService _tooltipService;
         IAbilityEventService _abilityService;
@@ -21,8 +23,10 @@ namespace JW.DungeonSliding.UI
 
         public void AddAbility(AbilityDataBase data)
         {
-            Debug.Log(data.Name);
-            HasAbilityItem item = Instantiate(_abilityItemPrefab, _abilityParentTransform);
+            if (_currentIndex >= _abilityItems.Count) return;
+
+            HasAbilityViewerItem item = _abilityItems[_currentIndex++];
+            item.gameObject.SetActive(true);
             item.SetData(data, _tooltipService.ShowTooltip, _tooltipService.CloseTooltip);
         }
     }

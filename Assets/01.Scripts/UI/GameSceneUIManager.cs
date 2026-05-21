@@ -26,7 +26,7 @@ namespace JW.DungeonSliding.UI
         [Header("Presenter")]
         [SerializeField] private GamePopupPresenter _gamePopupPresenter;
 
-        [SerializeField] private HasAbilityPresenter _hasAbilityPresenter;
+        [SerializeField] private HasAbilityItemPresenter _hasAbilityPresenter;
 
         public void Init()
         {

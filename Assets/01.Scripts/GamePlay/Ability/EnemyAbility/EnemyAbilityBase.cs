@@ -22,8 +22,6 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
             CalculateParam(section);
             BindService();
-
-
         }
         public abstract IEnumerator Execute(AbilityArgs args);
         public virtual void ReleaseAbility() { }
@@ -38,7 +36,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
             {
                 if(_owner.TryGet<T>(out var ownerService))
                 {
-                    service = getService;
+                    service = ownerService;
                 }
                 else
                 {

@@ -58,7 +58,6 @@ namespace JW.DungeonSliding.GamePlay.Ability
         void GrantAbilityPoint(int currentLevel);
     }
 
-
     public class PlayerAbilitySystem : IRerollService, IAbilityRandomGetter, IAbilityEventService
     {
         private ShuffleBag<AbilityDataBase> _ruleAbilityBag;
@@ -85,8 +84,8 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
             LoadData();
 
-            var session2 = new AbilitySelectSession(GetRandomRuleAbilities(3), SelectAbility, () => GetRandomRuleAbilities(3), _rerollCount);
-            abilitySelectSessions.Enqueue(session2);
+            var session = new AbilitySelectSession(GetRandomRuleAbilities(3), SelectRuleAbility, () => GetRandomRuleAbilities(3), _rerollCount);
+            abilitySelectSessions.Enqueue(session);
 
             GameTriggerEventBus.Instance.EnqueueInstanceTriggerEvent(EGameEventTrigger.OnEnterRoom, ProgressAbilitySelect);
         }
@@ -109,29 +108,39 @@ namespace JW.DungeonSliding.GamePlay.Ability
         }
         public void GrantAbilityPoint(int currentLevel)
         {
-            Debug.Log($"GrantAbilityPoint : {currentLevel}");
-            var session = new AbilitySelectSession(GetRandomStatAbilites(3), SelectAbility, () => GetRandomStatAbilites(3), _rerollCount);
-            abilitySelectSessions.Enqueue(session);
-
-            if (IsAbilityLevel(currentLevel))
+            if (IsRuleAbilityLevel(currentLevel))
             {
-                var session2 = new AbilitySelectSession(GetRandomRuleAbilities(3), SelectAbility, () => GetRandomRuleAbilities(3), _rerollCount);
-                abilitySelectSessions.Enqueue(session2);
+                GainRuleAbility();
+            }
+            else
+            {
+                GainStatAbility();
             }
 
             GameTriggerEventBus.Instance.EnqueueInstanceTriggerEvent(EGameEventTrigger.OnTurnEnd, ProgressAbilitySelect);
         }
-        private bool IsAbilityLevel(int currentLevel)
-        {
-            int abilityLevel = GameManager.Config.Ability.AbilityLevel;
 
-            int achive = currentLevel % abilityLevel;
+        public void GainRuleAbility()
+        {
+            var ruleSession = new AbilitySelectSession(GetRandomRuleAbilities(3), SelectRuleAbility, () => GetRandomRuleAbilities(3), _rerollCount);
+            abilitySelectSessions.Enqueue(ruleSession);
+        }
+        public void GainStatAbility()
+        {
+            var statSession = new AbilitySelectSession(GetRandomStatAbilites(3), SelectStatAbility, () => GetRandomStatAbilites(3), _rerollCount);
+            abilitySelectSessions.Enqueue(statSession);
+        }
+
+        private bool IsRuleAbilityLevel(int currentLevel)
+        {
+            int ruleAbilityLevel = GameManager.Config.Ability.RuleAbilityLevel;
+
+            int achive = currentLevel % ruleAbilityLevel;
 
             return achive == 0;
         }
         public void ProgressAbilitySelect()
         {
-            Debug.Log(abilitySelectSessions.Count);
             if (IsExistGetAbility())
             {
                 var session = abilitySelectSessions.Dequeue();
@@ -146,13 +155,21 @@ namespace JW.DungeonSliding.GamePlay.Ability
             return abilitySelectSessions.Count > 0;
         }
 
-        public void SelectAbility(AbilityDataBase _abilityData)
+        public void SelectRuleAbility(AbilityDataBase _abilityData)
         {
             IAbility ability = _playerAbilityFactory.CreateAbility(_abilityData);
 
             OnAddedRuleAbility?.Invoke(_abilityData);
             OnSelectAbility?.Invoke(ability);
         }
+        public void SelectStatAbility(AbilityDataBase _abilityData)
+        {
+            IAbility ability = _playerAbilityFactory.CreateAbility(_abilityData);
+
+            OnSelectAbility?.Invoke(ability);
+        }
+
+
         public AbilityDataBase[] GetRandomRuleAbilities(int count)
         {
             AbilityDataBase[] abilityDatas = new AbilityDataBase[count];
@@ -179,7 +196,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
             for (int i = 0; i < count; i++)
             {
-                SelectAbility(abilities[i]);
+                SelectRuleAbility(abilities[i]);
             }
         }
         public void ObtainRandomStatAbility(int count)
@@ -188,7 +205,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
             for (int i = 0; i < count; i++)
             {
-                SelectAbility(abilities[i]);
+                SelectRuleAbility(abilities[i]);
             }
         }
         public void AddReroll(int amount = 1)

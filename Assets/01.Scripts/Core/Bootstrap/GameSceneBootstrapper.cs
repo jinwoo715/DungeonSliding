@@ -109,6 +109,7 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
         {
             _triggerEventBus.ClearInstance();
             _eventBinder?.Dispose();
+            _gameStateController.Clear();
         }
     }
 }

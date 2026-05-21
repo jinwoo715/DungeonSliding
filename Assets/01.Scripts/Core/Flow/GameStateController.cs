@@ -28,6 +28,8 @@ namespace JW.DungeonSliding.Core.Flow
         IRouteService _routeService;
         IBattleResult _battleResult;
 
+        private Action OnEnterWorkingAbility;
+        private Action OnExitWorkingAbility;
         public void Init(IRouteService routeService, IBattleResult battleResult)
         {
             _routeService = routeService;
@@ -35,8 +37,11 @@ namespace JW.DungeonSliding.Core.Flow
 
             OnExitState += TurnEndProcess;
 
-            AbilityBusyCounter.OnWorkingAbility += () => EnterGameState(EGameStateType.WorkingAbility);
-            AbilityBusyCounter.OnEndAllAbility += () => ExitGameState(EGameStateType.WorkingAbility);
+            OnEnterWorkingAbility += () => EnterGameState(EGameStateType.WorkingAbility);
+            OnExitWorkingAbility += () => ExitGameState(EGameStateType.WorkingAbility);
+
+            AbilityBusyCounter.OnWorkingAbility += OnEnterWorkingAbility;
+            AbilityBusyCounter.OnEndAllAbility += OnExitWorkingAbility;
         }
         public bool IsValidTurn()
         {
@@ -54,6 +59,16 @@ namespace JW.DungeonSliding.Core.Flow
                 GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTrigger.OnTurnStart);
             }
         }
+
+        public void EnterWorkingAbility()
+        {
+            EnterGameState(EGameStateType.WorkingAbility);
+        }
+        public void ExitWorkingAbility()
+        {
+            ExitGameState(EGameStateType.WorkingAbility);
+        }
+
         public void EnterGameState(EGameStateType flowType)
         {
             _gameFlowType |= flowType;
@@ -73,8 +88,11 @@ namespace JW.DungeonSliding.Core.Flow
         }
         public void Clear()
         {
-            AbilityBusyCounter.OnWorkingAbility -= () => EnterGameState(EGameStateType.WorkingAbility);
-            AbilityBusyCounter.OnWorkingAbility -= () => ExitGameState(EGameStateType.WorkingAbility);
+            AbilityBusyCounter.OnWorkingAbility -= OnEnterWorkingAbility;
+            AbilityBusyCounter.OnEndAllAbility -= OnExitWorkingAbility;
+
+            OnEnterWorkingAbility = null;
+            OnExitWorkingAbility = null;
         }
     }
 }

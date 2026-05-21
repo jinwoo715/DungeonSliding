@@ -37,7 +37,7 @@ namespace JW.DungeonSliding.Map
 
         public ActMapDataBundle GetActMapBundle(int actNum)
         {
-            if (Bundles.Count < actNum) return null;
+            if (Bundles.Count <= actNum) return null;
 
             return Bundles[actNum];
         }

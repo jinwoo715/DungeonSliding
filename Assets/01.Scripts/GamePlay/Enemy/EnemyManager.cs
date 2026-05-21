@@ -143,7 +143,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
                 Tile tile = spawnPositions[i];
 
-                EnemyData data = _bossEnemyDatas[8];
+                EnemyData data = _bossEnemyDatas[ranNum];
                 Debug.Log(data.AbilityList);
                 SpawnEnemy(data, act, tile);
             }
@@ -151,10 +151,10 @@ namespace JW.DungeonSliding.GamePlay.Entities
         private void SpawnEnemy(EnemyData data, int act, Tile spawnPosition)
         {
             Enemy enemy = GetEnemy();
-            OnSpawnEnemy?.Invoke(spawnPosition, enemy);
             InitEnemy(enemy, data, act);
             SetEnemyOnTile(enemy, spawnPosition);
             SetEnemySkill(data, enemy, act);
+            OnSpawnEnemy?.Invoke(spawnPosition, enemy);
         }
         private void InitEnemy(Enemy enemy, EnemyData data, int act)
         {

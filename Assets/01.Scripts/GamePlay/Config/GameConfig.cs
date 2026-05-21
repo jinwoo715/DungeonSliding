@@ -51,7 +51,7 @@ namespace JW.DungeonSliding.GamePlay
             [SerializeField] private float _epicCardRatio;
             [SerializeField] private float _legendaryCardRatio;
 
-            public int AbilityLevel => _GainAbilityPerLevel;
+            public int RuleAbilityLevel => _GainAbilityPerLevel;
         }
 
         [System.Serializable]
