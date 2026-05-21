@@ -31,8 +31,7 @@ namespace JW.DungeonSliding.GamePlay.Stats
         private int _damageTakeMultiplier;
 
         private int _criticalMultiple = 150;
-        private float _hpRecoveryMultiple = 1;
-        private float _moveRecoveryMultiple = 1;
+        private float _recoveryMultiple = 1;
 
         public event Action<ECreatureStatType> OnStatChanged;
        
@@ -112,13 +111,9 @@ namespace JW.DungeonSliding.GamePlay.Stats
             {
                 _damageDealMultiplier += Mathf.RoundToInt(modifierContext.Value);
             }
-            else if(type == ECreatureStatType.HPRecoveryMultiplier)
+            else if(type == ECreatureStatType.RecoveryMultiplier)
             {
-                _hpRecoveryMultiple += modifierContext.Value;
-            }
-            else if(type == ECreatureStatType.MoveRecoveryMultiplier)
-            {
-                _moveRecoveryMultiple += modifierContext.Value;
+                _recoveryMultiple += modifierContext.Value;
             }
             else if(type == ECreatureStatType.CriticalMultiplier)
             {
@@ -180,7 +175,7 @@ namespace JW.DungeonSliding.GamePlay.Stats
         private void ModifyCurrentHp(StatModifierContext modifierContext)
         {
             int fixedValue = CalculateFixedAddValue(modifierContext);
-            int finalValue = Mathf.RoundToInt(_hpRecoveryMultiple * fixedValue); 
+            int finalValue = Mathf.RoundToInt(_recoveryMultiple * fixedValue); 
 
             _currentHP += finalValue;
 
@@ -190,7 +185,7 @@ namespace JW.DungeonSliding.GamePlay.Stats
         private void ModifyCurrentMoveCount(StatModifierContext modifierContext)
         {
             int fixedValue = CalculateFixedAddValue(modifierContext);
-            int finalValue = Mathf.RoundToInt(_moveRecoveryMultiple * fixedValue);
+            int finalValue = Mathf.RoundToInt(_recoveryMultiple * fixedValue);
 
             _currentMove += finalValue;
 

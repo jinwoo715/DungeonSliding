@@ -1,23 +1,31 @@
-using UnityEngine;
+癤퓎sing UnityEngine;
 
-namespace JW.DungeonSliding.Ability.Data
+namespace JW.DungeonSliding.GamePlay.Ability
 {
-    public class RuleAbilityDataSO : ScriptableObject
+    [CreateAssetMenu(fileName = "RuleAbility", menuName = "Ability/Rule Ability", order = 2)]
+    public class RuleAbilityDataSO : AbilityDataSOBase
     {
-        public EGameEventTrigger GameTrigger;
-        public ECreatureTrigger CreatureTrigger;
+        public EGameEventTrigger GameTrigger = EGameEventTrigger.None;
+        public ECreatureTrigger CreatureTrigger = ECreatureTrigger.None;
+        public string AbilityName;
+        public float P1;
+        public float P2;
+        public string Notes;
+
+        public override AbilityDataBase ToRuntimeData()
+        {
+            var data = new RuleAbilityData
+            {
+                GameTrigger = GameTrigger,
+                CreatureTrigger = CreatureTrigger,
+                AbilityName = AbilityName,
+                P1 = P1,
+                P2 = P2,
+                Notes = Notes
+            };
+
+            CopyBaseDataTo(data);
+            return data;
+        }
     }
-
-    public class StatEnhanceAbility : RuleAbilityDataSO
-    {
-
-    }
-    public class NextAttackEnhanceAbility : RuleAbilityDataSO
-    {
-
-    }
-
-    //공격 강화형
-    //다음 공격 강화형
-    //능력형
 }

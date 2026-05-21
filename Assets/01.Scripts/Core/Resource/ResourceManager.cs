@@ -15,8 +15,10 @@ namespace JW.DungeonSliding.Core.Resource
         [SerializeField] private List<TextAsset> _textDatas;
         [SerializeField] private GameConfig _gameConfig;
         [SerializeField] private MapBundle _mapBundle;
+        [SerializeField] private AbilityDatabaseSO _abilityDatabase;
 
         public MapBundle MapBundle => _mapBundle;
+        public AbilityDatabaseSO AbilityDatabase => _abilityDatabase;
 
         public Dictionary<string, string> _textDataByName = new Dictionary<string, string>();
         public GameConfig GameConfig => _gameConfig;

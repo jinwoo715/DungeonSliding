@@ -52,6 +52,23 @@ namespace JW.DungeonSliding.GamePlay
             [SerializeField] private float _legendaryCardRatio;
 
             public int RuleAbilityLevel => _GainAbilityPerLevel;
+
+            public float GetRankWeight(EAbilityRank rank)
+            {
+                switch (rank)
+                {
+                    case EAbilityRank.Nomal:
+                        return _nomalCardRatio;
+                    case EAbilityRank.Rare:
+                        return _rareCardRatio;
+                    case EAbilityRank.Epic:
+                        return _epicCardRatio;
+                    case EAbilityRank.Legend:
+                        return _legendaryCardRatio;
+                    default:
+                        return 0;
+                }
+            }
         }
 
         [System.Serializable]

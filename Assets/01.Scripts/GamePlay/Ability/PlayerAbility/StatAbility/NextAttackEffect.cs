@@ -5,10 +5,10 @@ namespace JW.DungeonSliding.GamePlay.Ability
 {
     public class NextAttackEffect : IStatAbilityEffect
     {
-        private INextAttackEnhancer _nextAttackEnhancer;
-        private StatAbilityData _data;
+        private readonly INextAttackEnhancer _nextAttackEnhancer;
+        private readonly RuleStatAbilityData _data;
 
-        public NextAttackEffect(INextAttackEnhancer nextAttackEnhancer, StatAbilityData data)
+        public NextAttackEffect(INextAttackEnhancer nextAttackEnhancer, RuleStatAbilityData data)
         {
             _nextAttackEnhancer = nextAttackEnhancer;
             _data = data;
@@ -19,7 +19,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
             switch (_data.NextAttackType)
             {
                 case ENextAttackType.Add:
-                    _nextAttackEnhancer.AddNextAttackDamage((Mathf.RoundToInt(_data.NextAttackValue)));
+                    _nextAttackEnhancer.AddNextAttackDamage(Mathf.RoundToInt(_data.NextAttackValue));
                     break;
                 case ENextAttackType.Multiple:
                     _nextAttackEnhancer.AddNextAttackDamageMulti(_data.NextAttackValue);

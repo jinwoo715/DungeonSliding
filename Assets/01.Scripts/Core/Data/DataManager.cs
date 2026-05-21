@@ -14,6 +14,7 @@ namespace JW.DungeonSliding.Core.Data
         public Dictionary<string, EnemyAbilityData> _enemyAbility = new Dictionary<string, EnemyAbilityData>();
 
         public List<AbilityDataBase> StatAbilities { get; private set; } = new List<AbilityDataBase>();
+        public List<AbilityDataBase> RuleStatAbilities { get; private set; } = new List<AbilityDataBase>();
         public List<AbilityDataBase> RuleAbilities { get; private set; } = new List<AbilityDataBase>();
         public GameConfig Config { get; private set; }
 
@@ -51,12 +52,10 @@ namespace JW.DungeonSliding.Core.Data
             };
 
             StatAbilities = new List<AbilityDataBase>();
+            RuleStatAbilities = new List<AbilityDataBase>();
+            RuleAbilities = new List<AbilityDataBase>();
 
-            string rule = GameManager.Resource.GetTextData(ConstDataKey.RULE_ABILITY_DATA);
-            string stat = GameManager.Resource.GetTextData(ConstDataKey.STAT_ABILITY_DATA);
-
-            RuleAbilities.AddRange(JsonConvert.DeserializeObject<List<RuleAbilityData>>(rule, settings));
-            StatAbilities.AddRange(JsonConvert.DeserializeObject<List<StatAbilityData>>(stat, settings));
+            LoadAbilityData(settings);
 
             string enemyAbility = GameManager.Resource.GetTextData(ConstDataKey.ENEMY_ABILITY_DATA);
             var enemyAbilities = JsonConvert.DeserializeObject<List<EnemyAbilityData>>(enemyAbility, settings);
@@ -76,6 +75,33 @@ namespace JW.DungeonSliding.Core.Data
             EnemyBossData = JsonConvert.DeserializeObject<List<EnemyData>>(bossDatas, settings);
 
             Config = GameManager.Resource.GameConfig;
+        }
+
+        private void LoadAbilityData(JsonSerializerSettings settings)
+        {
+            AbilityDatabaseSO abilityDatabase = GameManager.Resource.AbilityDatabase;
+
+            if (abilityDatabase != null && abilityDatabase.HasAnyAbilityData)
+            {
+                StatAbilities = abilityDatabase.CreateStatAbilityRuntimeData();
+                RuleStatAbilities = abilityDatabase.CreateRuleStatAbilityRuntimeData();
+                RuleAbilities = abilityDatabase.CreateRuleAbilityRuntimeData();
+                return;
+            }
+
+            string rule = GameManager.Resource.GetTextData(ConstDataKey.RULE_ABILITY_DATA);
+            string ruleStat = GameManager.Resource.GetTextData(ConstDataKey.RULE_STAT_ABILITY_DATA);
+            string stat = GameManager.Resource.GetTextData(ConstDataKey.STAT_ABILITY_DATA);
+
+            if (!string.IsNullOrEmpty(ruleStat))
+            {
+                var ruleStatAbilities = JsonConvert.DeserializeObject<List<RuleStatAbilityData>>(ruleStat, settings);
+                RuleStatAbilities.AddRange(ruleStatAbilities);
+                RuleAbilities.AddRange(ruleStatAbilities);
+            }
+
+            RuleAbilities.AddRange(JsonConvert.DeserializeObject<List<RuleAbilityData>>(rule, settings));
+            StatAbilities.AddRange(JsonConvert.DeserializeObject<List<StatAbilityData>>(stat, settings));
         }
 
     }

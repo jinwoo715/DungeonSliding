@@ -20,26 +20,25 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         public IAbility CreateAbility(AbilityDataBase data)
         {
-            string abilityType = data.UID.Substring(0, 2);
+            if (data is RuleStatAbilityData ruleStatAbility)
+                return CreateRuleStatAbility(ruleStatAbility);
 
-            if (abilityType == "SA")
-            {
-                StatAbilityData statAbility = data as StatAbilityData;
-                return CreateStatAbility(data as StatAbilityData);
-            }
-            else if(abilityType == "RA")
-            {
-                return CreateRuleAbility(data as RuleAbilityData);
-            }
-            else
-            {
-                Debug.LogError("Abiilty Type Error");
-                return null;
-            }
+            if (data is StatAbilityData statAbility)
+                return CreateStatAbility(statAbility);
+
+            if (data is RuleAbilityData ruleAbility)
+                return CreateRuleAbility(ruleAbility);
+
+            Debug.LogError($"Abiilty Type Error : {data?.GetType().Name}");
+            return null;
         }
         private IAbility CreateStatAbility(StatAbilityData data)
         {
             return new StatAbility(data, _context);
+        }
+        private IAbility CreateRuleStatAbility(RuleStatAbilityData data)
+        {
+            return new RuleStatAbility(data, _context);
         }
         private IAbility CreateRuleAbility(RuleAbilityData data)
         {

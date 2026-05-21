@@ -33,6 +33,8 @@ namespace JW.DungeonSliding.UI
         {
             _data = abilityData;
 
+            Debug.Log(_data.Rank);
+
             _cardImage.sprite = _cardSprite[(int)_data.Rank];
 
             //TODO Image Sprite

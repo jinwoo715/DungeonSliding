@@ -29,9 +29,9 @@ MonoBehaviour:
     _floorUpDMGValue: 0
   Ability:
     _GainAbilityPerLevel: 3
-    _nomalCardRatio: 0
-    _rareCardRatio: 0
-    _epicCardRatio: 0
+    _nomalCardRatio: 70
+    _rareCardRatio: 25
+    _epicCardRatio: 5
     _legendaryCardRatio: 1
   UI:
     _fadeOutTime: 0

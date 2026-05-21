@@ -1180,9 +1180,11 @@ MonoBehaviour:
   - {fileID: 4900000, guid: 6ba6c8480f5f59f48b4610613ad78109, type: 3}
   - {fileID: 4900000, guid: 2c46628783c17744790acd6b47d221be, type: 3}
   - {fileID: 4900000, guid: 62893ef3756b49f4f9f59a9328495dc1, type: 3}
+  - {fileID: 4900000, guid: d57e6f3a6bd84734b8dc54f580c8f9af, type: 3}
   - {fileID: 4900000, guid: 6e552dd4bf1fb474a9eea7a0e65f5d85, type: 3}
   _gameConfig: {fileID: 11400000, guid: af371193289e7284aa7e3bc27acbdb07, type: 2}
   _mapBundle: {fileID: 11400000, guid: 0e7655a53bbab524f939b18867f4be2d, type: 2}
+  _abilityDatabase: {fileID: 11400000, guid: a6a9a87ca13c43a7a24f5abf6e54a1c3, type: 2}
 --- !u!4 &339937008
 Transform:
   m_ObjectHideFlags: 0

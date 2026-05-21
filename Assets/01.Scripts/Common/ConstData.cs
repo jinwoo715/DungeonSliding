@@ -24,6 +24,7 @@ namespace JW.DungeonSliding
         public static readonly string ENEMY_ABILITY_DATA = "EnemyAbilityData";
 
         public static readonly string RULE_ABILITY_DATA = "RuleAbilityData"; 
+        public static readonly string RULE_STAT_ABILITY_DATA = "RuleStatAbilityData";
         public static readonly string STAT_ABILITY_DATA = "StatAbilityData";
     }
 

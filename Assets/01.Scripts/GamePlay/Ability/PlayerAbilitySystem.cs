@@ -60,11 +60,11 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
     public class PlayerAbilitySystem : IRerollService, IAbilityRandomGetter, IAbilityEventService
     {
-        private ShuffleBag<AbilityDataBase> _ruleAbilityBag;
+        private ShuffleBag<AbilityDataBase> _specialAbilityBag;
         private ShuffleBag<AbilityDataBase> _statAbilityBag;
 
         private Dictionary<string, AbilityDataBase> _statAbilityDatas = new();
-        private Dictionary<string, AbilityDataBase> _ruleAbilityDatas = new();
+        private Dictionary<string, AbilityDataBase> _specialAbilityDatas = new();
 
         private IPlayerAbilityFactory _playerAbilityFactory;
 
@@ -92,19 +92,48 @@ namespace JW.DungeonSliding.GamePlay.Ability
         private void LoadData()
         {
             List<AbilityDataBase> sDatas = GameManager.Data.StatAbilities;
-            List<AbilityDataBase> rDatas = GameManager.Data.RuleAbilities;
+            List<AbilityDataBase> specialDatas = GameManager.Data.RuleAbilities;
 
-            _statAbilityBag = new ShuffleBag<AbilityDataBase>(sDatas);
+            _statAbilityBag = CreateRankWeightedBag(sDatas);
             for (int i = 0; i < sDatas.Count; i++)
             {
                 _statAbilityDatas.Add(sDatas[i].UID, sDatas[i]);
             }
 
-            _ruleAbilityBag = new ShuffleBag<AbilityDataBase>(rDatas);
-            for (int i = 0; i < rDatas.Count; i++)
+            _specialAbilityBag = CreateRankWeightedBag(specialDatas);
+            for (int i = 0; i < specialDatas.Count; i++)
             {
-                _ruleAbilityDatas.Add(rDatas[i].UID, rDatas[i]);
+                _specialAbilityDatas.Add(specialDatas[i].UID, specialDatas[i]);
             }
+        }
+        private ShuffleBag<AbilityDataBase> CreateRankWeightedBag(List<AbilityDataBase> datas)
+        {
+            Dictionary<EAbilityRank, int> rankCounts = CountRanks(datas);
+
+            return new ShuffleBag<AbilityDataBase>(datas, data =>
+            {
+                if (data == null || !rankCounts.TryGetValue(data.Rank, out int count) || count <= 0)
+                    return 0;
+
+                float rankWeight = GameManager.Config.Ability.GetRankWeight(data.Rank);
+                return rankWeight / count;
+            });
+        }
+        private Dictionary<EAbilityRank, int> CountRanks(List<AbilityDataBase> datas)
+        {
+            Dictionary<EAbilityRank, int> rankCounts = new Dictionary<EAbilityRank, int>();
+
+            for (int i = 0; i < datas.Count; i++)
+            {
+                EAbilityRank rank = datas[i].Rank;
+
+                if (!rankCounts.ContainsKey(rank))
+                    rankCounts[rank] = 0;
+
+                rankCounts[rank]++;
+            }
+
+            return rankCounts;
         }
         public void GrantAbilityPoint(int currentLevel)
         {
@@ -175,7 +204,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
             AbilityDataBase[] abilityDatas = new AbilityDataBase[count];
             for (int i = 0; i < count; i++)
             {
-                abilityDatas[i] = _ruleAbilityBag.GetItem();
+                abilityDatas[i] = _specialAbilityBag.GetItem();
             }
 
             return abilityDatas;
@@ -205,7 +234,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
             for (int i = 0; i < count; i++)
             {
-                SelectRuleAbility(abilities[i]);
+                SelectStatAbility(abilities[i]);
             }
         }
         public void AddReroll(int amount = 1)

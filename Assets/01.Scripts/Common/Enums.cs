@@ -139,6 +139,16 @@ namespace JW.DungeonSliding
         RequiredXp,
     }
 
+    //현재 체력 회복
+    //최대 체력 상승
+    //데미지 상승
+    //주는 데미지 상승
+    //크리티컬 데미지 상승
+    //체력 회복 수치 상승
+    //이동 회복 수치 상승
+    //현재 이동 회복
+    //최대 이동 상승
+
     public enum ECreatureStatType
     {
         None,
@@ -148,11 +158,9 @@ namespace JW.DungeonSliding
         DamageTakeMultiplier,
         DamageDealtMultiplier,
         CriticalMultiplier,
-        HPRecoveryMultiplier,
-        MoveRecoveryMultiplier,
+        RecoveryMultiplier,
         CurrentMoveCount,
         MaxMoveCount,
-        BarrierCount,
     }
 
     public enum EPlayerStatChangeType
