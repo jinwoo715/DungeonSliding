@@ -73,15 +73,11 @@ namespace JW.DungeonSliding.Core.Flow
         {
             _gameFlowType |= flowType;
 
-            Debug.Log($"Enter : {flowType}");
-
             OnChangeMoveState?.Invoke(_gameFlowType == 0);
         }
         public void ExitGameState(EGameStateType flowType)
         {
             _gameFlowType &= ~flowType;
-
-            Debug.Log($"Exit : {flowType}");
 
             OnChangeMoveState?.Invoke(_gameFlowType == 0);
             OnExitState?.Invoke(flowType);

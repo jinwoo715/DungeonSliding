@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88a553424e690f34e8ac1b8ed399c08e, type: 3}
+  m_Name: RA_ADDITIONAL_STRIKE
+  m_EditorClassIdentifier: 
+  UID: RA_ADDITIONAL_STRIKE
+  Name: "\uC794\uC0C1 \uACF5\uACA9"
+  Description: "\uACF5\uACA9 \uC2DC {P1}\uD37C\uC13C\uD2B8 \uD655\uB960\uB85C \uCD94\uAC00
+    {P2}\uD68C \uD0C0\uACA9"
+  IconName: Fire
+  Rank: 1
+  Sprite: {fileID: 374495580, guid: 080cb6d98b00c2645b2c41df5f69bc78, type: 3}
+  GameTrigger: 0
+  CreatureTrigger: 8
+  AbilityName: ChanceExtraAttackAbility
+  P1: 35
+  P2: 1
+  Notes: 

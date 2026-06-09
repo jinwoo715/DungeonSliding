@@ -26,6 +26,16 @@ namespace JW.DungeonSliding
             _statReadOnly = combatant.StatReadOnly;
 
             _statModifier.OnStatChanged += UpdateStat;
+
+            UpdateStat(ECreatureStatType.CurrentHP);
+            UpdateStat(ECreatureStatType.Damage);
+
+            if (combatant is Enemy enemy)
+            {
+                _nameText.text = enemy.Name;
+
+                _nameText.color = enemy.IsBoss == true ? Color.red : Color.white;
+            }
         }
 
         private void LateUpdate()

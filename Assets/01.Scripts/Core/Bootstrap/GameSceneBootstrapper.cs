@@ -1,3 +1,4 @@
+using JW.DungeonSliding.Core;
 using JW.DungeonSliding.Core.Flow;
 using JW.DungeonSliding.GamePlay.Ability;
 using JW.DungeonSliding.GamePlay.Combat;
@@ -54,8 +55,10 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
             _routeBuilder.Init(_world.MapManager);
             _gameStateController.Init(_routeBuilder, _battleManager);
 
+            
+
             // 2. Installer를 이용한 의존성 주입
-            WorldInstaller.Install(_world, _player.Controller.Player, _enemyAbilityFactory);
+            WorldInstaller.Install(_world, _player.Controller.Player, _enemyAbilityFactory, GameManager.Data);
 
             new PlayerInstaller().Install(
                 _player, 
@@ -84,6 +87,7 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
 
             new UIInstaller().Install(
                 _ui, 
+                _world.StageController,
                 _world.StageController, 
                 _abilitySystem, 
                 _player.Controller);
@@ -99,9 +103,7 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
                 _abilitySystem, 
                 _gameStateController,
                 _player.InputCoordinator, 
-                _player.Controller, 
-                _world.StageController, 
-                _ui.StageViewer
+                _player.Controller
             );
         }
 

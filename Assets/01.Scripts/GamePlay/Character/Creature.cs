@@ -102,16 +102,18 @@ namespace JW.DungeonSliding.GamePlay.Entities
         }
 
         #region Combat
-        public virtual void TakeDamage(DamageContext damageInfo)
+        public virtual bool TakeDamage(DamageContext damageInfo)
         {
             if (_combatController.TryTakeDamage(damageInfo))
             {
-                _animatorController.SetAnimationTrigger(ConstString.HIT_ANIM);
+               
                 CheckHPOut();
+                return true;
             }
             else
             {
                 EndHittedAnimation();
+                return false;
             }
         }
         public virtual void ExcuteAttack(ActPair actPair)

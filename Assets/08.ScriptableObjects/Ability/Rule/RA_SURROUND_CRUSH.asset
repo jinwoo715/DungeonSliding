@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88a553424e690f34e8ac1b8ed399c08e, type: 3}
+  m_Name: RA_SURROUND_CRUSH
+  m_EditorClassIdentifier: 
+  UID: RA_SURROUND_CRUSH
+  Name: "\uD3EC\uC704\uB9DD \uC5ED\uC804"
+  Description: "\uACF5\uACA9 \uC2DC \uC8FC\uC704 \uC801 \uD55C \uB9C8\uB9AC\uB2F9
+    {P1}\uB9CC\uD07C \uCD94\uAC00 \uB370\uBBF8\uC9C0"
+  IconName: Fire
+  Rank: 1
+  Sprite: {fileID: 2062015785, guid: 080cb6d98b00c2645b2c41df5f69bc78, type: 3}
+  GameTrigger: 0
+  CreatureTrigger: 8
+  AbilityName: SurrondEnemyAddDamageAbility
+  P1: 2
+  P2: 0
+  Notes: 

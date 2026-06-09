@@ -15,7 +15,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
     public interface IDamageable
     {
         event Action OnHitSequenceEnd;
-        void TakeDamage(DamageContext damageInfo);
+        bool TakeDamage(DamageContext damageInfo);
     }
 
     public interface IAttackRequester

@@ -65,6 +65,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             _player.OnGetXp += _levelSystem.AddXp;
             
             _levelSystem.OnLevelUp += abilityEventService.GrantAbilityPoint;
+            _levelSystem.OnLevelUp += ApplyLevelUpGrowth;
             _levelSystem.OnLevelUp += _player.HandleLevelUp;
 
             _player.OnMoveEnd += PayMoveCost;
@@ -87,6 +88,50 @@ namespace JW.DungeonSliding.GamePlay.Entities
             PlayerConfig playerConfig = GameManager.Config.Player;
             return new CreatureBaseStat(playerConfig.HP, playerConfig.DMG, playerConfig.MVCount);
         }
+
+        private void ApplyLevelUpGrowth(int level)
+        {
+            PlayerConfig playerConfig = GameManager.Config.Player;
+
+            ApplyLevelUpStat(
+                ECreatureStatType.MaxHp,
+                playerConfig.LevelUpHP,
+                playerConfig.LevelUpHPRatio);
+
+            ApplyLevelUpStat(
+                ECreatureStatType.Damage,
+                playerConfig.LevelUpDamage,
+                playerConfig.LevelUpDamageRatio);
+
+            if (IsMoveGrowthLevel(level, playerConfig.LevelUpMoveInterval))
+            {
+                ApplyLevelUpStat(
+                    ECreatureStatType.MaxMoveCount,
+                    playerConfig.LevelUpMove,
+                    0);
+            }
+        }
+
+        private void ApplyLevelUpStat(ECreatureStatType statType, int flatGrowth, int ratioGrowth)
+        {
+            if (flatGrowth > 0)
+            {
+                StatModifier.ModifyStat(new StatModifierContext(statType, EApplyStatType.Add, flatGrowth));
+            }
+
+            if (ratioGrowth > 0)
+            {
+                float ratio = ratioGrowth * 0.01f;
+                StatModifier.ModifyStat(new StatModifierContext(statType, EApplyStatType.Multiple, ratio));
+            }
+        }
+
+        private bool IsMoveGrowthLevel(int level, int interval)
+        {
+            if (interval <= 0) return true;
+
+            return level % interval == 0;
+        }
         
         public void OnPlayerMove(EDirectionType directionType)
         {
@@ -101,7 +146,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
         private void PayMoveCost()
         {
-            StatModifier.ModifyStat(new StatModifierContext(ECreatureStatType.CurrentMoveCount, EApplyStatType.Add, -_moveRule.MoveCost));
+            if(_player.SlideResultType == ESlideResultType.Move)
+                StatModifier.ModifyStat(new StatModifierContext(ECreatureStatType.CurrentMoveCount, EApplyStatType.Add, -_moveRule.MoveCost));
         }
 
         private void CheckPlayerAlive()

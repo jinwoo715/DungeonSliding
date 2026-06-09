@@ -1,0 +1,69 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8eac70b88e92ce441a1c22b488ad3dd2, type: 3}
+  m_Name: Act_4_04
+  m_EditorClassIdentifier: 
+  Width: 7
+  Height: 7
+  MapTiles: 00010101010101010001010100010101010101010101010101010101010101010100000101000101010100010101000101
+  CretureTempletes:
+  - NomalEnemyPos:
+    - X: 1
+      Z: 6
+    - X: 4
+      Z: 5
+    - X: 6
+      Z: 3
+    - X: 4
+      Z: 2
+    BossEnemyPos:
+    - X: 3
+      Z: 0
+    PlayerPos:
+      X: 6
+      Z: 0
+  effectTileDatas:
+  - EffectObjectType: 3
+    Point:
+      X: 1
+      Z: 3
+    TeleportPoint:
+      X: 4
+      Z: 0
+  - EffectObjectType: 3
+    Point:
+      X: 4
+      Z: 0
+    TeleportPoint:
+      X: 1
+      Z: 3
+  - EffectObjectType: 0
+    Point:
+      X: 2
+      Z: 6
+    TeleportPoint:
+      X: -1
+      Z: -1
+  - EffectObjectType: 0
+    Point:
+      X: 1
+      Z: 0
+    TeleportPoint:
+      X: -1
+      Z: -1
+  - EffectObjectType: 2
+    Point:
+      X: 3
+      Z: 1
+    TeleportPoint:
+      X: -1
+      Z: -1

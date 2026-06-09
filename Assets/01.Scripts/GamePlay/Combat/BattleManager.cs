@@ -26,7 +26,6 @@ namespace JW.DungeonSliding.GamePlay.Combat
     }
     public class BattleManager : MonoBehaviour, IAttackRequestListener, IAttackRegister, IBattleResult
     {
-        //TODO BattleManager
         private ICombatantSensor _combatSensor;
         private IGameStateModifier _gameStateModifier;
 
@@ -75,7 +74,6 @@ namespace JW.DungeonSliding.GamePlay.Combat
                     act = _actPairs.Dequeue();
                 }
 
-
                 if (act.Attacker.IsActive == false || act.Target.IsActive == false)
                     continue;
 
@@ -95,10 +93,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
                 while (timer < timeOut)
                 {
-                    if(isAttackDone && isHitDone)
-                    {
-                        break;
-                    }
+                    if(isAttackDone && isHitDone) break;
                     else
                     {
                         timer += Time.deltaTime;
@@ -144,7 +139,6 @@ namespace JW.DungeonSliding.GamePlay.Combat
         }
         public void UnRegisterAttackRequester(IAttackRequester requester, int priority)
         {
-            Debug.Log($"UnRegister : {requester} / {priority}");
             if (_requesterByPriority.TryGetValue(priority, out var list))
             {
                 if (list.Contains(requester))

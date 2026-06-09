@@ -72,6 +72,11 @@ namespace JW.DungeonSliding.GamePlay.Stage
 
         public void StartStage()
         {
+            if(_currentFloor > _currentMapBundle.TotalFloorCount())
+            {
+                OnClearAllFloor?.Invoke();
+            }
+
             ClearField();
 
             UpdateFloorAndAct();
@@ -106,13 +111,14 @@ namespace JW.DungeonSliding.GamePlay.Stage
             {
                 UpdateMapData();
             }
-            OnChangeFloorEvent?.Invoke(_currentAct - 1);
+            OnChangeFloorEvent?.Invoke(_currentFloor);
         }
         private bool TryUpdateAct()
         {
             if(_currentActProgress > _requireProgress)
             {
                 _currentAct++;
+                OnChangeActEvent?.Invoke(Act);
                 return true;
             }
 

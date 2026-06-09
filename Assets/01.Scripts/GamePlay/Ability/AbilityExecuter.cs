@@ -72,6 +72,8 @@ namespace JW.DungeonSliding.GamePlay.Ability
                     StartCoroutine(RunAbilityWithCounter(ability, args));
                 }
             }
+
+            OnEndGameEventAbility?.Invoke();
         }
         public void ExecuteGameEventAbility<T>(EGameEventTrigger trigger, T data)
         {
@@ -88,6 +90,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
                     StartCoroutine(RunAbilityWithCounter(ability, args));
                 }
             }
+            OnEndGameEventAbility?.Invoke();
         }
 
         private IEnumerator RunAbilityWithCounter(IAbility ability, AbilityArgs args)
@@ -148,8 +151,6 @@ namespace JW.DungeonSliding.GamePlay.Ability
         {
             foreach (var ability in abilities)
             {
-                Debug.Log(ability.ToString());
-
                 if (ability.CreatureTrigger != ECreatureTrigger.None)
                 {
                     // EGameEventTrigger에 정의된 모든 Enum 값을 순회

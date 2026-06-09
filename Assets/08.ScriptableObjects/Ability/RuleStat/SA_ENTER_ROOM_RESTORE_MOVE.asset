@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f4e5d8d5a674c80943035cdab7f2a11, type: 3}
+  m_Name: SA_ENTER_ROOM_RESTORE_MOVE
+  m_EditorClassIdentifier: 
+  UID: SA_ENTER_ROOM_RESTORE_MOVE
+  Name: "\uAC1C\uCC99\uC790\uC758 \uBCF4\uAE09"
+  Description: "\uBC29 \uC785\uC7A5\uC2DC \uC774\uB3D9 \uD69F\uC218 {StatValue}\uB9CC\uD07C
+    \uD68C\uBCF5"
+  IconName: Speed
+  Rank: 0
+  Sprite: {fileID: 21300000, guid: 12bba31e10a26b645908ca35cce3ac2a, type: 3}
+  PlayerStatType: 8
+  ApplyType: 1
+  RatioType: 0
+  StatValue: 5
+  GameTriggerType: 2
+  CreatureTriggerType: 0
+  StatType: 1
+  NextAttackType: 0
+  NextAttackValue: 0
+  NeedStackCount: 1
+  IsResetEnabled: 0
+  ResetGameTrigger: 2
+  ResetCreatureTrigger: 0
+  ResetThreshold: 0

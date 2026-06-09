@@ -9,6 +9,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
         public string Description;
         public string IconName;
         public EAbilityRank Rank;
+        public Sprite Sprite;
 
         public abstract AbilityDataBase ToRuntimeData();
 
@@ -19,6 +20,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
             data.Description = Description;
             data.IconName = IconName;
             data.Rank = Rank;
+            data.AbilitySprite = Sprite;
         }
     }
 }

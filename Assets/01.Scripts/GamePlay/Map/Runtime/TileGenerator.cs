@@ -7,7 +7,6 @@ namespace JW.DungeonSliding.Map
     public class TileGenerator : MonoBehaviour
     {
         [SerializeField] private TileObject _routeTilePrefab;
-        [SerializeField] private TileObject _wallTilePrefab;
 
         private bool[] _tileArrayInfo;
         private int _width;
@@ -23,7 +22,6 @@ namespace JW.DungeonSliding.Map
             _board = board;
 
             _tilePoolDic.CreatePool(ETileType.Route.ToString(), _routeTilePrefab, this.transform);
-            _tilePoolDic.CreatePool(ETileType.Wall.ToString(), _wallTilePrefab, this.transform);
         }
 
         public void SetMap(bool[] tileArrayInfo, int height, int width)

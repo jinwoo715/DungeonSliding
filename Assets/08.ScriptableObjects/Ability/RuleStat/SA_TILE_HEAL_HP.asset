@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f4e5d8d5a674c80943035cdab7f2a11, type: 3}
+  m_Name: SA_TILE_HEAL_HP
+  m_EditorClassIdentifier: 
+  UID: SA_TILE_HEAL_HP
+  Name: "\uC5D0\uB108\uC9C0 \uD761\uC218"
+  Description: "\uD6A8\uACFC \uD0C0\uC77C\uC744 \uBC1F\uC73C\uBA74 {StatValue}\uB9CC\uD07C
+    HP\uD68C\uBCF5"
+  IconName: Healing
+  Rank: 0
+  Sprite: {fileID: -747889103, guid: b7d19ec039fa7b141bd165aa95496c75, type: 3}
+  PlayerStatType: 1
+  ApplyType: 1
+  RatioType: 0
+  StatValue: 2
+  GameTriggerType: 0
+  CreatureTriggerType: 2048
+  StatType: 1
+  NextAttackType: 0
+  NextAttackValue: 0
+  NeedStackCount: 1
+  IsResetEnabled: 0
+  ResetGameTrigger: 0
+  ResetCreatureTrigger: 0
+  ResetThreshold: 0

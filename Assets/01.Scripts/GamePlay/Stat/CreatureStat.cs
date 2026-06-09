@@ -61,6 +61,7 @@ namespace JW.DungeonSliding.GamePlay.Stats
             OnStatChanged?.Invoke(ECreatureStatType.Damage);
             OnStatChanged?.Invoke(ECreatureStatType.CurrentMoveCount);
             OnStatChanged?.Invoke(ECreatureStatType.MaxMoveCount);
+            OnStatChanged?.Invoke(ECreatureStatType.CriticalMultiplier);
         }
 
         public int Get(ECreatureStatType stat)
@@ -93,6 +94,8 @@ namespace JW.DungeonSliding.GamePlay.Stats
 
         public void ModifyStat(StatModifierContext modifierContext)
         {
+            Debug.Log($"{modifierContext.TargetStat}, { modifierContext.Value}");
+
             ECreatureStatType type = modifierContext.TargetStat;
 
             if (type == ECreatureStatType.CurrentHP)
@@ -145,7 +148,7 @@ namespace JW.DungeonSliding.GamePlay.Stats
                 }
             }
 
-            OnStatChanged?.Invoke(modifierContext.TargetStat);
+            OnStatChanged?.Invoke(type);
         }
         private int CalculateFixedAddValue(StatModifierContext modifierContext)
         {

@@ -21,7 +21,6 @@ namespace JW.DungeonSliding.GamePlay.Combat
 
         public void RequestCounterAttack(ICombatant target)
         {
-            Debug.Log("CounterAttack");
             OnRequestCounterAttack?.Invoke(new ActPair(_owner, target, EAttackType.Counter));
         }
 

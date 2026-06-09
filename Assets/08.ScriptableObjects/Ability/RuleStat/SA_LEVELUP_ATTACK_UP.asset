@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f4e5d8d5a674c80943035cdab7f2a11, type: 3}
+  m_Name: SA_LEVELUP_ATTACK_UP
+  m_EditorClassIdentifier: 
+  UID: SA_LEVELUP_ATTACK_UP
+  Name: "\uC9C4\uD654\uC758 \uCE7C\uB0A0"
+  Description: "\uB808\uBCA8\uC5C5 \uC2DC \uACF5\uACA9\uB825{StatValue} \uC99D\uAC00"
+  IconName: Fire
+  Rank: 1
+  Sprite: {fileID: 21300000, guid: 556def944fd02f54c98ac89a1fd817a7, type: 3}
+  PlayerStatType: 3
+  ApplyType: 1
+  RatioType: 0
+  StatValue: 1
+  GameTriggerType: 0
+  CreatureTriggerType: 8192
+  StatType: 1
+  NextAttackType: 0
+  NextAttackValue: 0
+  NeedStackCount: 1
+  IsResetEnabled: 0
+  ResetGameTrigger: 0
+  ResetCreatureTrigger: 0
+  ResetThreshold: 0

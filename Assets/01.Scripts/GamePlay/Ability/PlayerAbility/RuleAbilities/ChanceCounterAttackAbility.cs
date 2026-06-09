@@ -700,11 +700,11 @@ namespace JW.DungeonSliding.GamePlay.Ability
                 if (!_isCombatted)
                 {
                     _nonBattleCount++;
-
+                    Debug.Log($"{_nonBattleCount} / {_data.P1}");
                     if (_nonBattleCount >= _data.P1)
                     {
                         _isHideMode = true;
-                        _statusModifier.ApplyStatus(Entities.ECreatureStatus.Hide, 1);
+                        _statusModifier.ApplyStatus(ECreatureStatus.Hide, 1);
                     }
                 }
                 else
@@ -712,14 +712,16 @@ namespace JW.DungeonSliding.GamePlay.Ability
                     _nonBattleCount = 0;
                 }
             }
-            Debug.Log(_nonBattleCount);
+            else
+            {
+                _statusModifier.ApplyStatus(ECreatureStatus.Hide, 1);
+            }
             yield break;
         }
 
         public void ReceivePayload(BattleResultPayLoad payload)
         {
             _isCombatted = payload.IsCombatted;
-            Debug.Log($"BattleResultPayLoad {_isCombatted}");
         }
 
         protected override void BindService()

@@ -33,12 +33,9 @@ namespace JW.DungeonSliding.UI
         {
             _data = abilityData;
 
-            Debug.Log(_data.Rank);
-
             _cardImage.sprite = _cardSprite[(int)_data.Rank];
 
-            //TODO Image Sprite
-            //_abilityImage.sprite = _data.AbilitySprite;
+            _abilityImage.sprite = _data.AbilitySprite;
             _abilityName.text = _data.Name;
 
             _abilityDescription.text = GetDescription(abilityData);
@@ -46,6 +43,9 @@ namespace JW.DungeonSliding.UI
 
         private string GetDescription(AbilityDataBase abilityData)
         {
+            if (abilityData is RuleStatAbilityData rsa)
+                return AbilityTextFormatter.ConvertRuleStatAbilityDescription(rsa);
+
             if (abilityData is StatAbilityData sa)
                 return AbilityTextFormatter.ConvertStatAbilityDescription(sa);
 

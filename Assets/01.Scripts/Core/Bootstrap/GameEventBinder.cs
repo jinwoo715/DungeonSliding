@@ -4,7 +4,6 @@ using JW.DungeonSliding.GamePlay.Ability;
 using JW.DungeonSliding.GamePlay.Combat;
 using JW.DungeonSliding.GamePlay.Entities;
 using JW.DungeonSliding.GamePlay.Move;
-using JW.DungeonSliding.GamePlay.Stage;
 using JW.DungeonSliding.GamePlay.Stats;
 using JW.DungeonSliding.Map;
 using JW.DungeonSliding.UI;
@@ -19,15 +18,11 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
         private IAbilityEventService _abilityEventService;
         private IInputService _inputService;
         private IGameStateModifier _gameModeModifier;
-        private IStageService _stageViewer;
-
-
         private IBoard _board;
         private IEnemyStatUIService _enemyStatUI;
         private IAttackRegister _attackRegister;
         private BattleManager _battleManager;
         private PlayerController _playerController;
-        private StageViewer _viewer;
 
         public void Bind(IEnemySpawnService enemySpawnService, 
             IBoard board,
@@ -36,8 +31,7 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
             BattleManager battleManager,
             IAbilityEventService abilityEventService, 
             IGameStateModifier gameModeModifier,
-            IInputService inputService, PlayerController playerController,
-            IStageService stageViewer, StageViewer viewer)
+            IInputService inputService, PlayerController playerController)
         {
             _enemySpawnService = enemySpawnService;
             _board = board;
@@ -49,8 +43,6 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
             _gameModeModifier = gameModeModifier;
             _inputService = inputService;
             _playerController = playerController;
-            _stageViewer = stageViewer;
-            _viewer = viewer;
 
             _enemySpawnService.OnSpawnEnemy += OnEnemySpawned;
             _enemySpawnService.OnEnemyDeath += OnEnemyDie;
@@ -63,8 +55,6 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
             inputService.OnMoveInput += playerController.OnPlayerMove;
 
             gameModeModifier.OnChangeMoveState += playerController.OnChangeMoveState;
-
-            stageViewer.OnChangeFloorEvent += viewer.UpdateFloor;
         }
 
         private void OnEnemySpawned(Tile tile, Enemy enemy)
@@ -96,7 +86,6 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
             }
             if (_inputService != null) _inputService.OnMoveInput -= _playerController.OnPlayerMove;
             if (_gameModeModifier != null) _gameModeModifier.OnChangeMoveState -= _playerController.OnChangeMoveState;
-            if (_stageViewer != null) _stageViewer.OnChangeFloorEvent -= _viewer.UpdateFloor;
         }
 
         private void OnExecuteAbility(AbilitySelectSession ctx) => _gameModeModifier.EnterGameState(EGameStateType.AbilityUI);

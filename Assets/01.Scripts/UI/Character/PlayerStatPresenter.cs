@@ -46,6 +46,11 @@ namespace JW.DungeonSliding.UI
                 nextAttackEnhancer.OnChangedNextAttackCount -= UpdateExraAttackCount;
                 nextAttackEnhancer.OnChangedNextAttackDamage -= UpdateAddDamage;
             };
+
+            ChangePlayerStat(ECreatureStatType.CurrentHP);
+            ChangePlayerStat(ECreatureStatType.CurrentMoveCount);
+            ChangePlayerStat(ECreatureStatType.Damage);
+            ChangePlayerStat(ECreatureStatType.CriticalMultiplier);
         }
         private void UnBind()
         {
@@ -71,6 +76,10 @@ namespace JW.DungeonSliding.UI
                     int currentMove = _statReadOnly.Get(ECreatureStatType.CurrentMoveCount);
                     int maxMove = _statReadOnly.Get(ECreatureStatType.MaxMoveCount);
                     _viewer.UpdateMoveCount(currentMove, maxMove);
+                    break;
+                case ECreatureStatType.CriticalMultiplier:
+                    int criticalMultiple = _statReadOnly.Get(ECreatureStatType.CriticalMultiplier);
+                    _viewer.UpdateCriticalMultiple(criticalMultiple);
                     break;
             }
         }

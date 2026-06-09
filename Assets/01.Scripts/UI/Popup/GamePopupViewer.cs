@@ -18,7 +18,6 @@ namespace JW.DungeonSliding
         public void Init()
         {
             _button.onClick.AddListener(OnClickButton);
-            Debug.Log("Button Init");
         }
 
         public void SetData(string name, string info, ButtonSet buttonSet)

@@ -44,5 +44,10 @@ namespace JW.DungeonSliding.GamePlay.Ability.Enemy
         {
             BindService(ref _visualController);
         }
+
+        public override void ReleaseAbility()
+        {
+            _visualController.ExitBlind();
+        }
     }
 }

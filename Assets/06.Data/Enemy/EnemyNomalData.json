@@ -1,0 +1,62 @@
+[
+  {
+    "UID": "ENEMY_NOMAL",
+    "Name": "석상",
+    "Description": "능력 없음.",
+    "BaseDamage": 4,
+    "BaseHP": 12,
+    "BaseXP": 3,
+    "AbilityList": "",
+    "EnemyAbilityType": ""
+  },
+  {
+    "UID": "ENEMY_AUTO_ROTATION",
+    "Name": "태엽",
+    "Description": "턴이 끝나면 오른쪽으로 회전한다.",
+    "BaseDamage": 3,
+    "BaseHP": 8,
+    "BaseXP": 2,
+    "AbilityList": "자동회전",
+    "EnemyAbilityType": "자동회전"
+  },
+  {
+    "UID": "ENEMY_COUNTER",
+    "Name": "응징",
+    "Description": "피격시 일정 확률 반격한다.",
+    "BaseDamage": 3,
+    "BaseHP": 9,
+    "BaseXP": 2,
+    "AbilityList": "확률적 반격",
+    "EnemyAbilityType": "반격"
+  },
+  {
+    "UID": "ENEMY_FRONT_DEFENCE",
+    "Name": "철벽",
+    "Description": "정면에서 오는 모든 공격 방어한다.",
+    "BaseDamage": 3,
+    "BaseHP": 10,
+    "BaseXP": 2,
+    "AbilityList": "정면 공격 방어",
+    "EnemyAbilityType": "정면 공격 방어"
+  },
+  {
+    "UID": "ENEMY_KNOCKBACK",
+    "Name": "충격",
+    "Description": "공격시 플레이어를 1칸 넉백 시킨다.",
+    "BaseDamage": 4,
+    "BaseHP": 8,
+    "BaseXP": 2,
+    "AbilityList": "넉백 공격",
+    "EnemyAbilityType": "넉백 공격"
+  },
+  {
+    "UID": "ENEMY_PLAYER_FACING",
+    "Name": "응시",
+    "Description": "턴이 끝나면 플레이어 방향으로 회전한다.",
+    "BaseDamage": 3,
+    "BaseHP": 9,
+    "BaseXP": 2,
+    "AbilityList": "플레이어 보기",
+    "EnemyAbilityType": "플레이어 보기"
+  }
+]

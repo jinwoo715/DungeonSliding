@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -26,8 +27,6 @@ namespace JW.DungeonSliding.UI
         {
             _viewer.SetData(tooltipContext.IconSprite, tooltipContext.Name, tooltipContext.Description);
             _viewer.gameObject.SetActive(true);
-
-            _layoutGroup.childAlignment = tooltipContext.Anchor;
         }
        
         public void CloseTooltip()

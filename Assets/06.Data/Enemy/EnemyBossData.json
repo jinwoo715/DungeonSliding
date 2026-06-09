@@ -1,0 +1,92 @@
+[
+  {
+    "UID": "ENEMY_BOSS_MEDUSA",
+    "Name": "메두사",
+    "Description": "턴이 끝나면 자동으로 오른쪽으로 회전한다.\n메두사가 보고있는 방향으로는 이동할 수 없다.",
+    "BaseDamage": 6,
+    "BaseHP": 42,
+    "BaseXP": 8,
+    "AbilityList": "자동회전|이동 막기",
+    "EnemyAbilityType": "자동회전, 이동 막기"
+  },
+  {
+    "UID": "ENEMY_BOSS_GRAVITON",
+    "Name": "그라비톤",
+    "Description": "이동 소모값을 증가시킨다.",
+    "BaseDamage": 5,
+    "BaseHP": 46,
+    "BaseXP": 8,
+    "AbilityList": "강중력",
+    "EnemyAbilityType": "강중력"
+  },
+  {
+    "UID": "ENEMY_BOSS_DOPPELGANGER",
+    "Name": "도플갱어",
+    "Description": "턴이 끝나면 플레이어의 스텟을 복사한다.",
+    "BaseDamage": 5,
+    "BaseHP": 30,
+    "BaseXP": 9,
+    "AbilityList": "도플갱어",
+    "EnemyAbilityType": "도플갱어"
+  },
+  {
+    "UID": "ENEMY_BOSS_EREBOS",
+    "Name": "에레보스",
+    "Description": "맵을 암전 시킨다.",
+    "BaseDamage": 6,
+    "BaseHP": 38,
+    "BaseXP": 8,
+    "AbilityList": "실명",
+    "EnemyAbilityType": "실명"
+  },
+  {
+    "UID": "ENEMY_BOSS_REAPER",
+    "Name": "리퍼",
+    "Description": "필드 위 다른 적이 죽을 때 마다 강화된다.",
+    "BaseDamage": 6,
+    "BaseHP": 40,
+    "BaseXP": 9,
+    "AbilityList": "동족의 분노",
+    "EnemyAbilityType": "동족의 분노"
+  },
+  {
+    "UID": "ENEMY_BOSS_MELTDOWN",
+    "Name": "멜트다운",
+    "Description": "피격 당할때 마다 강화된다.",
+    "BaseDamage": 5,
+    "BaseHP": 44,
+    "BaseXP": 9,
+    "AbilityList": "버서커",
+    "EnemyAbilityType": "버서커"
+  },
+  {
+    "UID": "ENEMY_BOSS_INFINITY",
+    "Name": "인피니티",
+    "Description": "턴이 진행될수록 강화된다.",
+    "BaseDamage": 5,
+    "BaseHP": 42,
+    "BaseXP": 9,
+    "AbilityList": "성장",
+    "EnemyAbilityType": "성장"
+  },
+  {
+    "UID": "ENEMY_BOSS_BALOR",
+    "Name": "바롤",
+    "Description": "필드 위 적군을 강화시킨다.",
+    "BaseDamage": 7,
+    "BaseHP": 48,
+    "BaseXP": 10,
+    "AbilityList": "아군 선동",
+    "EnemyAbilityType": "아군 선동"
+  },
+  {
+    "UID": "ENEMY_BOSS_ORDO",
+    "Name": "오르도",
+    "Description": "턴이 끝날 때 마다 필드 위 모든 적을 플레이어 방향으로 회전시킨다.",
+    "BaseDamage": 6,
+    "BaseHP": 45,
+    "BaseXP": 10,
+    "AbilityList": "자동 타겟",
+    "EnemyAbilityType": "자동 타겟"
+  }
+]

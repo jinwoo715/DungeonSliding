@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f4aabc56915ffd4f9895152de577c99, type: 3}
+  m_Name: SA_FinalDamage_Ratio_Up_Rare
+  m_EditorClassIdentifier: 
+  UID: SA_FinalDamage_Ratio_Up_Rare
+  Name: "\uD53C\uD574\uB7C9 \uC99D\uAC00"
+  Description: "\uCD5C\uC885 \uD53C\uD574\uB7C9 {StatValue}% \uC99D\uAC00"
+  IconName: Fire
+  Rank: 1
+  Sprite: {fileID: 21300000, guid: c278ec36abbc540489a08ba8765cd092, type: 3}
+  PlayerStatType: 5
+  ApplyType: 1
+  RatioType: 0
+  StatValue: 10

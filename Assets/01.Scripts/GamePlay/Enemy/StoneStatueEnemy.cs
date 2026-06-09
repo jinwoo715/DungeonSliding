@@ -16,7 +16,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             base.Initialize(cretureType);
             Rotate.OnRotateEnd += EndHittedAnimation;
         }
-        public void ExcuteAttack()
+        public virtual void ExcuteAttack()
         {
             _eyeLight.SetActive(true);
             _animatorController.SetAnimationTrigger(ConstString.ONE_HAND_ATTACK_ANIM);
@@ -33,12 +33,13 @@ namespace JW.DungeonSliding.GamePlay.Entities
         }
 
         private float _rotateDelay = 0.3f;
-        public override void TakeDamage(DamageContext damageInfo)
+        public override bool TakeDamage(DamageContext damageInfo)
         {
-            if (IsActive == false) return;
+            if (IsActive == false) return false;
+
             base.TakeDamage(damageInfo);
 
-            if (damageInfo.AppliedFinalDamage == 0) return;
+            if (damageInfo.AppliedFinalDamage == 0) return false;
 
             Vector3 punchScale = new Vector3(0.02f, 0f, 0.02f);
             _avatar.transform.DOPunchPosition(punchScale, _rotateDelay, 20);
@@ -48,8 +49,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
             var particle = ParticlePool.Instance.GetParticle("HitDust");
             particle.SetParticle(this.transform.position + Vector3.up * 0.65f + GetHitParticlePosition(toDir), 1.0f);
 
-
-            if (IsActive == false) return;
+            if (IsActive == false) return false;
 
             float targetRotation = GetEulerYByDirection(toDir);
             particle.transform.rotation = Quaternion.Euler(-20, targetRotation, 0);
@@ -62,6 +62,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
                 StartCoroutine(CoDelayRotate(toDir));
             }
             else EndHittedAnimation();
+
+            return true;
         }
 
         private IEnumerator CoDelayRotate(EDirectionType toDir)

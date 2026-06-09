@@ -27,6 +27,8 @@ namespace JW.DungeonSliding.UI
 
             _nameText.text = name;
             _contentsText.text = content;
+
+            _contentsText.ForceMeshUpdate();
         }
     }
 }

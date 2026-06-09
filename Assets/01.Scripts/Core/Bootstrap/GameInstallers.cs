@@ -1,3 +1,4 @@
+using JW.DungeonSliding.Core.Data;
 using JW.DungeonSliding.Core.Flow;
 using JW.DungeonSliding.Core.Inputs;
 using JW.DungeonSliding.GamePlay.Ability;
@@ -14,12 +15,12 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
 {
     public static class WorldInstaller
     {
-        public static void Install(WorldReferences world, ICombatant player, EnemyAbilityFactory enemyAbilityFactory)
+        public static void Install(WorldReferences world, ICombatant player, EnemyAbilityFactory enemyAbilityFactory, IDataService service)
         {
             world.MapManager.Init();
             world.StageController.Init(world.MapManager, world.ObstacleController, player, world.EnemyManager);
             world.ObstacleController.Init(world.MapManager);
-            world.EnemyManager.Init(enemyAbilityFactory);
+            world.EnemyManager.Init(enemyAbilityFactory, service);
         }
     }
 
@@ -74,15 +75,25 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
 
     public class UIInstaller
     {
-        public void Install(UIReferences ui, IStageViewer stageViewer, IAbilityEventService abilityService, IPlayerInfoViewer playerInfoViewer)
+        public void Install(UIReferences ui, IStageService stageService, IStageViewer stageViewer, IAbilityEventService abilityService, IPlayerInfoViewer playerInfoViewer)
         {
             ui.HasAbilityPresenter.Init(ui.AbilityTooltipPresenter, abilityService);
             ui.UIManager.Init();
-            ui.StageViewer.Init(stageViewer.TotalFloor, stageViewer.BossFloors);
+            GetStagePresenter(ui.StageViewer).Init(stageService, stageViewer, ui.StageViewer);
             ui.AbilityUIController.Init(abilityService);
             ui.PlayerStatPresenter.Init(playerInfoViewer.GetPlayerInfo());
             ui.EnemyStatPresenter.Init();
             ui.EnemyTooltipClicker.Init(ui.EnemyTooltipPresenter);
+        }
+
+        private StagePresenter GetStagePresenter(StageViewer stageViewer)
+        {
+            StagePresenter presenter = stageViewer.GetComponent<StagePresenter>();
+
+            if (presenter == null)
+                presenter = stageViewer.gameObject.AddComponent<StagePresenter>();
+
+            return presenter;
         }
     }
 }

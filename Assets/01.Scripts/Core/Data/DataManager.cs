@@ -6,7 +6,13 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.Core.Data
 {
-    public class DataManager
+    public interface IDataService
+    {
+        List<EnemyData> GetEnemyData();
+        List<EnemyData> GetBossData();
+    }
+
+    public class DataManager : IDataService
     {
         public List<EnemyData> EnemyData { get; private set; }
         public List<EnemyData> EnemyBossData { get; private set; }
@@ -104,5 +110,7 @@ namespace JW.DungeonSliding.Core.Data
             StatAbilities.AddRange(JsonConvert.DeserializeObject<List<StatAbilityData>>(stat, settings));
         }
 
+        public List<EnemyData> GetEnemyData() => EnemyData;
+        public List<EnemyData> GetBossData() => EnemyBossData;
     }
 }

@@ -31,7 +31,7 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
 
         [Header("Controller")]
         public AbilitySelectPresenter AbilityUIController;
-        public EnemyTooltipController EnemyTooltipClicker;
+        public EnemyTooltipHandler EnemyTooltipClicker;
 
         [Header("Presenter")]
         public HasAbilityItemPresenter HasAbilityPresenter;

@@ -24,6 +24,8 @@ namespace JW.DungeonSliding.GamePlay
 
             [SerializeField] private int _levelUpHp;
             [SerializeField] private int _levelUpDamage;
+            [SerializeField] private int _levelUpMove;
+            [SerializeField] private int _levelUpMoveInterval;
 
             [SerializeField] private int _levelUpHpRatio;
             [SerializeField] private int _levelUpDamageRatio;
@@ -33,6 +35,12 @@ namespace JW.DungeonSliding.GamePlay
             public int HP => _baseHP;
             public int DMG => _baseDamage;
             public int MVCount => _baseMoveCount;
+            public int LevelUpHP => _levelUpHp;
+            public int LevelUpDamage => _levelUpDamage;
+            public int LevelUpMove => _levelUpMove;
+            public int LevelUpMoveInterval => _levelUpMoveInterval;
+            public int LevelUpHPRatio => _levelUpHpRatio;
+            public int LevelUpDamageRatio => _levelUpDamageRatio;
         }
 
         [System.Serializable]

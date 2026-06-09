@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88a553424e690f34e8ac1b8ed399c08e, type: 3}
+  m_Name: RA_MOVE_OR_DIE
+  m_EditorClassIdentifier: 
+  UID: RA_MOVE_OR_DIE
+  Name: "\uC0AC\uD22C\uC758 \uC9C8\uC8FC"
+  Description: "\uC774\uB3D9 \uD69F\uC218\uAC00 0\uC77C \uB54C, HP {P1}\uB9CC\uD07C
+    \uC18C\uBAA8, \uC774\uB3D9 \uD69F\uC218 {P2}\uB9CC\uD07C \uD68C\uBCF5"
+  IconName: Fire
+  Rank: 1
+  Sprite: {fileID: -214298916, guid: 080cb6d98b00c2645b2c41df5f69bc78, type: 3}
+  GameTrigger: 0
+  CreatureTrigger: 32768
+  AbilityName: EmergencyConvertHPToMoveAbility
+  P1: 5
+  P2: 3
+  Notes: 

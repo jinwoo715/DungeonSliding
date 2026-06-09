@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a30a86fae2a1e6348af479c1da600c8d, type: 3}
+  m_Name: GameConfig
+  m_EditorClassIdentifier: 
+  Combat:
+    _backAttackDamageMultiplier: 2
+  Player:
+    _moveSpeed: 0
+    _baseHP: 34
+    _baseDamage: 8
+    _baseMoveCount: 20
+    _levelUpHp: 4
+    _levelUpDamage: 1
+    _levelUpMove: 2
+    _levelUpMoveInterval: 1
+    _levelUpHpRatio: 0
+    _levelUpDamageRatio: 0
+    _levelUpNeedValueRatio: 0
+  Enemy:
+    _floorUpHpValue: 3
+    _floorUpDMGValue: 5
+  Ability:
+    _GainAbilityPerLevel: 3
+    _nomalCardRatio: 70
+    _rareCardRatio: 25
+    _epicCardRatio: 5
+    _legendaryCardRatio: 1
+  UI:
+    _fadeOutTime: 0
+    _fadeInTime: 0
+    _fadeOutWaitTime: 0
+  Act:
+    _bossStages: 0300000006000000090000000c0000000f00000014000000
+    _actPerFloorCount: 4
+    _totalFloor: 20

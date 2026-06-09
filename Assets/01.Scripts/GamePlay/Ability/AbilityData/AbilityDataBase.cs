@@ -10,5 +10,6 @@ namespace JW.DungeonSliding.GamePlay.Ability
         public string Description;
         public string IconName;
         public EAbilityRank Rank;
+        public Sprite AbilitySprite;
     }
 }

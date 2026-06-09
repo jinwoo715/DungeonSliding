@@ -110,13 +110,15 @@ namespace JW.DungeonSliding.GamePlay.Context
             buttonSet.ButtonName = "로비";
             buttonSet.ButtonEvent = () => { GameManager.Scene.LoadScene(SceneType.LobbyScene); };
             _popupService.ShowOneButtonPopup("패배", "게임에 패배하였습니다.", buttonSet);
+            OnFailGame?.Invoke();
         }
         public void VictoryGame() 
         {
             ButtonSet buttonSet = new ButtonSet();
             buttonSet.ButtonName = "로비";
             buttonSet.ButtonEvent = () => { GameManager.Scene.LoadScene(SceneType.LobbyScene); };
-            _popupService.ShowOneButtonPopup("패배", "게임에 패배하였습니다.", buttonSet);
+            _popupService.ShowOneButtonPopup("승리", "게임에 승리하였습니다.", buttonSet);
+            OnVictoryGame?.Invoke();
         }
     }
 }

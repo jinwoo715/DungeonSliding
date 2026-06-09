@@ -38,6 +38,8 @@ namespace JW.DungeonSliding.GamePlay.Statues
         }
         public void RemoveStatus(ECreatureStatus status)
         {
+            Debug.Log($"Remove : {status}");
+
             _statusFlags &= ~status;
 
             if (_statusDurations.ContainsKey(status))

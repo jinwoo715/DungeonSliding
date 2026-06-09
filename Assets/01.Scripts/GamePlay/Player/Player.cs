@@ -83,8 +83,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
         }
 
         #region Move
-
-        
         public void SlideRoute(EDirectionType inputDirection)
         {
             if (_moveController.IsMoving) return;
@@ -101,7 +99,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         {
             OnSlideEnd?.Invoke();
             ChangeCharacterState(ECharacterStateType.Idle);
-            SlideResultType = ESlideResultType.None;
+            SlideResultType = ESlideResultType.Move;
             Ability.ExecuteCreatureTrigger(ECreatureTrigger.OnSlided);
         }
         private void HandleSlideBlocked(ESlideResultType slideResultType)
@@ -125,7 +123,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         #endregion
 
         #region Combat
-        public override void TakeDamage(DamageContext damageInfo)
+        public override bool TakeDamage(DamageContext damageInfo)
         {
             EDirectionType dir = DirectionUtility.GetDirFromTileToTile(TileObject.TilePosition, damageInfo.Attacker.TileObject.TilePosition);
             Rotate.SetRotation(dir);
@@ -138,7 +136,12 @@ namespace JW.DungeonSliding.GamePlay.Entities
                 KnockBack(backDirection);
             }
 
-            base.TakeDamage(damageInfo);
+            if (base.TakeDamage(damageInfo))
+            {
+                _animatorController.SetAnimationTrigger(ConstString.HIT_ANIM);
+                return true;
+            }
+            return false;
         }
         public override void EndHittedAnimation()
         {

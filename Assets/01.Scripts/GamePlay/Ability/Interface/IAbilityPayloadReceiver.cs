@@ -6,4 +6,8 @@ namespace JW.DungeonSliding.GamePlay.Ability
     {
         void ReceivePayload(T payload);
     }
+    public interface IAbilityPayloadSender
+    {
+        public void SendPayload<T>(T payload);
+    }
 }

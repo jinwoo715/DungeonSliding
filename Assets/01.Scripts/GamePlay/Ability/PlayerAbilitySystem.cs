@@ -72,7 +72,7 @@ namespace JW.DungeonSliding.GamePlay.Ability
         public event Action<IAbility> OnSelectAbility;
         public event Action<AbilitySelectSession> OnExcuteAbilitySelection;
 
-        private int _rerollCount = 1;
+        private int _rerollCount = 10;
 
         Queue<AbilitySelectSession> abilitySelectSessions = new Queue<AbilitySelectSession>();
 
@@ -193,6 +193,8 @@ namespace JW.DungeonSliding.GamePlay.Ability
         }
         public void SelectStatAbility(AbilityDataBase _abilityData)
         {
+            Debug.Log($"{_abilityData.Name} / {_abilityData.Description}");
+
             IAbility ability = _playerAbilityFactory.CreateAbility(_abilityData);
 
             OnSelectAbility?.Invoke(ability);

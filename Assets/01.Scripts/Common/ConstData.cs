@@ -12,9 +12,9 @@ namespace JW.DungeonSliding
         public static readonly int LEVELUP_XP_OFFSET = 3;
 
         //Enemy Stat Up Value
-        public static readonly float ENEMY_HP_POW = 1.06f;
-        public static readonly float ENEMY_DMG_POW = 1.03f;
-        public static readonly float ENEMY_XP_POW = 1.015f;
+        public static readonly float ENEMY_HP_POW = 1.08f;
+        public static readonly float ENEMY_DMG_POW = 1.05f;
+        public static readonly float ENEMY_XP_POW = 1.04f;
     }
 
     public class ConstDataKey

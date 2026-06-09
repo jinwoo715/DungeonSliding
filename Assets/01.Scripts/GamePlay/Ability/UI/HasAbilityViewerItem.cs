@@ -2,11 +2,14 @@ using JW.DungeonSliding.GamePlay.Ability;
 using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace JW.DungeonSliding.UI
 {
     public class HasAbilityViewerItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
+        [SerializeField] private Image _abilityImage;
+
         private AbilityDataBase _abilityData;
 
         private Action CloseTooltipEvent;
@@ -17,6 +20,7 @@ namespace JW.DungeonSliding.UI
             _abilityData = abilityData;
             CloseTooltipEvent = closeEvent;
             ShowTooltipEvent = showEvent;
+            _abilityImage.sprite = abilityData.AbilitySprite;
         }
 
         public void OnPointerEnter(PointerEventData eventData)

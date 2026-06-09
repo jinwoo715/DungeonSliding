@@ -14,6 +14,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         [SerializeField] private Transform _statUITransform;
         [SerializeField] private EnemyData _enemyData;
 
+        public bool IsBoss { get; set; } = false;
         public string Name => _enemyData.Name;
         public string Description => _enemyData.Description;
         public Transform StatUITransform => _statUITransform;

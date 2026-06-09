@@ -9,12 +9,14 @@ using System;
 using JW.DungeonSliding.Core;
 using JW.DungeonSliding.GamePlay.Stats;
 using JW.DungeonSliding.GamePlay.Ability;
+using JW.DungeonSliding.Core.Data;
 
 namespace JW.DungeonSliding.GamePlay.Entities
 {
     public interface IEnemySpawnService
     {
         int ActiveEnemyCount { get; }
+
         event Action<Tile, Enemy> OnSpawnEnemy;
         event Action<Tile, Enemy> OnEnemyDeath;
         void ReceiveNomalEnemySpawnList(List<Tile> spawnPositions, int act);
@@ -39,18 +41,75 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public event Action<Tile, Enemy> OnSpawnEnemy;
         public event Action<Tile, Enemy> OnEnemyDeath;
 
-        public void Init(IEnemyAbilityCreater enemyAbilityCreater)
+        public void Init(IEnemyAbilityCreater enemyAbilityCreater, IDataService dataService)
         {
             _enemyAbilityCreater = enemyAbilityCreater;
 
-            LoadData();
+            _nomalEnemyDatas = dataService.GetEnemyData();
+            _bossEnemyDatas = dataService.GetBossData();
         }
-        public void LoadData()
+        
+        public bool TryGetCombatant(Tile tilePoint, out ICombatant combatant)
         {
-            _nomalEnemyDatas = GameManager.Data.EnemyData;
-            _bossEnemyDatas = GameManager.Data.EnemyBossData;
+            if(_activeEnemyByTile.TryGetValue(tilePoint, out ICombatant value))
+            {
+                combatant = value;
+                return true;
+            }
+            else
+            {
+                combatant = value;
+                return false;
+            }
+        }
+        public List<ICombatant> GetAllActiveCombatant()
+        {
+            List<ICombatant> activeList = new List<ICombatant>();
+            foreach (var enemy in _activeEnemyByTile)
+            {
+                activeList.Add(enemy.Value);
+            }
+            return activeList;
         }
 
+        public void ReceiveNomalEnemySpawnList(List<Tile> spawnPositions, int act)
+        {
+            int maxRandomEnemyIndex = Mathf.Min(act, _nomalEnemyDatas.Count);
+
+            for (int i = 0; i < spawnPositions.Count; i++)
+            {
+                int ranNum = UnityEngine.Random.Range(0, maxRandomEnemyIndex);
+
+                Tile tile = spawnPositions[i];
+
+                EnemyData data = _nomalEnemyDatas[ranNum];
+
+                SpawnEnemy(data, act, tile, false);
+            }
+        }
+        public void ReceiveBossEnemySpawnList(List<Tile> spawnPositions, int act)
+        {
+            for (int i = 0; i < spawnPositions.Count; i++)
+            {
+                int ranNum = UnityEngine.Random.Range(0, _bossEnemyDatas.Count);
+
+                Tile tile = spawnPositions[i];
+
+                EnemyData data = _bossEnemyDatas[ranNum];
+                SpawnEnemy(data, act, tile, true);
+            }
+        }
+
+        private Enemy SpawnEnemy(EnemyData data, int act, Tile spawnPosition, bool isBoss)
+        {
+            Enemy enemy = GetEnemy();
+            enemy.IsBoss = isBoss;
+            enemy.SetData(data, act);
+            SetEnemyOnTile(enemy, spawnPosition);
+            SetEnemySkill(data, enemy, act);
+            OnSpawnEnemy?.Invoke(spawnPosition, enemy);
+            return enemy;
+        }
         private Enemy GetEnemy()
         {
             Enemy enemy = null;
@@ -71,6 +130,21 @@ namespace JW.DungeonSliding.GamePlay.Entities
             enemy.Initialize(ECreatureType.Enemy);
 
             return enemy;
+        }
+        private void SetEnemyOnTile(Enemy enemy, Tile tile)
+        {
+            enemy.TileObject.SetPosition(tile);
+            _activeEnemyByTile.Add(tile, enemy);
+        }
+        private void SetEnemySkill(EnemyData data, Enemy enemy, int act)
+        {
+            var datas = GameManager.Data.EnemyAbilities(data.AbilityList);
+
+            if (datas != null)
+            {
+                var abilities = _enemyAbilityCreater.CreateAbility(datas, enemy, act);
+                enemy.AbilityRegister.RegisterAutoAllAbility(abilities);
+            }
         }
         private void DeathEnemy(Enemy enemy)
         {
@@ -94,86 +168,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
             enemy.OnEnemyReturnEvent -= DeathEnemy;
             enemy.gameObject.SetActive(false);
             _enemyPoolByUID.Push(enemy);
-        }
-
-        //Interface
-        public bool TryGetCombatant(Tile tilePoint, out ICombatant combatant)
-        {
-            if(_activeEnemyByTile.TryGetValue(tilePoint, out ICombatant value))
-            {
-                combatant = value;
-                return true;
-            }
-            else
-            {
-                combatant = value;
-                return false;
-            }
-        }
-        public List<ICombatant> GetAllActiveCombatant()
-        {
-            List<ICombatant> activeList = new List<ICombatant>();
-            foreach (var enemy in _activeEnemyByTile)
-            {
-                activeList.Add(enemy.Value);
-            }
-            return activeList;
-        }
-        public void ReceiveNomalEnemySpawnList(List<Tile> spawnPositions, int act)
-        {
-            int maxRandomEnemyIndex = Mathf.Min(act, _nomalEnemyDatas.Count);
-
-            for (int i = 0; i < spawnPositions.Count; i++)
-            {
-                int ranNum = UnityEngine.Random.Range(0, maxRandomEnemyIndex);
-
-                Tile tile = spawnPositions[i];
-
-                EnemyData data = _nomalEnemyDatas[ranNum];
-
-                SpawnEnemy(data, act, tile);
-            }
-        }
-        public void ReceiveBossEnemySpawnList(List<Tile> spawnPositions, int act)
-        {
-            Debug.Log($"Boss Stage {spawnPositions.Count}");
-            for (int i = 0; i < spawnPositions.Count; i++)
-            {
-                int ranNum = UnityEngine.Random.Range(0, _bossEnemyDatas.Count);
-
-                Tile tile = spawnPositions[i];
-
-                EnemyData data = _bossEnemyDatas[ranNum];
-                Debug.Log(data.AbilityList);
-                SpawnEnemy(data, act, tile);
-            }
-        }
-        private void SpawnEnemy(EnemyData data, int act, Tile spawnPosition)
-        {
-            Enemy enemy = GetEnemy();
-            InitEnemy(enemy, data, act);
-            SetEnemyOnTile(enemy, spawnPosition);
-            SetEnemySkill(data, enemy, act);
-            OnSpawnEnemy?.Invoke(spawnPosition, enemy);
-        }
-        private void InitEnemy(Enemy enemy, EnemyData data, int act)
-        {
-            enemy.SetData(data, act);
-        }
-        private void SetEnemyOnTile(Enemy enemy, Tile tile)
-        {
-            enemy.TileObject.SetPosition(tile);
-            _activeEnemyByTile.Add(tile, enemy);
-        }
-        private void SetEnemySkill(EnemyData data, Enemy enemy, int act)
-        {
-            var datas = GameManager.Data.EnemyAbilities(data.AbilityList);
-
-            if (datas != null)
-            {
-                var abilities = _enemyAbilityCreater.CreateAbility(datas, enemy, act);
-                enemy.AbilityRegister.RegisterAutoAllAbility(abilities);
-            }
         }
     }
 }

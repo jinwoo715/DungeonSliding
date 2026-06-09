@@ -1,7 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace JW.DungeonSliding
 {
@@ -16,53 +14,94 @@ namespace JW.DungeonSliding
         [SerializeField] private GameObject _bossMarkObject;
 
         [SerializeField] private RectTransform _arrow;
+        [SerializeField] private float _arrowXOffset = 72.9f;
 
-        public List<float> yOffsets = new List<float>();
+        private readonly List<GameObject> _createdLines = new();
+        private readonly List<GameObject> _createdBossMarks = new();
 
-        public float _floorYOffset;
-        public float _startYOffset;
+        private float _floorYOffset;
+        private float _startYOffset;
+        private int _totalFloorCount;
 
-        public int totalCount;
-        public int bossCount;
-
-        [ContextMenu("Test")]
-        public void Test()
+        public void Init(int totalFloorCount, List<int> bossFloors)
         {
-            //Init(totalCount, bossCount);
-        }
+            Debug.Log($"{totalFloorCount}, {bossFloors.Count}");
 
-        public int floor = 0;
+            ClearCreatedObjects();
 
-        [ContextMenu("Test2")]
-        public void TestFloor()
-        {
-            UpdateFloor(floor);
-        }
+            _totalFloorCount = Mathf.Max(0, totalFloorCount);
 
-        public void Init(int totalFloorCount, List<int> bossTerm)
-        {
-            _floorYOffset = _rectTransform.sizeDelta.y / (totalFloorCount-1);
+            if (_totalFloorCount <= 0)
+            {
+                if (_arrow != null)
+                    _arrow.gameObject.SetActive(false);
+
+                return;
+            }
+
+            if (_arrow != null)
+                _arrow.gameObject.SetActive(true);
+
+            _floorYOffset = _totalFloorCount > 1 ? _rectTransform.sizeDelta.y / (_totalFloorCount - 1) : 0;
+
+
             _startYOffset = _rectTransform.position.y - (_rectTransform.sizeDelta.y / 2);
 
-            int index = 0;
+            HashSet<int> bossFloorSet = bossFloors != null
+                ? new HashSet<int>(bossFloors)
+                : new HashSet<int>();
 
-            for (int i = 1; i <= totalFloorCount; i++)
+            for (int floor = 1; floor <= _totalFloorCount; floor++)
             {
-                var line = Instantiate(_dividLine, _dividLineParent);
-                line.transform.position = new Vector3(_rectTransform.position.x, _startYOffset + _floorYOffset * (i-1));
+                Vector3 floorPosition = GetFloorPosition(floor);
 
-                if (i == bossTerm[index])
+                var line = Instantiate(_dividLine, _dividLineParent);
+                line.transform.position = floorPosition;
+
+                _createdLines.Add(line);
+
+                if (bossFloorSet.Contains(floor))
                 {
                     var mark = Instantiate(_bossMarkObject, _bossMarkParent);
-                    mark.transform.position = new Vector3(_rectTransform.position.x, _startYOffset + _floorYOffset * (i-1));
-                    index++;
+                    mark.transform.position = floorPosition;
+                    _createdBossMarks.Add(mark);
                 }
             }
+
+            UpdateFloor(1);
         }
 
         public void UpdateFloor(int floor)
         {
-            _arrow.transform.position = new Vector3(_rectTransform.position.x - 72.9f, _startYOffset + _floorYOffset * floor);
+            if (_arrow == null || _totalFloorCount <= 0)
+                return;
+
+            int clampedFloor = Mathf.Clamp(floor, 1, _totalFloorCount);
+            Vector3 floorPosition = GetFloorPosition(clampedFloor);
+            _arrow.transform.position = new Vector3(_rectTransform.position.x - _arrowXOffset, floorPosition.y);
+        }
+
+        private Vector3 GetFloorPosition(int floor)
+        {
+            int floorIndex = Mathf.Clamp(floor - 1, 0, Mathf.Max(0, _totalFloorCount - 1));
+            return new Vector3(_rectTransform.position.x, _startYOffset + _floorYOffset * floorIndex);
+        }
+
+        private void ClearCreatedObjects()
+        {
+            DestroyAll(_createdLines);
+            DestroyAll(_createdBossMarks);
+        }
+
+        private void DestroyAll(List<GameObject> objects)
+        {
+            for (int i = 0; i < objects.Count; i++)
+            {
+                if (objects[i] != null)
+                    Destroy(objects[i]);
+            }
+
+            objects.Clear();
         }
     }
 }

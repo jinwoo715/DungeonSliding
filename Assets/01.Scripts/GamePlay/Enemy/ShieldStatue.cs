@@ -5,12 +5,9 @@ namespace JW.DungeonSliding.GamePlay.Entities
 {
     public class ShieldStatue : StoneStatueEnemy
     {
-        public void ExcuteAttack()
+        public override void ExcuteAttack()
         {
             _animatorController.SetAnimationTrigger(ConstString.ONE_HAND_ATTACK_ANIM);
         }
-
-       
-
     }
 }

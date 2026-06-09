@@ -17,6 +17,7 @@ namespace JW.DungeonSliding.UI
         [SerializeField] private TMP_Text _hpText;
         [SerializeField] private TMP_Text _damageText;
         [SerializeField] private TMP_Text _moveCountText;
+        [SerializeField] private TMP_Text _criticalText;
         [SerializeField] private TMP_Text _levelText;
 
         [SerializeField] private TMP_Text _extraAttackCountText;
@@ -51,6 +52,12 @@ namespace JW.DungeonSliding.UI
             else
                 _extraAttackCountText.text = $"X{count+1}";
         }
+
+        public void UpdateCriticalMultiple(int multiple)
+        {
+            _criticalText.text = $"{multiple}%";
+        }
+
         public void UpdateNextAttackExtraDamage(int damage)
         {
             if (damage == 0)
