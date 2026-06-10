@@ -3,6 +3,7 @@ using JW.DungeonSliding.GamePlay.Ability;
 using JW.DungeonSliding.GamePlay.Combat;
 using JW.DungeonSliding.GamePlay.Move;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -56,27 +57,39 @@ namespace JW.DungeonSliding.Core.Flow
                 {
                     GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTrigger.OnTurnEnd);
                 }
-                GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTrigger.OnTurnStart);
-            }
-        }
 
-        public void EnterWorkingAbility()
-        {
-            EnterGameState(EGameStateType.WorkingAbility);
-        }
-        public void ExitWorkingAbility()
-        {
-            ExitGameState(EGameStateType.WorkingAbility);
+                if ((_gameFlowType & EGameStateType.WorkingAbility) == EGameStateType.WorkingAbility)
+                {
+                    Debug.Log("Working Ability");
+                    return;
+                }
+                else
+                {
+                    GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTrigger.OnTurnStart);
+                }
+            }
+
+            if(stateType == EGameStateType.WorkingAbility)
+            {
+                if((_gameFlowType & EGameStateType.Battle) == 0)
+                {
+                    GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTrigger.OnTurnStart);
+                }
+            }
         }
 
         public void EnterGameState(EGameStateType flowType)
         {
+            Debug.Log($"Enter {flowType}");
+
             _gameFlowType |= flowType;
 
             OnChangeMoveState?.Invoke(_gameFlowType == 0);
         }
         public void ExitGameState(EGameStateType flowType)
         {
+            Debug.Log($"Exit {flowType}");
+
             _gameFlowType &= ~flowType;
 
             OnChangeMoveState?.Invoke(_gameFlowType == 0);

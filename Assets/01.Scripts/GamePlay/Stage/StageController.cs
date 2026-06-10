@@ -32,9 +32,7 @@ namespace JW.DungeonSliding.GamePlay.Stage
 
         private int _currentFloor;
         private int _currentAct;
-
-        private int _currentActProgress = 1;
-        private int _requireProgress;
+        private int _nextBossFloor;
 
         public event Action OnClearAllFloor;
         public event Action OnClearFloor;
@@ -104,7 +102,6 @@ namespace JW.DungeonSliding.GamePlay.Stage
         }
         private void UpdateFloorAndAct()
         {
-            _currentActProgress++;
             _currentFloor++;
 
             if (TryUpdateAct())
@@ -115,7 +112,7 @@ namespace JW.DungeonSliding.GamePlay.Stage
         }
         private bool TryUpdateAct()
         {
-            if(_currentActProgress > _requireProgress)
+            if(_currentFloor > _nextBossFloor)
             {
                 _currentAct++;
                 OnChangeActEvent?.Invoke(Act);
@@ -126,7 +123,7 @@ namespace JW.DungeonSliding.GamePlay.Stage
         }
         private bool IsBossFloor()
         {
-            return _currentActProgress == _requireProgress;
+            return _currentFloor == _nextBossFloor;
         }
         private CreatureTemplete GetTemplete(MapData map)
         {
@@ -140,8 +137,7 @@ namespace JW.DungeonSliding.GamePlay.Stage
             var data = _currentMapBundle.GetActMapBundle(_currentAct);
             _actMapBag = new ShuffleBag<MapData>(data.MapDatas);
 
-            _currentActProgress--;
-            _requireProgress = data.ActFloorCount;
+            _nextBossFloor += data.ActFloorCount;
         }
     }
 }

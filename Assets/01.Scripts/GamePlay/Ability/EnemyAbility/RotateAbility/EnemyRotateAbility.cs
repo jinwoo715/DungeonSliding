@@ -8,20 +8,27 @@ using UnityEngine;
 
 namespace JW.DungeonSliding.GamePlay.Ability.Enemy
 {
-    public class AutoRotate : EnemyAbilityBase
+    public class AutoRotate : EnemyAbilityBase, IAbilityPayloadReceiver<BattleResultPayLoad>
     {
-        IRouteService _moveable;
+        private bool _isRotatable = false;
+        private IRouteService _moveable;
+
         public AutoRotate(EnemyAbilityData data, IAbilityContextService context, ICombatant owner, int section) : base(data, context, owner, section) { }
 
         public override IEnumerator Execute(AbilityArgs args)
         {
-            if (_moveable.LastMoveTileCount == 0)
+            if (!_isRotatable) 
                 yield break;
 
             EDirectionType nextDirection = DirectionUtility.GetRightRotateResultDirection(_owner.Rotate.Direction);
             yield return _owner.Rotate.CoRotateToDirection(nextDirection);
         }
-          
+
+        public void ReceivePayload(BattleResultPayLoad payload)
+        {
+            _isRotatable = !payload.IsCombatted;
+        }
+
         protected override void BindService()
         {
             BindService(ref _moveable);

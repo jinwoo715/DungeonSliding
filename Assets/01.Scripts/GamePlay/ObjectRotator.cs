@@ -1,3 +1,4 @@
+using JW.DungeonSliding.Core;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -30,6 +31,11 @@ namespace JW.DungeonSliding.GamePlay.Entities
         }
         public IEnumerator CoRotateToDirection(EDirectionType directionType)
         {
+            var rotateDustParticle = ParticlePool.Instance.GetParticle("RotationDust");
+            rotateDustParticle.SetParticle(this.transform.position + Vector3.up * 0.15f, 2.0f);
+
+            GameManager.Sound.PlayEffectSound(EEffectSoundType.RotateStatue);
+
             if (directionType != Direction)
             {
                 float timer = 0;

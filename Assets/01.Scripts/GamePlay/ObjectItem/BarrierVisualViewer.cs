@@ -41,8 +41,6 @@ namespace JW.DungeonSliding
 
                 float t = currentTime / 1;
 
-                Debug.Log($"Fade Out {currentTime}");
-
                 _barrierMat.SetFloat("_TotalAlpha", currentTime);
 
                 yield return null;
@@ -57,8 +55,6 @@ namespace JW.DungeonSliding
             while (currentTime < 1)
             {
                 currentTime += Time.deltaTime * _fadeInlerpMultiplier;
-
-                Debug.Log($"Fade In {currentTime}");
 
                 _barrierMat.SetFloat("_TotalAlpha", currentTime);
 

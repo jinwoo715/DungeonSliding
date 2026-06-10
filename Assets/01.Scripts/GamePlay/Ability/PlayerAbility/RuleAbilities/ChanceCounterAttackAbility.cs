@@ -615,6 +615,8 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         public override IEnumerator Execute(AbilityArgs args)
         {
+            Debug.Log($"{args.CreatureTrigger} / {args.GameTrigger}");
+            Debug.Log("Get Random Ability");
             _abilityRandomGetter.ObtainRandomRuleAbility(2);
 
             yield break;
@@ -680,48 +682,36 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         public override IEnumerator Execute(AbilityArgs args)
         {
-            if(args.CreatureTrigger == ECreatureTrigger.OnRegisterAttack)
-            {
-                if (_isHideMode == true)
-                {
-                    _statusModifier.RemoveStatus(ECreatureStatus.Hide);
-                    _nonBattleCount = 0;
-                    _isHideMode = false;
-
-                    yield break;
-                }
-            }
-
             if (_moveable.SlideTileCount() < 1)
                 yield break;
 
-            if (!_isHideMode)
+            if (_isCombatted)
+                yield break;
+
+            _nonBattleCount++;
+            Debug.Log($"{_nonBattleCount} / {_data.P1}");
+
+            if (_nonBattleCount >= _data.P1)
             {
-                if (!_isCombatted)
-                {
-                    _nonBattleCount++;
-                    Debug.Log($"{_nonBattleCount} / {_data.P1}");
-                    if (_nonBattleCount >= _data.P1)
-                    {
-                        _isHideMode = true;
-                        _statusModifier.ApplyStatus(ECreatureStatus.Hide, 1);
-                    }
-                }
-                else
-                {
-                    _nonBattleCount = 0;
-                }
-            }
-            else
-            {
+                _isHideMode = true;
                 _statusModifier.ApplyStatus(ECreatureStatus.Hide, 1);
             }
+
             yield break;
         }
 
         public void ReceivePayload(BattleResultPayLoad payload)
         {
             _isCombatted = payload.IsCombatted;
+            
+            if (_isCombatted)
+            {
+                _statusModifier.RemoveStatus(ECreatureStatus.Hide);
+                _nonBattleCount = 0;
+                _isHideMode = false;
+            }
+
+            Debug.Log($"{_nonBattleCount} / {_data.P1}");
         }
 
         protected override void BindService()

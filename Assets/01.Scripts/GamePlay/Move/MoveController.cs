@@ -9,11 +9,6 @@ using JW.DungeonSliding.GamePlay.Move;
 
 namespace JW.DungeonSliding
 {
-    public interface IMoveResultReader
-    {
-        int LastMoveCount { get; }
-    }
-
     public class MoveController : MonoBehaviour
     {
         private IRouteService _routeService;
@@ -162,6 +157,12 @@ namespace JW.DungeonSliding
 
             IsMoving = false;
             OnPushedEnd?.Invoke();
+        }
+        public void ThrowAwaySlide()
+        {
+            OnSlideStart?.Invoke();
+            OnSlideEnd?.Invoke();
+            FinishMove();
         }
     }
 }

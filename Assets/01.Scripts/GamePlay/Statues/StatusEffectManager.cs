@@ -38,8 +38,6 @@ namespace JW.DungeonSliding.GamePlay.Statues
         }
         public void RemoveStatus(ECreatureStatus status)
         {
-            Debug.Log($"Remove : {status}");
-
             _statusFlags &= ~status;
 
             if (_statusDurations.ContainsKey(status))
@@ -55,6 +53,9 @@ namespace JW.DungeonSliding.GamePlay.Statues
 
             foreach (var key in keys)
             {
+                if (key == ECreatureStatus.Barrier)
+                    continue;
+
                 // duration이 -1(영구 지속)인 상태(예: 배리어)는 턴 계산을 건너뜀
                 if (_statusDurations[key] == -1) continue;
 

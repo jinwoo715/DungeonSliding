@@ -13,5 +13,6 @@ namespace JW.DungeonSliding.Map
         public void SetMoveResult(ESlideResultType result);
         public void KnockBack(EDirectionType dir);
         public void SlideRoute(EDirectionType directionType);
+        public void ThrowAwaySlide();
     }
 }

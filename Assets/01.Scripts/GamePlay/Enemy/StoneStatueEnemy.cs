@@ -1,4 +1,5 @@
 using DG.Tweening;
+using JW.DungeonSliding.Core;
 using JW.DungeonSliding.GamePlay.Combat;
 using JW.DungeonSliding.Map;
 using System.Collections;
@@ -29,6 +30,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public override void OnDeath()
         {
             base.OnDeath();
+            GameManager.Sound.PlayEffectSound(EEffectSoundType.CollapseStatue);
             StopAllCoroutines();
         }
 
@@ -49,6 +51,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
             var particle = ParticlePool.Instance.GetParticle("HitDust");
             particle.SetParticle(this.transform.position + Vector3.up * 0.65f + GetHitParticlePosition(toDir), 1.0f);
 
+            GameManager.Sound.PlayEffectSound(EEffectSoundType.HitStatue);
+
             if (IsActive == false) return false;
 
             float targetRotation = GetEulerYByDirection(toDir);
@@ -56,9 +60,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
             if (IsCanRotate() && toDir != Rotate.Direction)
             {
-                var rotateDustParticle = ParticlePool.Instance.GetParticle("RotationDust");
-                rotateDustParticle.SetParticle(this.transform.position + Vector3.up * 0.15f, 2.0f);
-
                 StartCoroutine(CoDelayRotate(toDir));
             }
             else EndHittedAnimation();
@@ -69,6 +70,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
         private IEnumerator CoDelayRotate(EDirectionType toDir)
         {
             yield return new WaitForSeconds(_rotateDelay);
+
+           
 
             StartCoroutine(Rotate.CoRotateToDirection(toDir));
         }

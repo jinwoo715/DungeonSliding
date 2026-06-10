@@ -16,7 +16,7 @@ namespace JW.DungeonSliding.Core.Resource
         [SerializeField] private GameConfig _gameConfig;
         [SerializeField] private MapBundle _mapBundle;
         [SerializeField] private AbilityDatabaseSO _abilityDatabase;
-
+        public List<AudioUnit> Clips;
         public MapBundle MapBundle => _mapBundle;
         public AbilityDatabaseSO AbilityDatabase => _abilityDatabase;
 

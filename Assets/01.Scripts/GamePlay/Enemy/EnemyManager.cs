@@ -89,13 +89,14 @@ namespace JW.DungeonSliding.GamePlay.Entities
         }
         public void ReceiveBossEnemySpawnList(List<Tile> spawnPositions, int act)
         {
+            Debug.Log("Boss Spawn");
             for (int i = 0; i < spawnPositions.Count; i++)
             {
                 int ranNum = UnityEngine.Random.Range(0, _bossEnemyDatas.Count);
 
                 Tile tile = spawnPositions[i];
 
-                EnemyData data = _bossEnemyDatas[ranNum];
+                EnemyData data = _bossEnemyDatas[0];
                 SpawnEnemy(data, act, tile, true);
             }
         }

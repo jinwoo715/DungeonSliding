@@ -1,3 +1,4 @@
+using JW.DungeonSliding.Core;
 using JW.Utility;
 using System;
 using UnityEngine;
@@ -54,6 +55,7 @@ namespace JW.DungeonSliding.GamePlay
 
             OnLevelUp?.Invoke(CurrentLevel);
 
+            GameManager.Sound.PlayEffectSound(EEffectSoundType.LevelUp);
             Debug.Log("On Level Up");
         }
     }

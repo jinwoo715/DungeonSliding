@@ -13,6 +13,7 @@ namespace JW.DungeonSliding
 {
     public interface IMoveRule
     {
+        public EDirectionType BanDirection { get; }
         public int MoveCost { get; }
         public bool IsCanMove(EDirectionType directionType);
         public void SetIsMoveable(bool value);
@@ -23,6 +24,8 @@ namespace JW.DungeonSliding
     public class MoveRule : IMoveRule
     {
         public int MoveCost { get; private set; } = 1;
+
+        public EDirectionType BanDirection => _moveBanDirection;
 
         private EDirectionType _moveBanDirection = EDirectionType.None;
         private bool _isMoveable = true;
@@ -35,6 +38,7 @@ namespace JW.DungeonSliding
         public void SetIsMoveable(bool value) => _isMoveable = value;
         public void SetMoveBanDirection(EDirectionType directionType)
         {
+            Debug.Log($"Ban {directionType}");
             _moveBanDirection = directionType;
         }
         public void SetMoveCost(int cost)

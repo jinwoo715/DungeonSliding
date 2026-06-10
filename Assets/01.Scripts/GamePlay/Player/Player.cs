@@ -1,3 +1,4 @@
+using JW.DungeonSliding.Core;
 using JW.DungeonSliding.GamePlay.Combat;
 using JW.DungeonSliding.GamePlay.Move;
 using JW.DungeonSliding.GamePlay.Stats;
@@ -37,6 +38,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
         {
             base.Initialize(cretureType);
             _objectFader.Init();
+            AttackRequester.OnRegisterAttack += () => StatusModifier.RemoveStatus(ECreatureStatus.Hide);
         }
         public void Wire(IRouteService routeService)
         {
@@ -139,6 +141,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
             if (base.TakeDamage(damageInfo))
             {
                 _animatorController.SetAnimationTrigger(ConstString.HIT_ANIM);
+                GameManager.Sound.PlayEffectSound(EEffectSoundType.HitPlayer);
+
                 return true;
             }
             return false;
@@ -153,6 +157,11 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public void SetMoveResult(ESlideResultType result)
         {
             SlideResultType = result;
+        }
+
+        public void ThrowAwaySlide()
+        {
+            _moveController.ThrowAwaySlide();
         }
     }
 }

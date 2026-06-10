@@ -18,7 +18,7 @@ MonoBehaviour:
   IconName: Fire
   Rank: 1
   Sprite: {fileID: -214298916, guid: 080cb6d98b00c2645b2c41df5f69bc78, type: 3}
-  GameTrigger: 2
+  GameTrigger: 0
   CreatureTrigger: 1
   AbilityName: GetExtraAbility
   P1: 2

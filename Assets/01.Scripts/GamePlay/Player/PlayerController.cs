@@ -5,6 +5,7 @@ using JW.DungeonSliding.GamePlay.Move;
 using JW.DungeonSliding.GamePlay.Stats;
 using JW.DungeonSliding.Map;
 using System;
+using System.Collections;
 using UnityEngine;
 using static JW.DungeonSliding.GamePlay.GameConfig;
 
@@ -48,13 +49,27 @@ namespace JW.DungeonSliding.GamePlay.Entities
         public INextAttackEnhancer NextAttackEnhancer => _player.NextAttackEnhancer;
         public IMoveRule _moveRule;
 
-        public void Init(IRouteService routeService, IMoveRule moveRule, IAttackRegister requesterRegistry, IAbilityEventService abilityEventService)
+        private IMoveContextProvider _moveContextProvider;
+        private ITurnPassRequester _turnPassRequester;
+        private Coroutine _passTurnRoutine;
+
+        public void Init(
+            IRouteService routeService,
+            IMoveRule moveRule,
+            IAttackRegister requesterRegistry,
+            IAbilityEventService abilityEventService,
+            IMoveContextProvider moveContextProvider,
+            ITurnPassRequester turnPassRequester)
         {
             _levelSystem = new LevelSystem();
             _levelSystem.Initialize();
 
             _player.Initialize(ECreatureType.Player);
+
             _moveRule = moveRule;
+            _moveContextProvider = moveContextProvider;
+            _turnPassRequester = turnPassRequester;
+
             _player.InitData(CreatePlayerBaseStat());
 
             _player.Wire(routeService);
@@ -69,6 +84,8 @@ namespace JW.DungeonSliding.GamePlay.Entities
             _levelSystem.OnLevelUp += _player.HandleLevelUp;
 
             _player.OnMoveEnd += PayMoveCost;
+
+            GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameEventTrigger.OnTurnStart, CheckValidTurn);
 
             GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameEventTrigger.OnTurnEnd, CheckPlayerAlive);
         }
@@ -126,6 +143,50 @@ namespace JW.DungeonSliding.GamePlay.Entities
             }
         }
 
+        private void CheckValidTurn()
+        {
+            if (_passTurnRoutine != null || !IsBlockedByMoveBan())
+                return;
+
+            _passTurnRoutine = StartCoroutine(CoRequestPassTurn());
+        }
+
+        private bool IsBlockedByMoveBan()
+        {
+            EDirectionType banDirection = _moveRule.BanDirection;
+            if (banDirection == EDirectionType.None)
+                return false;
+
+            Tile playerTile = _player.TileObject.TilePosition;
+
+            for (int i = 0; i < 4; i++)
+            {
+                EDirectionType direction = (EDirectionType)i;
+                ESlideResultType result = _moveContextProvider
+                    .GetMoveContext(playerTile, direction, ETileEnterType.None)
+                    .ResultType;
+
+                if (direction == banDirection)
+                {
+                    if (result != ESlideResultType.Move)
+                        return false;
+                }
+                else if (result != ESlideResultType.Stop)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private IEnumerator CoRequestPassTurn()
+        {
+            yield return null;
+
+            _passTurnRoutine = null;
+            _turnPassRequester.RequestPassTurn();
+        }
         private bool IsMoveGrowthLevel(int level, int interval)
         {
             if (interval <= 0) return true;

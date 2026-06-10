@@ -1,3 +1,4 @@
+using JW.DungeonSliding.Core;
 using JW.DungeonSliding.GamePlay.Ability;
 using System;
 using TMPro;
@@ -49,10 +50,12 @@ namespace JW.DungeonSliding.UI
         public void OnClickAbilityCard(AbilityDataBase abilityData)
         {
             SelectCardEvent?.Invoke(abilityData);
+            GameManager.Sound.PlayEffectSound(EEffectSoundType.SelectAbility);
         }
         public void OnClickRerollButton()
         {
             RerollEvent?.Invoke();
+            GameManager.Sound.PlayEffectSound(EEffectSoundType.PressButton);
         }
     }
 }

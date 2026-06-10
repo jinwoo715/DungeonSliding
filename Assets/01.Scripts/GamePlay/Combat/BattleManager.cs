@@ -24,7 +24,11 @@ namespace JW.DungeonSliding.GamePlay.Combat
         public void RegisterAttackRequester(IAttackRequester requester, int priority);
         public void UnRegisterAttackRequester(IAttackRequester requester, int priority);
     }
-    public class BattleManager : MonoBehaviour, IAttackRequestListener, IAttackRegister, IBattleResult
+    public interface ITurnPassRequester
+    {
+        void RequestPassTurn();
+    }
+    public class BattleManager : MonoBehaviour, IAttackRequestListener, IAttackRegister, IBattleResult, ITurnPassRequester
     {
         private ICombatantSensor _combatSensor;
         private IGameStateModifier _gameStateModifier;
@@ -35,6 +39,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
         private Queue<ActPair> _counterActPairs = new Queue<ActPair>();
 
         private int _combatCount = 0;
+        private bool _isPassTurn;
 
         public void Init(ICombatantSensor combatantSensor, IGameStateModifier gameStateModifier)
         {
@@ -116,8 +121,14 @@ namespace JW.DungeonSliding.GamePlay.Combat
             _actPairs.Clear();
             _counterActPairs.Clear();
             _combatCount = 0;
+            _isPassTurn = false;
             
             yield break;
+        }
+        public void RequestPassTurn()
+        {
+            _isPassTurn = true;
+            StartBattleSequence();
         }
         public void EnqueueActPair(ActPair pair)
         {
@@ -156,7 +167,7 @@ namespace JW.DungeonSliding.GamePlay.Combat
         }
         public bool IsBattleTurn()
         {
-            return _combatCount != 0;
+            return _combatCount != 0 || _isPassTurn;
         }
     }
 }

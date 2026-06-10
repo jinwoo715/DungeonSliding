@@ -23,6 +23,9 @@ namespace JW.DungeonSliding
         {
             Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
 
+            if (_tooltipService == null)
+                return;
+
             if (Physics.Raycast(ray, out var hit, 100000, _layer))
             {
                 if (_currentHoverEnemy == hit.collider)

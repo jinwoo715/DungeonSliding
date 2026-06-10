@@ -8,6 +8,7 @@ using JW.DungeonSliding.GamePlay.Entities;
 using JW.DungeonSliding.GamePlay.Move;
 using JW.DungeonSliding.GamePlay.Stage;
 using JW.DungeonSliding.GamePlay.Stats;
+using JW.DungeonSliding.Map;
 using JW.DungeonSliding.UI;
 using UnityEngine;
 
@@ -26,10 +27,23 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
 
     public class PlayerInstaller
     {
-        public void Install(PlayerReferences player, IRouteService routeService, IMoveRule moveRule, IAttackRegister requesterRegistry, IAbilityEventService abilityEventService)
+        public void Install(
+            PlayerReferences player,
+            IRouteService routeService,
+            IMoveRule moveRule,
+            IAttackRegister requesterRegistry,
+            IAbilityEventService abilityEventService,
+            IMoveContextProvider moveContextProvider,
+            ITurnPassRequester turnPassRequester)
         {
             player.InputCoordinator.Init();
-            player.Controller.Init(routeService, moveRule, requesterRegistry, abilityEventService);
+            player.Controller.Init(
+                routeService,
+                moveRule,
+                requesterRegistry,
+                abilityEventService,
+                moveContextProvider,
+                turnPassRequester);
             player.Level = new LevelSystem();
             player.Level.Initialize();
         }

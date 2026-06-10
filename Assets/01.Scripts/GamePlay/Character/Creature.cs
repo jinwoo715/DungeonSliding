@@ -106,7 +106,6 @@ namespace JW.DungeonSliding.GamePlay.Entities
         {
             if (_combatController.TryTakeDamage(damageInfo))
             {
-               
                 CheckHPOut();
                 return true;
             }
@@ -116,6 +115,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
                 return false;
             }
         }
+        
         public virtual void ExcuteAttack(ActPair actPair)
         {
             _combatController.SetAttackPayload(actPair);
@@ -201,6 +201,9 @@ namespace JW.DungeonSliding.GamePlay.Entities
         #region Sequence Method
         public virtual void OnTurnEnd()
         {
+            if (!IsActive)
+                return;
+
             _status.TimePassStatueUpdate();
             CheckMoveOut();
         }

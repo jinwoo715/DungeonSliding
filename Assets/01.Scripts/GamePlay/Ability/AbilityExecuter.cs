@@ -23,11 +23,17 @@ namespace JW.DungeonSliding.GamePlay.Ability
     {
         private Dictionary<EGameEventTrigger, List<IAbility>> _gameTriggerAbilities = new();
         private Dictionary<ECreatureTrigger, List<IAbility>> _creatureTriggerAbilities = new();
+        private readonly HashSet<IAbility> _registeredAbilities = new();
 
         private int _workingAbilityCount = 0;
 
         public event Action OnEndCreatureAbility;
         public event Action OnEndGameEventAbility;
+
+        private void OnDisable()
+        {
+            Clear();
+        }
 
         #region Excute
         public void ExecuteCreatureTrigger(ECreatureTrigger trigger)
@@ -111,6 +117,11 @@ namespace JW.DungeonSliding.GamePlay.Ability
         #region Registration
         public void RegisterAbility(IAbility ability)
         {
+            if (ability == null)
+                return;
+
+            _registeredAbilities.Add(ability);
+
             if (ability.CreatureTrigger != ECreatureTrigger.None)
                 RegisterCreatureEventAbility(ability.CreatureTrigger, ability);
 
@@ -151,6 +162,11 @@ namespace JW.DungeonSliding.GamePlay.Ability
         {
             foreach (var ability in abilities)
             {
+                if (ability == null)
+                    continue;
+
+                _registeredAbilities.Add(ability);
+
                 if (ability.CreatureTrigger != ECreatureTrigger.None)
                 {
                     // EGameEventTrigger에 정의된 모든 Enum 값을 순회
@@ -216,6 +232,8 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
         public void Clear()
         {
+            StopAllCoroutines();
+
             for (int i = 0; i < _workingAbilityCount; i++)
             {
                 AbilityBusyCounter.UnRegisterWorkAbility();
@@ -223,37 +241,24 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
             _workingAbilityCount = 0;
 
-            _creatureTriggerAbilities.Clear();
-
-            var keys = _gameTriggerAbilities.Keys;
-
-            foreach (var key in keys)
+            if (GameTriggerEventBus.Instance != null)
             {
-                foreach (var ability in _gameTriggerAbilities[key])
+                foreach (var action in GameActions)
                 {
-                    ability.ReleaseAbility();
+                    GameTriggerEventBus.Instance.UnSubscribeTriggerEvent(action.Item1, action.Item2);
                 }
-
-//                GameTriggerEventBus.Instance.SubscribeTriggerEvent(key, () => ExecuteGameEventAbility(key));
             }
 
-            foreach (var ability in GameActions)
-            {
-                GameTriggerEventBus.Instance.UnSubscribeTriggerEvent(ability.Item1, ability.Item2);
-            }
             GameActions.Clear();
-
             _gameTriggerAbilities.Clear();
+            _creatureTriggerAbilities.Clear();
 
-            foreach (var abilities in _creatureTriggerAbilities)
+            foreach (var ability in _registeredAbilities)
             {
-                foreach (var ability in abilities.Value)
-                {
-                    ability.ReleaseAbility();
-                }
+                ability.ReleaseAbility();
             }
 
-            _creatureTriggerAbilities.Clear();
+            _registeredAbilities.Clear();
         }
     }
 }

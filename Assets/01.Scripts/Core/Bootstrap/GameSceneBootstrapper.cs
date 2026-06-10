@@ -65,7 +65,9 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
                 _routeBuilder, 
                 _moveRule, 
                 _battleManager, 
-                _abilitySystem);
+                _abilitySystem,
+                _world.MapManager,
+                _battleManager);
 
             var abilityInstaller = new AbilityInstaller();
             abilityInstaller.InstallPlayerAbility(
