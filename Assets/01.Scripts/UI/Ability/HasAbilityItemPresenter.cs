@@ -7,7 +7,6 @@ namespace JW.DungeonSliding.UI
     public class HasAbilityItemPresenter : MonoBehaviour
     {
         [SerializeField] private List<HasAbilityViewerItem> _abilityItems;
-
         private int _currentIndex = 0;
 
         ITooltipService _tooltipService;

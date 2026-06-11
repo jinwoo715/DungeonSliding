@@ -1,6 +1,7 @@
 using JW.DungeonSliding.GamePlay.Entities;
 using JW.DungeonSliding.UI;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace JW.DungeonSliding
 {
@@ -21,6 +22,9 @@ namespace JW.DungeonSliding
 
         private void Update()
         {
+            if (EventSystem.current.IsPointerOverGameObject())
+                return;
+
             Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
 
             if (_tooltipService == null)

@@ -14,7 +14,9 @@ namespace JW.DungeonSliding
         HitPlayer,
         PressButton,
         SelectAbility,
-        LevelUp
+        LevelUp,
+        GameWin,
+        GameDefeat
     }
     public enum EBGMSoundType
     {
@@ -33,6 +35,8 @@ namespace JW.DungeonSliding
     public interface ISound
     {
         void PlayEffectSound(EEffectSoundType effectSound);
+        void PlayBGM();
+        void StopBGM();
     }
 
     public class SoundManager : MonoBehaviour, ISound
@@ -42,6 +46,9 @@ namespace JW.DungeonSliding
 
         private Dictionary<EEffectSoundType, AudioUnit> _clip = new Dictionary<EEffectSoundType, AudioUnit>();
 
+        [SerializeField] private AudioSource _bgmSource;
+        [SerializeField] private AudioClip _bgmClip;
+
         public void Init(List<AudioUnit> audioClips)
         {
             foreach (var unit in audioClips)
@@ -49,7 +56,6 @@ namespace JW.DungeonSliding
                 _clip.Add(unit.SoundType, unit);
             }
         }
-
         public void PlayEffectSound(EEffectSoundType effectSound)
         {
             if(_clip.TryGetValue(effectSound, out var unit))
@@ -79,6 +85,17 @@ namespace JW.DungeonSliding
         private void ReturnSoundSource(SoundSource ss)
         {
             _audioSources.Push(ss);
+        }
+
+        public void PlayBGM()
+        {
+            _bgmSource.time = 0;
+            _bgmSource.Play();
+        }
+
+        public void StopBGM()
+        {
+            _bgmSource.Stop();
         }
     }
 }

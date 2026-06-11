@@ -18,10 +18,15 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
         [SerializeField] private UIReferences _ui;
         [SerializeField] private BattleManager _battleManager;
 
-
         [Header("Managers")]
         [SerializeField] private GameSceneManager _gameSceneManager;
         [SerializeField] private GameVisualController _visualController;
+
+        private GameWinPresenter _winPresenter = new GameWinPresenter();
+        private GameLoosePresenter _loosePresenter = new GameLoosePresenter();
+
+        [SerializeField] private GameResultViewer _winViewer;
+        [SerializeField] private GameResultViewer _looseViewer;
 
         // 시스템 인스턴스
         private readonly PlayerAbilitySystem _abilitySystem = new();
@@ -55,7 +60,13 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
             _routeBuilder.Init(_world.MapManager);
             _gameStateController.Init(_routeBuilder, _battleManager);
 
-            
+            _gameSceneManager.Moveable = _player.Controller.Moveable;
+            _gameSceneManager.PlayerStat = _player.Controller.StatReadOnly;
+            _gameSceneManager.StageViewer = _world.StageController;
+            _abilitySystem.OnAddedRuleAbility += _gameSceneManager.AddedPlayerAbility;
+
+            _winPresenter.Init(_winViewer, _gameSceneManager);
+            _loosePresenter.Init(_looseViewer, _gameSceneManager);
 
             // 2. Installer를 이용한 의존성 주입
             WorldInstaller.Install(_world, _player.Controller.Player, _enemyAbilityFactory, GameManager.Data);

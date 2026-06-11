@@ -19,6 +19,7 @@ namespace JW.DungeonSliding.GamePlay.Entities
 
         private ECharacterStateType _characterState = ECharacterStateType.Idle;
         public ESlideResultType SlideResultType { get; private set; }
+        public int SlidedCount { get => _moveController.TotalMoveCount; set => _moveController.TotalMoveCount = value; }
 
         public event Action OnMoveEnd;
         public event Action OnSlideEnd;

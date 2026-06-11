@@ -29,8 +29,10 @@ namespace JW.DungeonSliding.UI
             request.Name = _abilityData.Name;
             request.Description = AbilityTextFormatter.ConvertPlayerAbility(_abilityData);
             request.Anchor = TextAnchor.LowerLeft;
-
+            request.ItemPosition = this.transform.position;
             ShowTooltipEvent?.Invoke(request);
+
+            Debug.Log("???");
         }
 
         public void OnPointerExit(PointerEventData eventData)

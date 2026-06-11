@@ -21,6 +21,7 @@ namespace JW.DungeonSliding.GamePlay.Stage
     public interface IStageViewer
     {
         public int CurrentFloor { get; }
+        public int MaxFloor { get; }
         public int TotalFloor { get; }
         public List<int> BossFloors { get; }
     }
@@ -44,6 +45,8 @@ namespace JW.DungeonSliding.GamePlay.Stage
         public int CurrentFloor => _currentFloor;
         public List<int> BossFloors => _currentMapBundle.GetBossStages();
         public int TotalFloor => _currentMapBundle.TotalFloorCount();
+
+        public int MaxFloor => TotalFloor;
 
         IMapService _mapService;
         IFieldObstacleService _obstacleService;

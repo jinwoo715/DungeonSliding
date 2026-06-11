@@ -12,6 +12,8 @@ using UnityEngine.SceneManagement;
 using System;
 using JW.DungeonSliding.Core;
 using JW.DungeonSliding.GamePlay.Stage;
+using JW.DungeonSliding.GamePlay.Stats;
+using JW.DungeonSliding.GamePlay.Ability;
 
 namespace JW.DungeonSliding.GamePlay.Context
 {
@@ -50,7 +52,7 @@ namespace JW.DungeonSliding.GamePlay.Context
         public Action ButtonEvent;
     }
 
-    public class GameSceneManager : MonoBehaviour
+    public class GameSceneManager : MonoBehaviour, IGameResultService
     {
         private CombatEventBus _combatEventBus = new();
         private RewardManager _rewardManager = new ();
@@ -58,14 +60,23 @@ namespace JW.DungeonSliding.GamePlay.Context
         private GameStateController _gameModeController;
         private IUIFader _uiFader;
 
-        public event Action OnFailGame;
-        public event Action OnVictoryGame;
+        public event Action<GameResultPayload> OnGameWin;
+        public event Action<GameResultPayload> OnGameLose;
 
-        IStageService _stageSerivce;
-        IPopupService _popupService;
+        private IStageService _stageSerivce;
+        private IPopupService _popupService;
+
+        public IMoveable Moveable;
+        public IStageViewer StageViewer;
+        public IStatReadOnly PlayerStat;
+        public List<AbilityDataBase> AbilityDataBases = new List<AbilityDataBase>();
+
+        private float _gameTime;
 
         public void Init(GameStateController gameModeController, IUIFader uiFader, IStageService stageSerivce, PlayerController playerController, IPopupService popupService)
         {
+            GameManager.Sound.PlayBGM();
+
             _gameModeController = gameModeController;
             _uiFader = uiFader;
             _stageSerivce = stageSerivce;
@@ -76,6 +87,16 @@ namespace JW.DungeonSliding.GamePlay.Context
             GameTriggerEventBus.Instance.SubscribeTriggerEvent(EGameEventTrigger.OnClearStage, ClearFloor);
 
             _rewardManager.Init(_combatEventBus);
+        }
+
+        private void Update()
+        {
+            _gameTime += Time.deltaTime;
+        }
+
+        public void AddedPlayerAbility(AbilityDataBase data)
+        {
+            AbilityDataBases.Add(data);
         }
 
         public void PrepareStage() 
@@ -109,16 +130,56 @@ namespace JW.DungeonSliding.GamePlay.Context
             ButtonSet buttonSet = new ButtonSet();
             buttonSet.ButtonName = "로비";
             buttonSet.ButtonEvent = () => { GameManager.Scene.LoadScene(SceneType.LobbyScene); };
-            _popupService.ShowOneButtonPopup("패배", "게임에 패배하였습니다.", buttonSet);
-            OnFailGame?.Invoke();
+            //_popupService.ShowOneButtonPopup("패배", "게임에 패배하였습니다.", buttonSet);
+
+            OnGameLose?.Invoke(GetResultPayload());
+            GameManager.Sound.PlayEffectSound(EEffectSoundType.GameDefeat);
+
+            GameManager.Sound.StopBGM();
+
+            ResetData();
         }
         public void VictoryGame() 
         {
             ButtonSet buttonSet = new ButtonSet();
             buttonSet.ButtonName = "로비";
             buttonSet.ButtonEvent = () => { GameManager.Scene.LoadScene(SceneType.LobbyScene); };
-            _popupService.ShowOneButtonPopup("승리", "게임에 승리하였습니다.", buttonSet);
-            OnVictoryGame?.Invoke();
+            //_popupService.ShowOneButtonPopup("승리", "게임에 승리하였습니다.", buttonSet);
+
+            GameManager.Sound.StopBGM();
+
+            OnGameWin?.Invoke(GetResultPayload());
+            GameManager.Sound.PlayEffectSound(EEffectSoundType.GameWin);
+            ResetData();
+        }
+
+        private void ResetData()
+        {
+            AbilityDataBases.Clear();
+            _gameTime = 0;
+            Moveable.SlidedCount = 0;
+        }
+
+        private GameResultPayload GetResultPayload()
+        {
+            GameResultPayload payload = new GameResultPayload();
+            payload.GamePlay.TotalSlideCount = Moveable.SlidedCount;
+            payload.GamePlay.TotalPlayTime = _gameTime;
+            payload.GamePlay.CurrentFloor = StageViewer.CurrentFloor;
+            payload.GamePlay.MaxFloor = StageViewer.MaxFloor;
+
+            payload.PlayerInfoPayload.HP = PlayerStat.Get(ECreatureStatType.CurrentHP);
+            payload.PlayerInfoPayload.MaxHP = PlayerStat.Get(ECreatureStatType.MaxHp);
+            payload.PlayerInfoPayload.Damage = PlayerStat.Get(ECreatureStatType.Damage);
+            payload.PlayerInfoPayload.Move = PlayerStat.Get(ECreatureStatType.CurrentMoveCount);
+            payload.PlayerInfoPayload.MaxMove = PlayerStat.Get(ECreatureStatType.MaxMoveCount);
+            payload.PlayerInfoPayload.Critical = PlayerStat.Get(ECreatureStatType.CriticalMultiplier);
+
+            Debug.Log($"{payload.PlayerInfoPayload.HP}");
+
+            payload.PlayerAbility.Lists = AbilityDataBases;
+
+            return payload;
         }
     }
 }

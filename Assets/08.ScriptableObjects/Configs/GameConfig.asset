@@ -18,7 +18,7 @@ MonoBehaviour:
     _moveSpeed: 0
     _baseHP: 34
     _baseDamage: 8
-    _baseMoveCount: 20
+    _baseMoveCount: 2
     _levelUpHp: 4
     _levelUpDamage: 1
     _levelUpMove: 2

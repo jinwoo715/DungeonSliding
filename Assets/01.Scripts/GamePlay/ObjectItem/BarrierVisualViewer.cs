@@ -3,11 +3,11 @@ using UnityEngine;
 
 namespace JW.DungeonSliding
 {
-
-
     public class BarrierVisualViewer : MonoBehaviour
     {
-        [SerializeField] private Material _barrierMat;
+        [SerializeField] private MeshRenderer _renderer;
+        [SerializeField] private Material _originMat;
+        private Material _barrierMat;
 
         [Header("Fade Tile Multiplier")]
         [SerializeField] private float _fadeOutLerpMultiplier;
@@ -15,6 +15,14 @@ namespace JW.DungeonSliding
 
         private Coroutine _fadeInCoroutine;
         private Coroutine _fadeOutCoroutine;
+
+        private void Start()
+        {
+            _barrierMat = new Material(_originMat);
+            _barrierMat.SetFloat("_TotalAlpha", 0f);
+
+            _renderer.material = _barrierMat;
+        }
 
         public void ExcuteBarrier()
         {

@@ -16,6 +16,7 @@ namespace JW.DungeonSliding.UI
         public string Name;
         public string Description;
         public TextAnchor Anchor;
+        public Vector2 ItemPosition;
     }
 
     public class GameTooltipPresenter : MonoBehaviour, ITooltipService

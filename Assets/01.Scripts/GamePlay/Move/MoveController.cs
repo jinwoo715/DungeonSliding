@@ -23,8 +23,15 @@ namespace JW.DungeonSliding
 
         public event Action OnPushedStart;
         public event Action OnPushedEnd;
+        private int _totalMoveCount = 0;
+
         public bool IsMoving { get; private set; }
         public int GetMoveDistance => _routeService.LastMoveTileCount;
+        public int TotalMoveCount 
+        { 
+            get => _totalMoveCount;
+            set => _totalMoveCount = value;
+        }
 
         public void Init(IRouteService routeService, IMoveable moveable)
         {
@@ -84,6 +91,8 @@ namespace JW.DungeonSliding
                     OnStepOnEffectTile?.Invoke();
                 }
             }
+
+            _totalMoveCount++;
             OnSlideEnd?.Invoke();
             FinishMove();
         }
