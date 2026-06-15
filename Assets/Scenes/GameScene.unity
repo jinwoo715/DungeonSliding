@@ -7044,6 +7044,8 @@ MonoBehaviour:
   - {fileID: 978742953}
   _abilityTooltipViewer: {fileID: 1044071021}
   _infoText: {fileID: 1933661665}
+  _retryButton: {fileID: 519985738}
+  _toLobbyButton: {fileID: 1073520030}
 --- !u!1 &787899387
 GameObject:
   m_ObjectHideFlags: 0
@@ -13454,50 +13456,6 @@ Transform:
   - {fileID: 726333318}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1472774798
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1472774799}
-  - component: {fileID: 1472774800}
-  m_Layer: 0
-  m_Name: GameObject
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1472774799
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1472774798}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1735015357}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1472774800
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1472774798}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e7fdd3ecf5d2ce242abb4c3f388746ec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1473799835
 GameObject:
   m_ObjectHideFlags: 0
@@ -16879,7 +16837,6 @@ Transform:
   - {fileID: 602964268}
   - {fileID: 1982418018}
   - {fileID: 959622232}
-  - {fileID: 1472774799}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1744860205
@@ -18294,6 +18251,8 @@ MonoBehaviour:
   - {fileID: 1344864109}
   _abilityTooltipViewer: {fileID: 431749576}
   _infoText: {fileID: 934594070}
+  _retryButton: {fileID: 1535983875}
+  _toLobbyButton: {fileID: 513122795}
 --- !u!1 &1899732279
 GameObject:
   m_ObjectHideFlags: 0

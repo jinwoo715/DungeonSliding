@@ -1,6 +1,7 @@
 
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 
@@ -8,10 +9,19 @@ namespace JW.DungeonSliding
 {
     public class MapDataSerializer
     {
-        private string defaultPath = "Assets/00.Resources/ScriptableObjects/MapDatas";
+        private const string DefaultPath = "Assets/08.ScriptableObjects/MapDatas";
+        private static readonly Regex ActNamePattern = new Regex(
+            @"^Act_(\d+)_",
+            RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         public void CreateMapAsset(MapDataContext mapDataContext)
         {
+            if (string.IsNullOrWhiteSpace(mapDataContext.MapName))
+            {
+                UnityEditor.EditorUtility.DisplayDialog("ë§µ ì €ì¥", "íŒŒì¼ ì´ë¦„ì„ ì§€ì •í•´ì£¼ì„¸ìš”.", "í™•ì¸");
+                return;
+            }
+
             MapData mapData = ScriptableObject.CreateInstance<MapData>();
             mapData.Width = mapDataContext.XCount;
             mapData.Height = mapDataContext.ZCount;
@@ -20,9 +30,9 @@ namespace JW.DungeonSliding
             if (!IsPlayerValid(mapData.CretureTempletes))
             {
                 bool ok = UnityEditor.EditorUtility.DisplayDialog(
-                "¸Ê ÀúÀå",
-                $"Player À§Ä¡°¡ ¾ø´Â TempleteÀÌ ÀÖ½À´Ï´Ù.",
-                "È®ÀÎ"
+                "ë§µ ì €ì¥",
+                $"Player ìœ„ì¹˜ê°€ ì—†ëŠ” Templeteì´ ìˆìŠµë‹ˆë‹¤.",
+                "í™•ì¸"
                 );
 
                 return;
@@ -31,9 +41,9 @@ namespace JW.DungeonSliding
             if (IsEnemyEmpty(mapData.CretureTempletes))
             {
                 bool ok = UnityEditor.EditorUtility.DisplayDialog(
-                "¸Ê ÀúÀå",
-                $"Enemy°¡ ºñ¾îÀÖ´Â TempleteÀÌ ÀÖ½À´Ï´Ù.",
-                "È®ÀÎ"
+                "ë§µ ì €ì¥",
+                $"Enemyê°€ ë¹„ì–´ìˆëŠ” Templeteì´ ìˆìŠµë‹ˆë‹¤.",
+                "í™•ì¸"
                 );
 
                 return;
@@ -42,9 +52,9 @@ namespace JW.DungeonSliding
             if (IsBossEmpty(mapData.CretureTempletes))
             {
                 bool ok = UnityEditor.EditorUtility.DisplayDialog(
-                "¸Ê ÀúÀå",
-                $"Boss°¡ ºñ¾îÀÖ´Â TempleteÀÌ ÀÖ½À´Ï´Ù.",
-                "È®ÀÎ"
+                "ë§µ ì €ì¥",
+                $"Bossê°€ ë¹„ì–´ìˆëŠ” Templeteì´ ìˆìŠµë‹ˆë‹¤.",
+                "í™•ì¸"
                 );
 
                 return;
@@ -61,29 +71,20 @@ namespace JW.DungeonSliding
                 }
             }
 
-            if (IsExistSameNameData(GetSavePath(mapDataContext.MapName)))
+            string savePath = GetSavePath(mapDataContext.MapName);
+            if (IsExistSameNameData(savePath))
             {
                 bool ok = UnityEditor.EditorUtility.DisplayDialog(
-                "¸Ê ÀúÀå",
-                $"'{mapDataContext.MapName}' ¸ÊÀÌ ÀÌ¹Ì Á¸ÀçÇÕ´Ï´Ù.\nµ¤¾î¾µ±î¿ä?",
-                "µ¤¾î¾²±â",
-                "Ãë¼Ò"
+                "ë§µ ì €ì¥",
+                $"'{mapDataContext.MapName}' ë§µì´ ì´ë¯¸ ì¡´ì¬í•©ë‹ˆë‹¤.\në®ì–´ì“¸ê¹Œìš”?",
+                "ë®ì–´ì“°ê¸°",
+                "ì·¨ì†Œ"
                 );
 
                 if (!ok) return;
             }
 
-            if (string.IsNullOrEmpty(mapDataContext.MapName))
-            {
-                bool ok = UnityEditor.EditorUtility.DisplayDialog(
-                "¸Ê ÀúÀå",
-                $"ÆÄÀÏ ÀÌ¸§À» ÁöÁ¤ÇØÁÖ¼¼¿ä.",
-                "È®ÀÎ"
-                );
-
-                return;
-            }
-            SaveMapData(mapData, mapDataContext.MapName);
+            SaveMapData(mapData, savePath);
         }
 
 
@@ -117,21 +118,58 @@ namespace JW.DungeonSliding
             return false;
         }
 
-        private void SaveMapData(MapData data, string fileName)
+        private void SaveMapData(MapData data, string savePath)
         {
-            AssetDatabase.CreateAsset(data, GetSavePath(fileName));
+            string directoryPath = Path.GetDirectoryName(savePath)?.Replace('\\', '/');
+            EnsureFolderExists(directoryPath);
+
+            MapData savedData = AssetDatabase.LoadAssetAtPath<MapData>(savePath);
+            if (savedData != null)
+            {
+                UnityEditor.EditorUtility.CopySerialized(data, savedData);
+                UnityEditor.EditorUtility.SetDirty(savedData);
+                Object.DestroyImmediate(data);
+            }
+            else
+            {
+                AssetDatabase.CreateAsset(data, savePath);
+                savedData = data;
+            }
+
             AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
 
             UnityEditor.EditorUtility.FocusProjectWindow();
-            Selection.activeObject = data;
+            Selection.activeObject = savedData;
         }
+
         private bool IsExistSameNameData(string path)
         {
-            return File.Exists(path);
+            return AssetDatabase.LoadAssetAtPath<MapData>(path) != null;
         }
+
         private string GetSavePath(string fileName)
         {
-            return Path.Combine(defaultPath, $"{fileName}.asset");
+            string targetDirectory = DefaultPath;
+            Match actMatch = ActNamePattern.Match(fileName);
+            if (actMatch.Success && int.TryParse(actMatch.Groups[1].Value, out int actNumber))
+            {
+                targetDirectory = $"{DefaultPath}/Act{actNumber}";
+            }
+
+            return $"{targetDirectory}/{fileName}.asset";
+        }
+
+        private void EnsureFolderExists(string folderPath)
+        {
+            if (string.IsNullOrEmpty(folderPath) || AssetDatabase.IsValidFolder(folderPath))
+            {
+                return;
+            }
+
+            string parentPath = Path.GetDirectoryName(folderPath)?.Replace('\\', '/');
+            EnsureFolderExists(parentPath);
+            AssetDatabase.CreateFolder(parentPath, Path.GetFileName(folderPath));
         }
     }
 }

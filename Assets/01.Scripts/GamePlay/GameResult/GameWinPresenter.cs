@@ -9,7 +9,7 @@ namespace JW.DungeonSliding
         event Action<GameResultPayload> OnGameLose;
     }
 
-    public class GameWinPresenter : MonoBehaviour
+    public class GameWinPresenter
     {
         private GameResultViewer _viewer;
 

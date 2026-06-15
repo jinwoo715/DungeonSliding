@@ -57,5 +57,18 @@ namespace JW.DungeonSliding.GamePlay.Ability
 
             return datas;
         }
+
+        public List<AbilityDataBase> CreatePureRuleAbilityRuntimeData()
+        {
+            var datas = new List<AbilityDataBase>(RuleAbilities.Count);
+
+            for (int i = 0; i < RuleAbilities.Count; i++)
+            {
+                if (RuleAbilities[i] != null)
+                    datas.Add(RuleAbilities[i].ToRuntimeData());
+            }
+
+            return datas;
+        }
     }
 }

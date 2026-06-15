@@ -67,9 +67,13 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
 
             _winPresenter.Init(_winViewer, _gameSceneManager);
             _loosePresenter.Init(_looseViewer, _gameSceneManager);
+            _winViewer.Init(_gameSceneManager.RetryGame, _gameSceneManager.ReturnToLobby);
+            _looseViewer.Init(_gameSceneManager.RetryGame, _gameSceneManager.ReturnToLobby);
 
             // 2. Installer를 이용한 의존성 주입
             WorldInstaller.Install(_world, _player.Controller.Player, _enemyAbilityFactory, GameManager.Data);
+
+            _world.StageController.OnClearAllFloor += _gameSceneManager.VictoryGame;
 
             new PlayerInstaller().Install(
                 _player, 
@@ -122,6 +126,9 @@ namespace JW.DungeonSliding.GamePlay.Bootstrap
 
         private void OnDestroy()
         {
+            if (_world.StageController != null)
+                _world.StageController.OnClearAllFloor -= _gameSceneManager.VictoryGame;
+
             _triggerEventBus.ClearInstance();
             _eventBinder?.Dispose();
             _gameStateController.Clear();

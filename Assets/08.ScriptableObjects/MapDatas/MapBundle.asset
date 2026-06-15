@@ -16,18 +16,12 @@ MonoBehaviour:
   - BundleName: 
     ActFloorCount: 3
     MapDatas:
-    - {fileID: 11400000, guid: 2f7f9b0ba6316c0409c0d9c04fae81a8, type: 2}
     - {fileID: 11400000, guid: 04d357bdb0644ca4f9f0b652fdbd393e, type: 2}
+    - {fileID: 11400000, guid: 2f7f9b0ba6316c0409c0d9c04fae81a8, type: 2}
     - {fileID: 11400000, guid: 74a319e44d834a00bebaa283c02aec8b, type: 2}
     - {fileID: 11400000, guid: b9008f371f79425d96002d74993b3fd9, type: 2}
     - {fileID: 11400000, guid: 02fd5bea14714a2fb0204c1cbed838af, type: 2}
     - {fileID: 11400000, guid: 63bc27cd92fb47fda348b2ebf8124e8a, type: 2}
-    - {fileID: 11400000, guid: 6c9ba1ffb9bb4ebc9847984b44fb34a5, type: 2}
-    - {fileID: 11400000, guid: 7fa6d46b050e4f70937169bbbc6cd0c3, type: 2}
-    - {fileID: 11400000, guid: 94ec84fecabe4bab95dc32ba02c47036, type: 2}
-    - {fileID: 11400000, guid: 0943ac9f166940379ee7731b28612700, type: 2}
-    - {fileID: 11400000, guid: d08651069d9e4b1aa24e9e9d5d858d99, type: 2}
-    - {fileID: 11400000, guid: 1bf45a5e95bb493ebdcf5511910a47f1, type: 2}
   - BundleName: 
     ActFloorCount: 3
     MapDatas:

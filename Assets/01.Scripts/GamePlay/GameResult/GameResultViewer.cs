@@ -1,9 +1,12 @@
+using JW.DungeonSliding.Core;
 using JW.DungeonSliding.GamePlay.Ability;
 using JW.DungeonSliding.UI;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace JW.DungeonSliding
 {
@@ -14,8 +17,24 @@ namespace JW.DungeonSliding
         [SerializeField] private GameTooltipViewer _abilityTooltipViewer;
 
         [SerializeField] private TMP_Text _infoText;
+        [SerializeField] private Button _retryButton;
+        [SerializeField] private Button _toLobbyButton;
 
         private StringBuilder _resultText = new StringBuilder();
+        private Action _retryAction;
+        private Action _toLobbyAction;
+
+        public void Init(Action retryAction, Action toLobbyAction)
+        {
+            _retryAction = retryAction;
+            _toLobbyAction = toLobbyAction;
+
+            _retryButton.onClick.RemoveListener(OnClickRetry);
+            _toLobbyButton.onClick.RemoveListener(OnClickToLobby);
+
+            _retryButton.onClick.AddListener(OnClickRetry);
+            _toLobbyButton.onClick.AddListener(OnClickToLobby);
+        }
 
         public void AppendInfo(string text)
         {
@@ -56,6 +75,27 @@ namespace JW.DungeonSliding
         private void CloseAblityPopup()
         {
             _abilityTooltipViewer.gameObject.SetActive(false);
+        }
+
+        private void OnClickRetry()
+        {
+            GameManager.Sound.PlayEffectSound(EEffectSoundType.PressButton);
+            _retryAction?.Invoke();
+        }
+
+        private void OnClickToLobby()
+        {
+            GameManager.Sound.PlayEffectSound(EEffectSoundType.PressButton);
+            _toLobbyAction?.Invoke();
+        }
+
+        private void OnDestroy()
+        {
+            if (_retryButton != null)
+                _retryButton.onClick.RemoveListener(OnClickRetry);
+
+            if (_toLobbyButton != null)
+                _toLobbyButton.onClick.RemoveListener(OnClickToLobby);
         }
     }
 }

@@ -73,9 +73,10 @@ namespace JW.DungeonSliding.GamePlay.Stage
 
         public void StartStage()
         {
-            if(_currentFloor > _currentMapBundle.TotalFloorCount())
+            if (_currentFloor >= _currentMapBundle.TotalFloorCount())
             {
                 OnClearAllFloor?.Invoke();
+                return;
             }
 
             ClearField();
@@ -83,8 +84,6 @@ namespace JW.DungeonSliding.GamePlay.Stage
             UpdateFloorAndAct();
 
             MapData map = _actMapBag.GetItem();
-            var effectTileData = map.effectTileDatas;
-
             CreatureTemplete templete = GetTemplete(map);
 
             _mapService.SetMap(map.MapTiles, map.Height, map.Width, map.effectTileDatas);
@@ -130,15 +129,46 @@ namespace JW.DungeonSliding.GamePlay.Stage
         }
         private CreatureTemplete GetTemplete(MapData map)
         {
-            var enemyTemplete = map.CretureTempletes;
-            int ranNum = Chance.GetRandomNum(enemyTemplete.Count);
-            CreatureTemplete templete = enemyTemplete[ranNum];
-            return templete;
+            List<CreatureTemplete> validTempletes = map.CretureTempletes.FindAll(
+                templete => templete != null);
+
+            if (validTempletes.Count == 0)
+            {
+                throw new InvalidOperationException(
+                    $"Map '{map.name}' does not contain a valid creature templete.");
+            }
+
+            int ranNum = Chance.GetRandomNum(validTempletes.Count);
+            return validTempletes[ranNum];
         }
         private void UpdateMapData()
         {
             var data = _currentMapBundle.GetActMapBundle(_currentAct);
-            _actMapBag = new ShuffleBag<MapData>(data.MapDatas);
+            if (data == null)
+            {
+                throw new InvalidOperationException($"Map bundle for Act {Act} does not exist.");
+            }
+
+            List<MapData> validMaps = data.MapDatas?.FindAll(
+                map => map != null &&
+                       map.MapTiles != null &&
+                       map.CretureTempletes != null &&
+                       map.CretureTempletes.Count > 0);
+
+            if (validMaps == null || validMaps.Count == 0)
+            {
+                throw new InvalidOperationException(
+                    $"Map bundle for Act {Act} does not contain a valid map.");
+            }
+
+            int invalidMapCount = data.MapDatas.Count - validMaps.Count;
+            if (invalidMapCount > 0)
+            {
+                Debug.LogWarning(
+                    $"Act {Act} MapBundle contains {invalidMapCount} invalid map reference(s). They will be ignored.");
+            }
+
+            _actMapBag = new ShuffleBag<MapData>(validMaps);
 
             _nextBossFloor += data.ActFloorCount;
         }

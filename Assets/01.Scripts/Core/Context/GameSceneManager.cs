@@ -72,6 +72,7 @@ namespace JW.DungeonSliding.GamePlay.Context
         public List<AbilityDataBase> AbilityDataBases = new List<AbilityDataBase>();
 
         private float _gameTime;
+        private bool _isGameFinished;
 
         public void Init(GameStateController gameModeController, IUIFader uiFader, IStageService stageSerivce, PlayerController playerController, IPopupService popupService)
         {
@@ -91,7 +92,8 @@ namespace JW.DungeonSliding.GamePlay.Context
 
         private void Update()
         {
-            _gameTime += Time.deltaTime;
+            if (!_isGameFinished)
+                _gameTime += Time.deltaTime;
         }
 
         public void AddedPlayerAbility(AbilityDataBase data)
@@ -105,6 +107,9 @@ namespace JW.DungeonSliding.GamePlay.Context
         }
         public void ClearFloor()
         {
+            if (_isGameFinished)
+                return;
+
             PrepareStage();
         }
         public IEnumerator CoWaitStartStage()
@@ -122,35 +127,56 @@ namespace JW.DungeonSliding.GamePlay.Context
             yield return _uiFader.FadeIn();
 
             _gameModeController.ExitGameState(EGameStateType.PrepareStage);
+
+            if (_isGameFinished)
+                yield break;
+
             GameTriggerEventBus.Instance.ExcuteAbilityEvent(EGameEventTrigger.OnEnterRoom);
         }
 
         public void FailGame()
         {
-            ButtonSet buttonSet = new ButtonSet();
-            buttonSet.ButtonName = "로비";
-            buttonSet.ButtonEvent = () => { GameManager.Scene.LoadScene(SceneType.LobbyScene); };
-            //_popupService.ShowOneButtonPopup("패배", "게임에 패배하였습니다.", buttonSet);
+            CompleteGame(false);
+        }
+        public void VictoryGame()
+        {
+            CompleteGame(true);
+        }
 
-            OnGameLose?.Invoke(GetResultPayload());
-            GameManager.Sound.PlayEffectSound(EEffectSoundType.GameDefeat);
+        private void CompleteGame(bool isVictory)
+        {
+            if (_isGameFinished)
+                return;
+
+            _isGameFinished = true;
+            _gameModeController.EnterGameState(EGameStateType.GameOver);
+
+            GameResultPayload payload = GetResultPayload();
 
             GameManager.Sound.StopBGM();
+
+            if (isVictory)
+            {
+                OnGameWin?.Invoke(payload);
+                GameManager.Sound.PlayEffectSound(EEffectSoundType.GameWin);
+            }
+            else
+            {
+                OnGameLose?.Invoke(payload);
+                GameManager.Sound.PlayEffectSound(EEffectSoundType.GameDefeat);
+            }
 
             ResetData();
         }
-        public void VictoryGame() 
+
+        public void RetryGame()
         {
-            ButtonSet buttonSet = new ButtonSet();
-            buttonSet.ButtonName = "로비";
-            buttonSet.ButtonEvent = () => { GameManager.Scene.LoadScene(SceneType.LobbyScene); };
-            //_popupService.ShowOneButtonPopup("승리", "게임에 승리하였습니다.", buttonSet);
+            GameManager.Scene.LoadScene(SceneType.GameScene);
+        }
 
-            GameManager.Sound.StopBGM();
-
-            OnGameWin?.Invoke(GetResultPayload());
-            GameManager.Sound.PlayEffectSound(EEffectSoundType.GameWin);
-            ResetData();
+        public void ReturnToLobby()
+        {
+            GameManager.Scene.LoadScene(SceneType.LobbyScene);
         }
 
         private void ResetData()

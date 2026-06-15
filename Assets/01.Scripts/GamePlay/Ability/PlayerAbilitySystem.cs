@@ -91,8 +91,24 @@ namespace JW.DungeonSliding.GamePlay.Ability
         }
         private void LoadData()
         {
-            List<AbilityDataBase> sDatas = GameManager.Data.StatAbilities;
-            List<AbilityDataBase> specialDatas = GameManager.Data.RuleAbilities;
+            if (GameManager.Data.StatAbilities == null ||
+                GameManager.Data.StatAbilities.Count == 0)
+            {
+                Debug.LogWarning(
+                    "Stat ability data is empty. Reloading ability data before initializing PlayerAbilitySystem.");
+                GameManager.Data.ReloadAbilityData();
+            }
+
+            List<AbilityDataBase> sDatas = GameManager.Data.StatAbilities?.FindAll(
+                data => data != null) ?? new List<AbilityDataBase>();
+            List<AbilityDataBase> specialDatas = GameManager.Data.RuleAbilities?.FindAll(
+                data => data != null) ?? new List<AbilityDataBase>();
+
+            if (sDatas.Count == 0 || specialDatas.Count == 0)
+            {
+                throw new InvalidOperationException(
+                    $"Player ability initialization failed. Stat: {sDatas.Count}, Rule: {specialDatas.Count}");
+            }
 
             _statAbilityBag = CreateRankWeightedBag(sDatas);
             for (int i = 0; i < sDatas.Count; i++)

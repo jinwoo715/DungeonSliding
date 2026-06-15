@@ -1,6 +1,7 @@
 using JW.DungeonSliding.GamePlay;
 using JW.DungeonSliding.GamePlay.Ability;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -57,11 +58,7 @@ namespace JW.DungeonSliding.Core.Data
                 ContractResolver = new EmptyStringValueTypeResolver()
             };
 
-            StatAbilities = new List<AbilityDataBase>();
-            RuleStatAbilities = new List<AbilityDataBase>();
-            RuleAbilities = new List<AbilityDataBase>();
-
-            LoadAbilityData(settings);
+            ReloadAbilityData(settings);
 
             string enemyAbility = GameManager.Resource.GetTextData(ConstDataKey.ENEMY_ABILITY_DATA);
             var enemyAbilities = JsonConvert.DeserializeObject<List<EnemyAbilityData>>(enemyAbility, settings);
@@ -83,31 +80,71 @@ namespace JW.DungeonSliding.Core.Data
             Config = GameManager.Resource.GameConfig;
         }
 
-        private void LoadAbilityData(JsonSerializerSettings settings)
+        public void ReloadAbilityData()
         {
-            AbilityDatabaseSO abilityDatabase = GameManager.Resource.AbilityDatabase;
+            var settings = new JsonSerializerSettings
+            {
+                ContractResolver = new EmptyStringValueTypeResolver()
+            };
 
-            if (abilityDatabase != null && abilityDatabase.HasAnyAbilityData)
+            ReloadAbilityData(settings);
+        }
+
+        private void ReloadAbilityData(JsonSerializerSettings settings)
+        {
+            StatAbilities = new List<AbilityDataBase>();
+            RuleStatAbilities = new List<AbilityDataBase>();
+            RuleAbilities = new List<AbilityDataBase>();
+
+            AbilityDatabaseSO abilityDatabase = GameManager.Resource.AbilityDatabase;
+            List<AbilityDataBase> pureRuleAbilities = new List<AbilityDataBase>();
+
+            if (abilityDatabase != null)
             {
                 StatAbilities = abilityDatabase.CreateStatAbilityRuntimeData();
                 RuleStatAbilities = abilityDatabase.CreateRuleStatAbilityRuntimeData();
-                RuleAbilities = abilityDatabase.CreateRuleAbilityRuntimeData();
-                return;
+                pureRuleAbilities = abilityDatabase.CreatePureRuleAbilityRuntimeData();
             }
 
-            string rule = GameManager.Resource.GetTextData(ConstDataKey.RULE_ABILITY_DATA);
-            string ruleStat = GameManager.Resource.GetTextData(ConstDataKey.RULE_STAT_ABILITY_DATA);
-            string stat = GameManager.Resource.GetTextData(ConstDataKey.STAT_ABILITY_DATA);
-
-            if (!string.IsNullOrEmpty(ruleStat))
+            if (StatAbilities.Count == 0)
             {
-                var ruleStatAbilities = JsonConvert.DeserializeObject<List<RuleStatAbilityData>>(ruleStat, settings);
-                RuleStatAbilities.AddRange(ruleStatAbilities);
-                RuleAbilities.AddRange(ruleStatAbilities);
+                StatAbilities.AddRange(
+                    LoadAbilityJson<StatAbilityData>(ConstDataKey.STAT_ABILITY_DATA, settings));
             }
 
-            RuleAbilities.AddRange(JsonConvert.DeserializeObject<List<RuleAbilityData>>(rule, settings));
-            StatAbilities.AddRange(JsonConvert.DeserializeObject<List<StatAbilityData>>(stat, settings));
+            if (RuleStatAbilities.Count == 0)
+            {
+                RuleStatAbilities.AddRange(
+                    LoadAbilityJson<RuleStatAbilityData>(ConstDataKey.RULE_STAT_ABILITY_DATA, settings));
+            }
+
+            if (pureRuleAbilities.Count == 0)
+            {
+                pureRuleAbilities.AddRange(
+                    LoadAbilityJson<RuleAbilityData>(ConstDataKey.RULE_ABILITY_DATA, settings));
+            }
+
+            RuleAbilities.Clear();
+            RuleAbilities.AddRange(RuleStatAbilities);
+            RuleAbilities.AddRange(pureRuleAbilities);
+
+            if (StatAbilities.Count == 0 || RuleAbilities.Count == 0)
+            {
+                throw new InvalidOperationException(
+                    $"Ability data load failed. Stat: {StatAbilities.Count}, Rule: {RuleAbilities.Count}");
+            }
+
+            Debug.Log(
+                $"Ability data loaded. Stat: {StatAbilities.Count}, RuleStat: {RuleStatAbilities.Count}, Rule: {RuleAbilities.Count}");
+        }
+
+        private List<T> LoadAbilityJson<T>(string dataKey, JsonSerializerSettings settings)
+        {
+            string json = GameManager.Resource.GetTextData(dataKey);
+            if (string.IsNullOrWhiteSpace(json))
+                return new List<T>();
+
+            return JsonConvert.DeserializeObject<List<T>>(json, settings) ?? new List<T>();
         }
 
         public List<EnemyData> GetEnemyData() => EnemyData;

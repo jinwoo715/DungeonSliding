@@ -42,8 +42,8 @@ namespace JW.DungeonSliding
         }
         private void OnEnable()
         {
-            Init();
             SetNames();
+            Init();
         }
         private void Init()
         {
@@ -71,6 +71,8 @@ namespace JW.DungeonSliding
         }
         private void OnGUI()
         {
+            EnsureInitialized();
+
             UpdateAreaSize();
             DrawHeader();
 
@@ -88,6 +90,22 @@ namespace JW.DungeonSliding
             }
 
             _mapGridView.DrawGridWithOverlays(_sessionState.CretureTemplateIndex);
+        }
+        private void EnsureInitialized()
+        {
+            if (_effectTileNames == null || _tileNames == null || _editModeNames == null)
+                SetNames();
+
+            if (_mapEditState == null ||
+                _mapGridView == null ||
+                _sessionState == null ||
+                _playerService == null ||
+                _cretureService == null ||
+                _effectObjService == null ||
+                _mapDataSerializer == null)
+            {
+                Init();
+            }
         }
         private void UpdateAreaSize()
         {
@@ -142,27 +160,6 @@ namespace JW.DungeonSliding
             );
         }
 
-        int seed;
-        int wallAmount;
-        float fillAmount;
-        private void CreateRandomMap()
-        {
-            seed = EditorGUILayout.IntField(seed);
-
-            wallAmount = EditorGUILayout.IntField(wallAmount);
-            
-            fillAmount = EditorGUILayout.FloatField(fillAmount);
-
-            if (GUILayout.Button("∑£¥˝ ª˝º∫"))
-            {
-                MapData newdata = MapCreater.CreateMap(xCountField, zCountField, wallAmount, new MapCreater.Tile(0,2), new MapCreater.Tile(0,0));
-
-                _mapEditState.LoadFromMapData(newdata);
-
-                Repaint();
-            }
-        }
-
         private void DrawLoadMapField()
         {
             EditorGUILayout.LabelField("Load Map Asset");
@@ -172,11 +169,11 @@ namespace JW.DungeonSliding
                 false
             );
             
-            if (GUILayout.Button("∑ŒµÂ"))
+            if (GUILayout.Button("Î°úÎìú"))
             {
                 if (_loadedMapAsset != null)
                 {
-                    Debug.Log("∑ŒµÂ");
+                    Debug.Log("Î°úÎìú");
                     _mapEditState.LoadFromMapData(_loadedMapAsset);
                     xCountField = _loadedMapAsset.Width;
                     zCountField = _loadedMapAsset.Height;
@@ -203,7 +200,7 @@ namespace JW.DungeonSliding
                 fixedHeight = 30
             };
 
-            if (GUILayout.Button("≈∏¿œ ª˝º∫", buttonStyle))
+            if (GUILayout.Button("ÌÉÄÏùº ÏÉùÏÑ±", buttonStyle))
             {
                 _mapEditState.InitTileMap(xCountField, zCountField);
             }
@@ -238,7 +235,7 @@ namespace JW.DungeonSliding
             _sessionState.CretureTemplateIndex = GUILayout.SelectionGrid(
             _sessionState.CretureTemplateIndex,
             templeteNums,
-            1, // columns = 1 => ºº∑Œ∑Œ Ω◊¿”
+            1, // columns = 1 => ÏÑ∏Î°úÎ°ú ÏåìÏûÑ
             GUILayout.Height(30 * templeteNums.Length)
             );
 
@@ -270,7 +267,7 @@ namespace JW.DungeonSliding
             _sessionState.SelectedEffectType = (EEffectObjectType)GUILayout.SelectionGrid(
             (int)_sessionState.SelectedEffectType,
             _effectTileNames,
-            2, // columns = 1 => ºº∑Œ∑Œ Ω◊¿”
+            2, // columns = 1 => ÏÑ∏Î°úÎ°ú ÏåìÏûÑ
             GUILayout.Height(30 * _effectTileNames.Length / 2)
             );
 
@@ -302,7 +299,7 @@ namespace JW.DungeonSliding
         private void BeginFixedWidthBox()
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Width(_mapEditState._dataFieldWidth));
-            EditorGUILayout.BeginVertical(); // °Á ø©±‚º≠ Width ¡¶∞≈
+            EditorGUILayout.BeginVertical(); // ‚Üê Ïó¨Í∏∞ÏÑú Width Ï†úÍ±∞
         }
         private void EndFixedWidthBox()
         {

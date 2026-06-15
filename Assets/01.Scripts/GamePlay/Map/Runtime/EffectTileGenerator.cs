@@ -36,6 +36,7 @@ namespace JW.DungeonSliding.Map
             {
                 ReturnEffectObject(_activeEffectObject[i]);
             }
+            _activeEffectObject.Clear();
         }
 
         public EffectObjectBase GetEffectObject(EEffectObjectType effectObjectType)

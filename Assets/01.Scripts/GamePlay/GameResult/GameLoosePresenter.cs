@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace JW.DungeonSliding
 {
-    public class GameLoosePresenter : MonoBehaviour
+    public class GameLoosePresenter
     {
         private GameResultViewer _viewer;
 
